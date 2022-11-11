@@ -2,6 +2,8 @@
 
 namespace Quatrevieux\Form\Instantiator;
 
+use TypeError;
+
 /**
  * @template T as object
  * @implements InstantiatorInterface<T>
@@ -34,7 +36,12 @@ final class PublicPropertyInstantiator implements InstantiatorInterface
         $object = new $className();
 
         foreach ($fields as $name => $value) {
-            $object->$name = $value;
+            // @todo in case of default value ?
+            try {
+                $object->$name = $value;
+            } catch (TypeError $e) {
+                // Ignore type error : can occur when trying to set null on a non-nullable property
+            }
         }
 
         return $object;

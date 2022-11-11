@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form;
 
 use Quatrevieux\Form\Instantiator\InstantiatorInterface;
+use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Validator\ValidatorInterface;
 
 /**
@@ -12,6 +13,11 @@ use Quatrevieux\Form\Validator\ValidatorInterface;
 final class Form implements FormInterface
 {
     public function __construct(
+        /**
+         * @var FormTransformerInterface
+         */
+        private readonly FormTransformerInterface $transformer,
+
         /**
          * @var InstantiatorInterface<T>
          */
@@ -29,6 +35,7 @@ final class Form implements FormInterface
      */
     public function submit(array $data): SubmittedFormInterface
     {
+        $data = $this->transformer->transformFromHttp($data);
         $dto = $this->instantiator->instantiate($data);
         $errors = $this->validator->validate($dto);
 

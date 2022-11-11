@@ -35,7 +35,7 @@ final class PublicPropertyInstantiatorGenerator implements InstantiatorTypeGener
         $classReflection = new ReflectionClass($instantiator->className());
 
         foreach ($classReflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            if (!$property->getType() || $property->getType()->allowsNull()) {
+            if (!$property->getType() || $property->getType()->allowsNull()) { // @todo in case of default value ?
                 $class->addInstantiateBody('$object->? = $fields[?] \?\? null;', [$property->name, $property->name]);
             } else {
                 $tmpVarname = '___tmp' . bin2hex(random_bytes(8));

@@ -5,6 +5,7 @@ namespace Quatrevieux\Form;
 use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\Fixtures\RequiredParametersRequest;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
+use Quatrevieux\Form\Fixtures\WithTransformerRequest;
 use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
 use Quatrevieux\Form\Validator\Constraint\ContainerConstraintValidatorRegistry;
 use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
@@ -61,6 +62,26 @@ class FunctionalTest extends FormTestCase
         $this->assertSame(3, $submitted->value()->foo);
         $this->assertSame('aaa', $submitted->value()->bar);
         $this->assertEmpty($submitted->errors());
+    }
+
+    public function test_submit_with_incompatible_data_type_should_be_filtered()
+    {
+        $form = $this->form(SimpleRequest::class);
+
+        $submitted = $form->submit(['foo' => ['bar'], 'bar' => new \stdClass()]);
+
+        $this->assertNull($submitted->value()->foo);
+        $this->assertNull($submitted->value()->bar);
+    }
+
+    public function test_with_transformer()
+    {
+        $form = $this->form(WithTransformerRequest::class);
+
+        $submitted = $form->submit(['list' => 'foo,bar,baz']);
+
+        $this->assertTrue($submitted->valid());
+        $this->assertSame(['foo', 'bar', 'baz'], $submitted->value()->list);
     }
 
     public function form(string $dataClass): FormInterface
