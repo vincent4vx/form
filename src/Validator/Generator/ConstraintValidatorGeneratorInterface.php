@@ -1,0 +1,29 @@
+<?php
+
+namespace Quatrevieux\Form\Validator\Generator;
+
+use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
+use Quatrevieux\Form\Validator\ValidatorInterface;
+
+/**
+ * Type for constraint validator expression generator
+ * This interface should be implemented by {@see ValidatorInterface} class
+ *
+ * @template C as ConstraintInterface
+ */
+interface ConstraintValidatorGeneratorInterface
+{
+    /**
+     * Generate the validator expression.
+     * This expression must return a FieldError or null value
+     *
+     * Ex: A constraint which validate that the value contains only alpha chars will generate an expression like :
+     * '!is_string($data->foo ?? null) || !ctype_alpha($data->foo ?? null) ? new FieldError("my error message") : null'
+     *
+     * @param C $constraint Constraint instance
+     * @param string $fieldAccessor PHP expression use to access to the field value. Ex: '($data->foo ?? null)'
+     *
+     * @return string PHP expression
+     */
+    public function generate(ConstraintInterface $constraint, string $fieldAccessor): string;
+}

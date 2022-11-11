@@ -1,0 +1,79 @@
+<?php
+
+namespace Quatrevieux\Form\Instantiator\Generator;
+
+use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Literal;
+use Nette\PhpGenerator\Method;
+use Nette\PhpGenerator\PhpFile;
+use Nette\PhpGenerator\PsrPrinter;
+use Quatrevieux\Form\Instantiator\InstantiatorInterface;
+
+/**
+ * Class generator helper for generates {@see InstantiatorInterface} class
+ */
+final class InstantiatorClass
+{
+    public readonly PhpFile $file;
+    public readonly ClassType $class;
+    public readonly Method $classNameMethod;
+    public readonly Method $instantiateMethod;
+
+    /**
+     * @param string $className Class name of the generated Instantiator class
+     */
+    public function __construct(string $className)
+    {
+        $this->file = new PhpFile();
+        $this->class = $this->file->addClass($className);
+
+        $this->classNameMethod = Method::from([InstantiatorInterface::class, 'className']);
+        $this->instantiateMethod = Method::from([InstantiatorInterface::class, 'instantiate']);
+
+        $this->class->addImplement(InstantiatorInterface::class);
+        $this->class->addMember($this->classNameMethod);
+        $this->class->addMember($this->instantiateMethod);
+    }
+
+    /**
+     * Define the class name of the DTO handled by the generated instantiator
+     * Will generate method :
+     *
+     * public function className(): string
+     * {
+     *     return MyDtoClassName::class;
+     * }
+     *
+     * @param class-string $className DTO FQCN
+     * @return void
+     */
+    public function setClassName(string $className): void
+    {
+        $this->classNameMethod->setBody('return ?::class;', [new Literal($className)]);
+    }
+
+    /**
+     * Add code to the `instantiate()` method body
+     *
+     * @param string $code Line of code to add. Use ? as placeholder.
+     * @param list<mixed>|null $args Placeholder parameters. Use `new Litteral()` to ignore autoformatting strings.
+     *
+     * @return void
+     *
+     * @see Method::addBody() Method call internally
+     */
+    public function addInstantiateBody(string $code, ?array $args = null): void
+    {
+        $this->instantiateMethod->addBody($code, $args);
+    }
+
+    /**
+     * Dump PHP code of the class
+     *
+     * @return string
+     */
+    public function code(): string
+    {
+        return (new PsrPrinter())->printFile($this->file);
+    }
+}
