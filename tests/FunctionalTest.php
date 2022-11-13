@@ -84,6 +84,29 @@ class FunctionalTest extends FormTestCase
         $this->assertSame(['foo', 'bar', 'baz'], $submitted->value()->list);
     }
 
+    public function test_import_simple()
+    {
+        $request = new SimpleRequest();
+        $request->foo = 'aaa';
+        $request->bar = 'bbb';
+
+        $imported = $this->form(SimpleRequest::class)->import($request);
+
+        $this->assertSame($request, $imported->value());
+        $this->assertSame(['foo' => 'aaa', 'bar' => 'bbb'], $imported->httpValue());
+    }
+
+    public function test_import_with_transformer()
+    {
+        $request = new WithTransformerRequest();
+        $request->list = ['a"aa', 'b,bb', 'ccc'];
+
+        $imported = $this->form(WithTransformerRequest::class)->import($request);
+
+        $this->assertSame($request, $imported->value());
+        $this->assertSame(['list' => '"a""aa","b,bb",ccc'], $imported->httpValue());
+    }
+
     public function form(string $dataClass): FormInterface
     {
         return $this->runtimeForm($dataClass);

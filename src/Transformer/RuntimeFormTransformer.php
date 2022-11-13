@@ -42,7 +42,27 @@ final class RuntimeFormTransformer implements FormTransformerInterface
      */
     public function transformToHttp(array $value): array
     {
-        // @todo
-        return $value;
+        $normalized = [];
+
+        foreach ($this->fieldsTransformers as $fieldName => $transformers) {
+            $fieldValue = $value[$fieldName] ?? null;
+
+            /** @var FieldTransformerInterface $transformer */
+            foreach (array_reverse($transformers) as $transformer) {
+                $fieldValue = $transformer->transformToHttp($fieldValue);
+            }
+
+            $normalized[$fieldName] = $fieldValue;
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @return array<string, list<FieldTransformerInterface>>
+     */
+    public function getFieldsTransformers(): array
+    {
+        return $this->fieldsTransformers;
     }
 }

@@ -41,4 +41,15 @@ final class Form implements FormInterface
 
         return new SubmittedForm($dto, $errors);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function import(object $data): ImportedFormInterface
+    {
+        return new ImportedForm(
+            $data,
+            $this->transformer->transformToHttp($this->instantiator->export($data))
+        );
+    }
 }

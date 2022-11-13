@@ -38,6 +38,15 @@ class InstantiatorTestGenerateSimple implements Quatrevieux\Form\Instantiator\In
         $object->bar = $fields['bar'] ?? null;
         return $object;
     }
+
+    /**
+     * @param T $data
+     * @return array
+     */
+    function export(object $data): array
+    {
+        return get_object_vars($data);
+    }
 }
 
 PHP

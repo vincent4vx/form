@@ -6,6 +6,6 @@ use Quatrevieux\Form\Transformer\Field\Csv;
 
 class WithTransformerRequest
 {
-    #[Csv]
+    #[Csv(enclosure: '"')]
     public array $list;
 }

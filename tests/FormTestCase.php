@@ -5,6 +5,7 @@ namespace Quatrevieux\Form;
 use FilesystemIterator;
 use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
+use Quatrevieux\Form\Transformer\GeneratedFormTransformerFactory;
 use Quatrevieux\Form\Validator\Constraint\ContainerConstraintValidatorRegistry;
 use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
@@ -32,12 +33,16 @@ class FormTestCase extends TestCase
                 generator: new ValidatorGenerator($validatorRegistry),
                 validatorRegistry: $validatorRegistry,
                 savePathResolver: $savePathResolver,
+            ),
+            new GeneratedFormTransformerFactory(
+                savePathResolver: $savePathResolver
             )
         );
     }
 
     protected function tearDown(): void
     {
+        //return;
         if (!is_dir(self::GENERATED_DIR)) {
             return;
         }

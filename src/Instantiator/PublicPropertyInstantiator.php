@@ -46,4 +46,12 @@ final class PublicPropertyInstantiator implements InstantiatorInterface
 
         return $object;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function export(object $data): array
+    {
+        return get_object_vars($data);
+    }
 }

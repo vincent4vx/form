@@ -4,6 +4,8 @@ namespace Quatrevieux\Form;
 
 /**
  * Factory for creates forms
+ *
+ * @todo import method ? call both create and import
  */
 interface FormFactoryInterface
 {

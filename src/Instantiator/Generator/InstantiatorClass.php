@@ -18,6 +18,7 @@ final class InstantiatorClass
     public readonly ClassType $class;
     public readonly Method $classNameMethod;
     public readonly Method $instantiateMethod;
+    public readonly Method $exportMethod;
 
     /**
      * @param string $className Class name of the generated Instantiator class
@@ -29,10 +30,12 @@ final class InstantiatorClass
 
         $this->classNameMethod = Method::from([InstantiatorInterface::class, 'className']);
         $this->instantiateMethod = Method::from([InstantiatorInterface::class, 'instantiate']);
+        $this->exportMethod = Method::from([InstantiatorInterface::class, 'export']);
 
         $this->class->addImplement(InstantiatorInterface::class);
         $this->class->addMember($this->classNameMethod);
         $this->class->addMember($this->instantiateMethod);
+        $this->class->addMember($this->exportMethod);
     }
 
     /**
@@ -65,6 +68,21 @@ final class InstantiatorClass
     public function addInstantiateBody(string $code, ?array $args = null): void
     {
         $this->instantiateMethod->addBody($code, $args);
+    }
+
+    /**
+     * Add code to the `export()` method body
+     *
+     * @param string $code Line of code to add. Use ? as placeholder.
+     * @param list<mixed>|null $args Placeholder parameters. Use `new Litteral()` to ignore autoformatting strings.
+     *
+     * @return void
+     *
+     * @see Method::addBody() Method call internally
+     */
+    public function addExportBody(string $code, ?array $args = null): void
+    {
+        $this->exportMethod->addBody($code, $args);
     }
 
     /**

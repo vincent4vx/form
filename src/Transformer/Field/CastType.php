@@ -6,6 +6,10 @@ use ReflectionNamedType;
 use ReflectionType;
 use Stringable;
 
+/**
+ * Available cast types
+ * To disable cast, use Mixed
+ */
 enum CastType
 {
     case Int;
@@ -44,6 +48,29 @@ enum CastType
     }
 
     /**
+     * Generate PHP expression for perform cast of the value to the matching type
+     * Generated code will behave same as {@see CastType::cast()}
+     *
+     * @param string $expressionToCast PHP expression to cast
+     *
+     * @return string Cast expression code
+     */
+    public function generateCastExpression(string $expressionToCast): string
+    {
+        $tmpVarName = '$__tmp_' . md5($expressionToCast);
+
+        return match ($this) {
+            self::Int => "(is_scalar($tmpVarName = $expressionToCast) ? (int) $tmpVarName : null)",
+            self::Float => "(is_scalar($tmpVarName = $expressionToCast) ? (float) $tmpVarName : null)",
+            self::String => "(is_scalar($tmpVarName = $expressionToCast) || $tmpVarName instanceof \Stringable ? (string) $tmpVarName : null)",
+            self::Bool => "(is_scalar($tmpVarName = $expressionToCast) ? (bool) $tmpVarName : null)",
+            self::Object => "(($tmpVarName = $expressionToCast) !== null ? (object) $tmpVarName : null)",
+            self::Array => "(($tmpVarName = $expressionToCast) !== null ? (array) $tmpVarName : null)",
+            self::Mixed => $expressionToCast,
+        };
+    }
+
+    /**
      * Get CastType enum value corresponding to declared ReflectionType
      * Will return `CastType::Mixed` is type cannot be resolved
      *
@@ -61,7 +88,7 @@ enum CastType
             'string' => self::String,
             'int' => self::Int,
             'float' => self::Float,
-            'boolean' => self::Bool,
+            'bool' => self::Bool,
             'array' => self::Array,
             'object' => self::Object,
             default => self::Mixed,

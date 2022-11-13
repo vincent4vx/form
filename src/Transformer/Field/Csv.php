@@ -3,14 +3,19 @@
 namespace Quatrevieux\Form\Transformer\Field;
 
 use Attribute;
+use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 
+/**
+ * Implementation of RFC-4180 CSV format
+ *
+ * @see https://www.rfc-editor.org/rfc/rfc4180
+ */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Csv implements FieldTransformerInterface
+final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorInterface
 {
     public function __construct(
         private readonly string $separator = ',',
         private readonly string $enclosure = '',
-        private readonly string $escape = '\\',
     ) {
     }
 
@@ -23,7 +28,7 @@ final class Csv implements FieldTransformerInterface
             return null;
         }
 
-        return str_getcsv($value, $this->separator, $this->enclosure, $this->escape);
+        return str_getcsv($value, $this->separator, $this->enclosure, '');
     }
 
     /**
@@ -31,6 +36,75 @@ final class Csv implements FieldTransformerInterface
      */
     public function transformToHttp(mixed $value): mixed
     {
-        // TODO: Implement transformToHttp() method.
+        if (!is_array($value)) {
+            return null;
+        }
+
+        if (!$this->enclosure) {
+            return implode($this->separator, $value);
+        }
+
+        return self::toCsv($value, $this->separator, $this->enclosure);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param Csv $transformer
+     */
+    public function generateTransformFromHttp(FieldTransformerInterface $transformer, string $previousExpression): string
+    {
+        $expressionVarName = '$__tmp_' . md5($previousExpression);
+        $separator = var_export($transformer->separator, true);
+        $enclosure = var_export($transformer->enclosure, true);
+
+        return "(is_string($expressionVarName = $previousExpression) ? str_getcsv($expressionVarName, $separator, $enclosure, '') : null)";
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param Csv $transformer
+     */
+    public function generateTransformToHttp(FieldTransformerInterface $transformer, string $previousExpression): string
+    {
+        $expressionVarName = '$__tmp_' . md5($previousExpression);
+        $separator = var_export($transformer->separator, true);
+
+        if ($transformer->enclosure) {
+            $enclosure = var_export($transformer->enclosure, true);
+            $expression = '\\' . self::class . '::toCsv(' . $expressionVarName . ', ' . $separator . ', ' . $enclosure . ')';
+        } else {
+            $expression = "implode($separator, $expressionVarName)";
+        }
+
+        return "(is_array($expressionVarName = $previousExpression) ? $expression : null)";
+    }
+
+    /**
+     * Create CSV with enclosure from array
+     *
+     * @internal Used by generated transformer
+     */
+    public static function toCsv(array $fields, string $separator, string $enclosure): string
+    {
+        $csv = '';
+
+        foreach ($fields as $item) {
+            if ($csv) {
+                $csv .= $separator;
+            }
+
+            $shouldBeEnclosed = str_contains($item, PHP_EOL) || str_contains($item, $separator) || str_contains($item, $enclosure);
+            $item = str_replace($enclosure, $enclosure . $enclosure, $item);
+
+            if ($shouldBeEnclosed) {
+                $csv .= $enclosure . $item . $enclosure;
+            } else {
+                $csv .= $item;
+            }
+        }
+
+        return $csv;
     }
 }

@@ -15,4 +15,10 @@ interface FormInterface
      * @return SubmittedFormInterface<T>
      */
     public function submit(array $data): SubmittedFormInterface;
+
+    /**
+     * @param T $data
+     * @return ImportedFormInterface<T>
+     */
+    public function import(object $data): ImportedFormInterface;
 }

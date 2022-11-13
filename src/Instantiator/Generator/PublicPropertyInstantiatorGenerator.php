@@ -51,5 +51,6 @@ final class PublicPropertyInstantiatorGenerator implements InstantiatorTypeGener
         }
 
         $class->addInstantiateBody('return $object;');
+        $class->addExportBody('return get_object_vars($data);');
     }
 }
