@@ -2,15 +2,14 @@
 
 namespace Quatrevieux\Form;
 
-use PHPUnit\Framework\TestCase;
+use Quatrevieux\Form\Fixtures\ConfiguredLengthValidator;
+use Quatrevieux\Form\Fixtures\FooImplementation;
 use Quatrevieux\Form\Fixtures\RequiredParametersRequest;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
+use Quatrevieux\Form\Fixtures\TestConfig;
+use Quatrevieux\Form\Fixtures\WithExternalDependencyConstraintRequest;
+use Quatrevieux\Form\Fixtures\WithExternalDependencyTransformerRequest;
 use Quatrevieux\Form\Fixtures\WithTransformerRequest;
-use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
-use Quatrevieux\Form\Validator\Constraint\ContainerConstraintValidatorRegistry;
-use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
-use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
-use Quatrevieux\Form\Validator\RuntimeValidatorFactory;
 
 class FunctionalTest extends FormTestCase
 {
@@ -105,6 +104,32 @@ class FunctionalTest extends FormTestCase
 
         $this->assertSame($request, $imported->value());
         $this->assertSame(['list' => '"a""aa","b,bb",ccc'], $imported->httpValue());
+    }
+
+    public function test_with_transformer_with_dependencies()
+    {
+        $this->container->set(FooImplementation::class, new FooImplementation('zsx'));
+
+        $submitted = $this->form(WithExternalDependencyTransformerRequest::class)->submit(['foo' => 'bar']);
+
+        $this->assertSame('zsxbaraqw', $submitted->value()->foo);
+    }
+
+    public function test_with_constraint_with_dependencies()
+    {
+        $this->container->set(TestConfig::class, new TestConfig(['foo.length' => 5]));
+        $this->container->set(ConfiguredLengthValidator::class, new ConfiguredLengthValidator($this->container->get(TestConfig::class)));
+
+        $submitted = $this->form(WithExternalDependencyConstraintRequest::class)->submit(['foo' => 'bar']);
+
+        $this->assertTrue($submitted->valid());
+        $this->assertSame('bar', $submitted->value()->foo);
+
+        $submitted = $this->form(WithExternalDependencyConstraintRequest::class)->submit(['foo' => 'barbaz']);
+
+        $this->assertFalse($submitted->valid());
+        $this->assertSame('barbaz', $submitted->value()->foo);
+        $this->assertEquals('Invalid length', $submitted->errors()['foo']);
     }
 
     public function form(string $dataClass): FormInterface

@@ -4,9 +4,10 @@ namespace Quatrevieux\Form;
 
 use FilesystemIterator;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
 use Quatrevieux\Form\Transformer\GeneratedFormTransformerFactory;
-use Quatrevieux\Form\Validator\Constraint\ContainerConstraintValidatorRegistry;
+use Quatrevieux\Form\Transformer\RuntimeFormTransformerFactory;
 use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 use Quatrevieux\Form\Validator\RuntimeValidatorFactory;
@@ -19,22 +20,30 @@ class FormTestCase extends TestCase
 
     protected FormFactoryInterface $runtimeFormFactory;
     protected FormFactoryInterface $generatedFormFactory;
+    protected ArrayContainer $container;
 
     protected function setUp(): void
     {
-        $this->runtimeFormFactory = new DefaultFormFactory();
+        $this->container = new ArrayContainer();
+        $registry = new ContainerRegistry($this->container);
+
+        $this->runtimeFormFactory = new DefaultFormFactory(
+            validatorFactory: new RuntimeValidatorFactory($registry),
+            transformerFactory: new RuntimeFormTransformerFactory($registry),
+        );
 
         $savePathResolver = fn (string $class) => self::GENERATED_DIR . '/' . str_replace('\\', '_', $class) . '.php';
 
         $this->generatedFormFactory = new DefaultFormFactory(
             new GeneratedInstantiatorFactory(savePathResolver: $savePathResolver),
             new GeneratedValidatorFactory(
-                factory: new RuntimeValidatorFactory($validatorRegistry = new ContainerConstraintValidatorRegistry()),
-                generator: new ValidatorGenerator($validatorRegistry),
-                validatorRegistry: $validatorRegistry,
+                factory: new RuntimeValidatorFactory($registry),
+                generator: new ValidatorGenerator($registry),
+                validatorRegistry: $registry,
                 savePathResolver: $savePathResolver,
             ),
             new GeneratedFormTransformerFactory(
+                registry: $registry,
                 savePathResolver: $savePathResolver
             )
         );
@@ -42,7 +51,6 @@ class FormTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        //return;
         if (!is_dir(self::GENERATED_DIR)) {
             return;
         }
@@ -53,8 +61,7 @@ class FormTestCase extends TestCase
         );
 
         /** @var \SplFileInfo $fileinfo */
-        foreach($files as $fileinfo)
-        {
+        foreach($files as $fileinfo) {
             if ($fileinfo->isDir()) {
                 rmdir($fileinfo->getRealPath());
             } else {
@@ -86,5 +93,25 @@ class FormTestCase extends TestCase
 
         $this->assertFileExists($baseName . 'Instantiator.php');
         $this->assertFileExists($baseName . 'Validator.php');
+    }
+}
+
+class ArrayContainer implements ContainerInterface
+{
+    public array $services = [];
+
+    public function get(string $id)
+    {
+        return $this->services[$id];
+    }
+
+    public function has(string $id): bool
+    {
+        return isset($this->services);
+    }
+
+    public function set(string $id, $service): void
+    {
+        $this->services[$id] = $service;
     }
 }

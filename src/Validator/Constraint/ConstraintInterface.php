@@ -15,6 +15,8 @@ interface ConstraintInterface
      * @param ConstraintValidatorRegistryInterface $registry
      *
      * @return ConstraintValidatorInterface<static>
+     *
+     * @see ConstraintValidatorRegistryInterface::getValidator()
      */
     public function getValidator(ConstraintValidatorRegistryInterface $registry): ConstraintValidatorInterface;
 }

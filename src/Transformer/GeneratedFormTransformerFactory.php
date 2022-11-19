@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Transformer;
 
 use Closure;
+use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 
 /**
@@ -37,6 +38,7 @@ final class GeneratedFormTransformerFactory implements FormTransformerFactoryInt
      * @var FormTransformerGenerator
      */
     private readonly FormTransformerGenerator $generator;
+    private FieldTransformerRegistryInterface $registry;
 
     /**
      * @param (Closure(string):string)|null $savePathResolver Resolve instatiator class file path using instantiator class name as parameter. By default, save into `sys_get_temp_dir()`
@@ -44,13 +46,14 @@ final class GeneratedFormTransformerFactory implements FormTransformerFactoryInt
      * @param FormTransformerFactoryInterface|null $factory Fallback instantiator factory.
      * @param FormTransformerGenerator|null $generator Code generator instance.
      */
-    public function __construct(?Closure $savePathResolver = null, ?Closure $classNameGenerator = null, ?FormTransformerFactoryInterface $factory = null, ?FormTransformerGenerator $generator = null)
+    public function __construct(FieldTransformerRegistryInterface $registry, ?FormTransformerFactoryInterface $factory = null, ?FormTransformerGenerator $generator = null, ?Closure $savePathResolver = null, ?Closure $classNameGenerator = null)
     {
         // @todo factoriser les closures par défaut
         $this->savePathResolver = $savePathResolver ?? fn (string $className) => sys_get_temp_dir() . DIRECTORY_SEPARATOR . str_replace('\\', '_', $className) . '.php';
         $this->classNameGenerator = $classNameGenerator ?? fn (string $dataClassName) => str_replace('\\', '_', $dataClassName) . 'Transformer';
-        $this->factory = $factory ?? new RuntimeFormTransformerFactory();
+        $this->factory = $factory ?? new RuntimeFormTransformerFactory($registry);
         $this->generator = $generator ?? new FormTransformerGenerator();
+        $this->registry = $registry;
     }
 
     /**
@@ -104,7 +107,7 @@ final class GeneratedFormTransformerFactory implements FormTransformerFactoryInt
     private function instantiate(string $transformerClass): ?FormTransformerInterface
     {
         if (class_exists($transformerClass, false) && is_subclass_of($transformerClass, FormTransformerInterface::class)) {
-            return new $transformerClass();
+            return new $transformerClass($this->registry);
         }
 
         return null;

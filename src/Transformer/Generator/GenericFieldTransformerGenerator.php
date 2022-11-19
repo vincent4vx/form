@@ -5,7 +5,16 @@ namespace Quatrevieux\Form\Transformer\Generator;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use ReflectionClass;
 
-class GenericFieldTransformerGenerator implements FieldTransformerGeneratorInterface
+/**
+ * Transformer generator used by default, when there is no available generator for the given transformer
+ *
+ * This generator will simply inline transformer instantiation, and call corresponding transformation method.
+ * To instantiate transformer, promoted property will be used.
+ *
+ * Generated code example:
+ * `(new MyTransformer(foo: "bar"))->transformFormHttp($data['foo'] ?? null)`
+ */
+final class GenericFieldTransformerGenerator implements FieldTransformerGeneratorInterface
 {
     /**
      * {@inheritdoc}

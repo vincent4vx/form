@@ -4,10 +4,10 @@ namespace Quatrevieux\Form\Transformer\Generator;
 
 use Closure;
 use Nette\PhpGenerator\ClassType;
-use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
+use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 
 /**
@@ -37,15 +37,32 @@ final class FormTransformerClass
         $this->class->addImplement(FormTransformerInterface::class);
         $this->class->addMember($this->fromHttpMethod);
         $this->class->addMember($this->toHttpMethod);
+
+        $this->class->addMethod('__construct')
+            ->addPromotedParameter('registry')
+            ->setPrivate()
+            ->setType(FieldTransformerRegistryInterface::class)
+        ;
     }
 
-    // @todo handle complex expression with inner method
+    /**
+     * Add new field transformer expressions for both from and to http
+     *
+     * @param string $fieldName DTO property name
+     * @param Closure(string):string $fromHttpExpression Generator of transformFromHttp expression. Takes as parameter the previous expression or HTTP field value
+     * @param Closure(string):string $toHttpExpression Generator of transformToHttp expression. Takes as parameter the previous expression or DTO property value
+     *
+     * @return void
+     */
     public function addFieldTransformationExpression(string $fieldName, Closure $fromHttpExpression, Closure $toHttpExpression): void
     {
         $this->fromHttpFieldsTransformationExpressions[$fieldName][] = $fromHttpExpression;
         $this->toHttpFieldsTransformationExpressions[$fieldName][] = $toHttpExpression;
     }
 
+    /**
+     * Generate the {@see FormTransformerInterface::transformFromHttp()} method body
+     */
     public function generateFromHttp(): void
     {
         $code = 'return [' . PHP_EOL;
@@ -66,6 +83,9 @@ final class FormTransformerClass
         $this->fromHttpMethod->addBody($code);
     }
 
+    /**
+     * Generate the {@see FormTransformerInterface::transformToHttp()} method body
+     */
     public function generateToHttp(): void
     {
         $code = 'return [' . PHP_EOL;
