@@ -17,7 +17,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Quatrevieux\\Form\\": "tests/"
+            "Quatrevieux\\Form\\": "tests/",
+            "Bench\\": "bench/"
         },
         "classmap": ["tests/Fixtures"]
     },
@@ -28,6 +29,9 @@
     },
     "require-dev": {
         "phpunit/phpunit": "~9.5",
-        "vimeo/psalm": "~4.29"
+        "vimeo/psalm": "~4.29",
+        "phpbench/phpbench": "^1.2",
+        "symfony/form": "^6.1",
+        "symfony/validator": "^6.1"
     }
 }
