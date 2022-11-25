@@ -63,8 +63,8 @@ final class GeneratedValidatorFactory implements ValidatorFactoryInterface
     {
         $className = $this->resolveClassName($dataClass);
 
-        if ($instantiator = $this->instantiate($className)) {
-            return $instantiator;
+        if ($validator = $this->instantiate($className)) {
+            return $validator;
         }
 
         $fileName = ($this->savePathResolver)($className);
@@ -72,13 +72,13 @@ final class GeneratedValidatorFactory implements ValidatorFactoryInterface
         if (is_file($fileName)) {
             require_once $fileName;
 
-            if ($instantiator = $this->instantiate($className)) {
-                return $instantiator;
+            if ($validator = $this->instantiate($className)) {
+                return $validator;
             }
         }
 
-        $instantiator = $this->factory->create($dataClass);
-        $code = $this->generator->generate($className, $instantiator, $this);
+        $validator = $this->factory->create($dataClass);
+        $code = $this->generator->generate($className, $validator);
 
         if ($code) {
             if (!is_dir(dirname($fileName))) {
@@ -88,7 +88,7 @@ final class GeneratedValidatorFactory implements ValidatorFactoryInterface
             file_put_contents($fileName, $code);
         }
 
-        return $instantiator;
+        return $validator;
     }
 
     /**

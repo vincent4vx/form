@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form;
 
+use Psr\Container\ContainerInterface;
 use Quatrevieux\Form\Instantiator\InstantiatorFactoryInterface;
 use Quatrevieux\Form\Instantiator\RuntimeInstantiatorFactory;
 use Quatrevieux\Form\Transformer\Field\NullFieldTransformerRegistry;
@@ -34,6 +35,24 @@ final class DefaultFormFactory implements FormFactoryInterface
             $this->transformerFactory->create($dataClass),
             $this->instantiatorFactory->create($dataClass),
             $this->validatorFactory->create($dataClass),
+        );
+    }
+
+    /**
+     * Create DefaultFormFactory using runtime factories and PSR-11 container for registries
+     *
+     * @param ContainerInterface $container PSR-11 container instance containing validators and transformers
+     *
+     * @return DefaultFormFactory
+     */
+    public static function runtime(ContainerInterface $container): DefaultFormFactory
+    {
+        $registry = new ContainerRegistry($container);
+
+        return new DefaultFormFactory(
+            new RuntimeInstantiatorFactory(),
+            new RuntimeValidatorFactory($registry),
+            new RuntimeFormTransformerFactory($registry)
         );
     }
 }

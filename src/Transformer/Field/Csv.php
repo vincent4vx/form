@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\Transformer\Field;
 
 use Attribute;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
+use Quatrevieux\Form\Util\Code;
 
 /**
  * Implementation of RFC-4180 CSV format
@@ -54,7 +55,7 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
      */
     public function generateTransformFromHttp(FieldTransformerInterface $transformer, string $previousExpression): string
     {
-        $expressionVarName = '$__tmp_' . md5($previousExpression);
+        $expressionVarName = Code::varName($previousExpression);
         $separator = var_export($transformer->separator, true);
         $enclosure = var_export($transformer->enclosure, true);
 
@@ -68,7 +69,7 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
      */
     public function generateTransformToHttp(FieldTransformerInterface $transformer, string $previousExpression): string
     {
-        $expressionVarName = '$__tmp_' . md5($previousExpression);
+        $expressionVarName = Code::varName($previousExpression);
         $separator = var_export($transformer->separator, true);
 
         if ($transformer->enclosure) {

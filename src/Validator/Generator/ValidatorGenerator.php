@@ -7,16 +7,29 @@ use Quatrevieux\Form\Instantiator\InstantiatorInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
 use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
 use Quatrevieux\Form\Validator\RuntimeValidator;
+use Quatrevieux\Form\Validator\ValidatorInterface;
 
+/**
+ * Generator of {@see ValidatorInterface} implementation
+ */
 final class ValidatorGenerator
 {
     public function __construct(
         private readonly ConstraintValidatorRegistryInterface $validatorRegistry,
+        private readonly ConstraintValidatorGeneratorInterface $genericValidatorGenerator = new GenericValidatorGenerator(),
     ) {
 
     }
 
-    public function generate(string $className, RuntimeValidator $validator, GeneratedValidatorFactory $factory): string
+    /**
+     * Generates the class implementation of {@see ValidatorInterface} following constrains stored into given validator
+     *
+     * @param string $className Class name of the validator class to generate
+     * @param RuntimeValidator $validator Validator containing constraints to generate
+     *
+     * @return string PHP file code
+     */
+    public function generate(string $className, RuntimeValidator $validator): string
     {
         $classHelper = new ValidatorClass($className);
 
@@ -25,7 +38,7 @@ final class ValidatorGenerator
                 $generator = $constraint->getValidator($this->validatorRegistry);
 
                 if (!$generator instanceof ConstraintValidatorGeneratorInterface) {
-                    $generator = new GenericValidatorGenerator(); // @todo keep instance
+                    $generator = $this->genericValidatorGenerator;
                 }
 
                 $classHelper->addConstraintCode($field, $generator->generate($constraint, '($data->' . $field . ' ?? null)'));

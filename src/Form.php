@@ -7,6 +7,8 @@ use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Validator\ValidatorInterface;
 
 /**
+ * Base form implementation
+ *
  * @template T as object
  * @implements FormInterface<T>
  */

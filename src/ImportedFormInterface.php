@@ -2,8 +2,6 @@
 
 namespace Quatrevieux\Form;
 
-use Quatrevieux\Form\Validator\FieldError;
-
 /**
  * @template T as object
  */

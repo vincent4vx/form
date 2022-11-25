@@ -44,11 +44,23 @@ final class ValidatorClass
         ;
     }
 
+    /**
+     * Add a new constraint validator expression on the given field
+     * All constraints will be applied successively, on validation will be stopped on first error
+     *
+     * @param string $fieldName Name of the field to validate
+     * @param string $errorExpression Validation expression in PHP. This expression must return a FieldError object on error, or null on success
+     *
+     * @todo use closure instead of string for expression
+     */
     public function addConstraintCode(string $fieldName, string $errorExpression): void
     {
         $this->fieldsConstraintsExpressions[$fieldName][] = $errorExpression;
     }
 
+    /**
+     * Generates the body method of {@see ValidatorInterface::validate()}
+     */
     public function generate(): void
     {
         $this->validateMethod->addBody('$errors = [];');

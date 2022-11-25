@@ -27,10 +27,7 @@ class FormTestCase extends TestCase
         $this->container = new ArrayContainer();
         $registry = new ContainerRegistry($this->container);
 
-        $this->runtimeFormFactory = new DefaultFormFactory(
-            validatorFactory: new RuntimeValidatorFactory($registry),
-            transformerFactory: new RuntimeFormTransformerFactory($registry),
-        );
+        $this->runtimeFormFactory = DefaultFormFactory::runtime($this->container);
 
         $savePathResolver = fn (string $class) => self::GENERATED_DIR . '/' . str_replace('\\', '_', $class) . '.php';
 
@@ -93,6 +90,22 @@ class FormTestCase extends TestCase
 
         $this->assertFileExists($baseName . 'Instantiator.php');
         $this->assertFileExists($baseName . 'Validator.php');
+    }
+
+    public function assertGeneratedClass(string $code, string $className, array|string $interfaces = []): void
+    {
+        $this->eval($code);
+
+        $this->assertTrue(class_exists($className, false));
+
+        foreach ((array) $interfaces as $interface) {
+            $this->assertTrue(is_subclass_of($className, $interface));
+        }
+    }
+
+    public function eval(string $code): void
+    {
+        eval(str_replace('<?php', '', $code));
     }
 }
 

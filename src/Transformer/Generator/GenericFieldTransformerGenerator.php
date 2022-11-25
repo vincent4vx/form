@@ -3,7 +3,7 @@
 namespace Quatrevieux\Form\Transformer\Generator;
 
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
-use ReflectionClass;
+use Quatrevieux\Form\Util\Code;
 
 /**
  * Transformer generator used by default, when there is no available generator for the given transformer
@@ -21,16 +21,7 @@ final class GenericFieldTransformerGenerator implements FieldTransformerGenerato
      */
     public function generateTransformFromHttp(FieldTransformerInterface $transformer, string $previousExpression): string
     {
-        $newTransformerExpression = 'new \\'.get_class($transformer).'(';
-        $reflection = new ReflectionClass($transformer);
-
-        foreach ($reflection->getProperties() as $property) {
-            if ($property->isPromoted()) {
-                $newTransformerExpression .= $property->name . ': ' . var_export($property->getValue($transformer), true) . ', ';
-            }
-        }
-
-        $newTransformerExpression .= ')';
+        $newTransformerExpression = Code::newExpression($transformer);
 
         return "($newTransformerExpression)->transformFromHttp($previousExpression)";
     }
@@ -40,17 +31,7 @@ final class GenericFieldTransformerGenerator implements FieldTransformerGenerato
      */
     public function generateTransformToHttp(FieldTransformerInterface $transformer, string $previousExpression): string
     {
-        // @todo refactor
-        $newTransformerExpression = 'new \\'.get_class($transformer).'(';
-        $reflection = new ReflectionClass($transformer);
-
-        foreach ($reflection->getProperties() as $property) {
-            if ($property->isPromoted()) {
-                $newTransformerExpression .= $property->name . ': ' . var_export($property->getValue($transformer), true) . ', ';
-            }
-        }
-
-        $newTransformerExpression .= ')';
+        $newTransformerExpression = Code::newExpression($transformer);
 
         return "($newTransformerExpression)->transformToHttp($previousExpression)";
     }

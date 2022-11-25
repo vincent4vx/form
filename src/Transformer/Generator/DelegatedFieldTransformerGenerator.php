@@ -3,7 +3,7 @@
 namespace Quatrevieux\Form\Transformer\Generator;
 
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
-use ReflectionClass;
+use Quatrevieux\Form\Util\Code;
 
 /**
  * Generate inline expression for call a delegated field transformer
@@ -28,8 +28,8 @@ final class DelegatedFieldTransformerGenerator
      */
     public function generateTransformFromHttp(DelegatedFieldTransformerInterface $transformer, string $previousExpression): string
     {
-        $newTransformerExpression = $this->generateInstantiation($transformer);
-        $tmpVarName = '$__transformer_' . md5($newTransformerExpression);
+        $newTransformerExpression = Code::newExpression($transformer);
+        $tmpVarName = Code::varName($newTransformerExpression, 'transformer');
 
         return "($tmpVarName = $newTransformerExpression)->getTransformer(\$this->registry)->transformFromHttp($tmpVarName, $previousExpression)";
     }
@@ -44,25 +44,9 @@ final class DelegatedFieldTransformerGenerator
      */
     public function generateTransformToHttp(DelegatedFieldTransformerInterface $transformer, string $previousExpression): string
     {
-        $newTransformerExpression = $this->generateInstantiation($transformer);
-        $tmpVarName = '$__transformer_' . md5($newTransformerExpression);
+        $newTransformerExpression = Code::newExpression($transformer);
+        $tmpVarName = Code::varName($newTransformerExpression, 'transformer');
 
         return "($tmpVarName = $newTransformerExpression)->getTransformer(\$this->registry)->transformToHttp($tmpVarName, $previousExpression)";
-    }
-
-    private function generateInstantiation(DelegatedFieldTransformerInterface $transformer): string
-    {
-        $newTransformerExpression = 'new \\'.get_class($transformer).'(';
-        $reflection = new ReflectionClass($transformer);
-
-        foreach ($reflection->getProperties() as $property) {
-            if ($property->isPromoted()) {
-                $newTransformerExpression .= $property->name . ': ' . var_export($property->getValue($transformer), true) . ', ';
-            }
-        }
-
-        $newTransformerExpression .= ')';
-
-        return $newTransformerExpression;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form\Transformer\Field;
 
+use Quatrevieux\Form\Util\Code;
 use ReflectionNamedType;
 use ReflectionType;
 use Stringable;
@@ -57,7 +58,7 @@ enum CastType
      */
     public function generateCastExpression(string $expressionToCast): string
     {
-        $tmpVarName = '$__tmp_' . md5($expressionToCast);
+        $tmpVarName = Code::varName($expressionToCast);
 
         return match ($this) {
             self::Int => "(is_scalar($tmpVarName = $expressionToCast) ? (int) $tmpVarName : null)",

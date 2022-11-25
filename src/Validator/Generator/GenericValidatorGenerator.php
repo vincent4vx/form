@@ -2,7 +2,9 @@
 
 namespace Quatrevieux\Form\Validator\Generator;
 
+use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
+use Quatrevieux\Form\Validator\ValidatorInterface;
 
 /**
  * Validator generator used by default, when there is no available generator for the given constraint
@@ -18,16 +20,14 @@ final class GenericValidatorGenerator implements ConstraintValidatorGeneratorInt
      */
     public function generate(ConstraintInterface $constraint, string $fieldAccessor): string
     {
-        // @todo optimise for SelfValidatorConstraint
-        $newConstraintExpression = 'new \\'.get_class($constraint).'(';
+        $newConstraintExpression = Code::newExpression($constraint);
+        $constraintVarName = Code::varName($newConstraintExpression, 'constraint');
 
-        foreach (get_object_vars($constraint) as $prop => $value) {
-            $newConstraintExpression .= $prop . ': ' . var_export($value, true) . ', ';
+        // Optimisation of SelfValidatedConstraint
+        if ($constraint instanceof ValidatorInterface) {
+            return "($constraintVarName = $newConstraintExpression)->validate($constraintVarName, $fieldAccessor)";
+        } else {
+            return "($constraintVarName = $newConstraintExpression)->getValidator(\$this->validatorRegistry)->validate($constraintVarName, $fieldAccessor)";
         }
-
-        $newConstraintExpression .= ')';
-        $constraintVarName = '$__constraint_'.md5($newConstraintExpression);
-
-        return "($constraintVarName = $newConstraintExpression)->getValidator(\$this->validatorRegistry)->validate($constraintVarName, $fieldAccessor)";
     }
 }

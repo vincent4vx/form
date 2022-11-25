@@ -24,6 +24,10 @@ interface SubmittedFormInterface
     public function valid(): bool;
 
     /**
+     * Get fields errors
+     *
+     * Errors are indexed by the field name
+     *
      * @return array<string, FieldError>
      */
     public function errors(): array;

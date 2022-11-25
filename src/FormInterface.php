@@ -17,7 +17,10 @@ interface FormInterface
     public function submit(array $data): SubmittedFormInterface;
 
     /**
-     * @param T $data
+     * Import data object into form
+     *
+     * @param T $data Data object
+     *
      * @return ImportedFormInterface<T>
      */
     public function import(object $data): ImportedFormInterface;

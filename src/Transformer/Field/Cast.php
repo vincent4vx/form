@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\Transformer\Field;
 
 use Attribute;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
+use Quatrevieux\Form\Util\Code;
 
 /**
  * Cast HTTP value to target type
@@ -64,7 +65,7 @@ final class Cast implements FieldTransformerInterface, FieldTransformerGenerator
      */
     public function generateTransformToHttp(FieldTransformerInterface $transformer, string $previousExpression): string
     {
-        $expressionVarName = '$__tmp_' . md5($previousExpression);
+        $expressionVarName = Code::varName($previousExpression);
         return "(($expressionVarName = $previousExpression) === null || is_scalar($expressionVarName) ? $expressionVarName : (array) $expressionVarName)";
     }
 }
