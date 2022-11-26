@@ -20,7 +20,14 @@ final class FormTransformerClass
     public readonly Method $fromHttpMethod;
     public readonly Method $toHttpMethod;
 
+    /**
+     * @var array<string, list<Closure(string):string>>
+     */
     private array $fromHttpFieldsTransformationExpressions = [];
+
+    /**
+     * @var array<string, list<Closure(string):string>>
+     */
     private array $toHttpFieldsTransformationExpressions = [];
 
     /**

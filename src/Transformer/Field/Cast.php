@@ -17,6 +17,8 @@ use Quatrevieux\Form\Util\Code;
  * Transformation to HTTP value will simply cast non-scalar types to array, and let untransformed any other values
  *
  * @see CastType List of available types
+ *
+ * @implements FieldTransformerGeneratorInterface<self>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Cast implements FieldTransformerInterface, FieldTransformerGeneratorInterface
@@ -36,6 +38,8 @@ final class Cast implements FieldTransformerInterface, FieldTransformerGenerator
 
     /**
      * {@inheritdoc}
+     *
+     * @return scalar|null|mixed[]
      */
     public function transformToHttp(mixed $value): string|array|bool|int|null|float
     {

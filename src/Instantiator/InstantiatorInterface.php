@@ -10,14 +10,14 @@ namespace Quatrevieux\Form\Instantiator;
 interface InstantiatorInterface
 {
     /**
-     * @param array $fields
+     * @param array<string, mixed> $fields
      * @return T
      */
     public function instantiate(array $fields): object;
 
     /**
      * @param T $data
-     * @return array
+     * @return array<string, mixed>
      */
     public function export(object $data): array;
 

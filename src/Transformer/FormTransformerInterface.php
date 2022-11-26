@@ -17,18 +17,18 @@ interface FormTransformerInterface
     /**
      * Transform raw HTTP value to array of data object properties values
      *
-     * @param array $value Raw HTTP value
+     * @param mixed[] $value Raw HTTP value
      *
-     * @return array PHP properties values
+     * @return mixed[] PHP properties values
      */
     public function transformFromHttp(array $value): array;
 
     /**
      * Transform data object properties values to normalized HTTP fields
      *
-     * @param array $value Array of properties values
+     * @param mixed[] $value Array of properties values
      *
-     * @return array Normalized HTTP fields value
+     * @return mixed[] Normalized HTTP fields value
      */
     public function transformToHttp(array $value): array;
 }

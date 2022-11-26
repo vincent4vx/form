@@ -16,7 +16,12 @@ class RuntimeValidatorFactory implements ValidatorFactoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
+     *
+     * @param class-string<T> $dataClass
+     * @template T as object
+     * @return ValidatorInterface<T>
+     *
      * @todo null validator for optimisations
      */
     public function create(string $dataClass): ValidatorInterface
@@ -25,7 +30,7 @@ class RuntimeValidatorFactory implements ValidatorFactoryInterface
         $fieldsConstraints = [];
 
         foreach ($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            $requiredShouldBeAdded = !$property->getType()->allowsNull();
+            $requiredShouldBeAdded = ($type = $property->getType()) && !$type->allowsNull();
             $fieldConstraints = [];
 
             foreach ($property->getAttributes(ConstraintInterface::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
@@ -49,6 +54,7 @@ class RuntimeValidatorFactory implements ValidatorFactoryInterface
             }
         }
 
+        /** @var RuntimeValidator<T> */
         return new RuntimeValidator($this->validatorRegistry, $fieldsConstraints);
     }
 }

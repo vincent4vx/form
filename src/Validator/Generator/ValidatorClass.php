@@ -20,6 +20,10 @@ final class ValidatorClass
     public readonly PhpFile $file;
     public readonly ClassType $class;
     public readonly Method $validateMethod;
+
+    /**
+     * @var array<string, list<string>>
+     */
     private array $fieldsConstraintsExpressions = [];
 
     /**

@@ -6,6 +6,8 @@ use Quatrevieux\Form\Validator\FieldError;
 
 /**
  * @template T as object
+ *
+ * @implements SubmittedFormInterface<T>
  */
 final class SubmittedForm implements SubmittedFormInterface
 {

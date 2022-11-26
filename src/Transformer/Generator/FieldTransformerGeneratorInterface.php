@@ -9,7 +9,7 @@ use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
  * This generator should be implemented by the {@see FieldTransformerInterface} class.
  * If not {@see GenericFieldTransformerGenerator} will be used.
  *
- * @template T as FieldTransformerGeneratorInterface
+ * @template T as FieldTransformerInterface
  */
 interface FieldTransformerGeneratorInterface
 {

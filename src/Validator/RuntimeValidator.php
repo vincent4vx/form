@@ -5,6 +5,10 @@ namespace Quatrevieux\Form\Validator;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
 
+/**
+ * @template T as object
+ * @implements ValidatorInterface<T>
+ */
 class RuntimeValidator implements ValidatorInterface
 {
     public function __construct(

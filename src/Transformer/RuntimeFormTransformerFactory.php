@@ -37,6 +37,7 @@ final class RuntimeFormTransformerFactory implements FormTransformerFactoryInter
         $fieldsTransformers = [];
 
         foreach ($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            /** @var list<FieldTransformerInterface|DelegatedFieldTransformerInterface> $transformers */
             $transformers = [];
             $needCast = $property->hasType();
 
@@ -47,7 +48,9 @@ final class RuntimeFormTransformerFactory implements FormTransformerFactoryInter
                     continue;
                 }
 
-                $transformers[] = $attribute->newInstance();
+                /** @var FieldTransformerInterface|DelegatedFieldTransformerInterface $transformer */
+                $transformer = $attribute->newInstance();
+                $transformers[] = $transformer;
 
                 if ($needCast && $className === Cast::class) {
                     $needCast = false;
@@ -55,6 +58,7 @@ final class RuntimeFormTransformerFactory implements FormTransformerFactoryInter
             }
 
             if ($needCast) {
+                /** @phpstan-ignore-next-line $property->getType() is not null */
                 $transformers[] = new Cast(CastType::fromReflectionType($property->getType()));
             }
 

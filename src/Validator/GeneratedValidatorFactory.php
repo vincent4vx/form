@@ -34,7 +34,7 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
      * @param ValidatorFactoryInterface $factory Fallback instantiator factory.
      * @param ValidatorGenerator $generator Code generator instance.
      * @param (Closure(string):string)|null $savePathResolver Resolve instatiator class file path using instantiator class name as parameter. By default, save into `sys_get_temp_dir()`
-     * @param (Closure(string):string)|null $classNameResolver Resolve instantiator class name using DTO class name as parameter. By default, replace namespace seprator by "_", and add "Instantiator" suffix
+     * @param (Closure(class-string):string)|null $classNameResolver Resolve instantiator class name using DTO class name as parameter. By default, replace namespace seprator by "_", and add "Instantiator" suffix
      */
     public function __construct(ValidatorFactoryInterface $factory, ValidatorGenerator $generator, ConstraintValidatorRegistryInterface $validatorRegistry, ?Closure $savePathResolver = null, ?Closure $classNameResolver = null)
     {
@@ -78,6 +78,7 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
      */
     protected function generate(string $generatedClassName, object $runtime): ?string
     {
-        return $this->generator->generate($generatedClassName, $runtime);
+        // @todo handle other validator instances ?
+        return $runtime instanceof RuntimeValidator ? $this->generator->generate($generatedClassName, $runtime) : null;
     }
 }

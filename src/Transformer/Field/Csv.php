@@ -10,6 +10,8 @@ use Quatrevieux\Form\Util\Code;
  * Implementation of RFC-4180 CSV format
  *
  * @see https://www.rfc-editor.org/rfc/rfc4180
+ *
+ * @implements FieldTransformerGeneratorInterface<self>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorInterface
@@ -85,6 +87,10 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
     /**
      * Create CSV with enclosure from array
      *
+     * @param scalar[] $fields
+     * @param string $separator
+     * @param string $enclosure
+     *
      * @internal Used by generated transformer
      */
     public static function toCsv(array $fields, string $separator, string $enclosure): string
@@ -96,8 +102,12 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
                 $csv .= $separator;
             }
 
-            $shouldBeEnclosed = str_contains($item, PHP_EOL) || str_contains($item, $separator) || str_contains($item, $enclosure);
-            $item = str_replace($enclosure, $enclosure . $enclosure, $item);
+            if (is_string($item)) {
+                $shouldBeEnclosed = str_contains($item, PHP_EOL) || str_contains($item, $separator) || str_contains($item, $enclosure);
+                $item = str_replace($enclosure, $enclosure . $enclosure, $item);
+            } else {
+                $shouldBeEnclosed = false;
+            }
 
             if ($shouldBeEnclosed) {
                 $csv .= $enclosure . $item . $enclosure;

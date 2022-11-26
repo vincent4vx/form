@@ -17,7 +17,7 @@ interface ImportedFormInterface
     /**
      * Get imported value normalized as HTTP value
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function httpValue(): array;
 }

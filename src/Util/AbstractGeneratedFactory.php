@@ -22,7 +22,7 @@ abstract class AbstractGeneratedFactory
         /**
          * Resolve generated class name using DTO class name as parameter
          *
-         * @var Closure(string):string
+         * @var Closure(class-string):string
          */
         private readonly Closure $classNameResolver,
 
@@ -67,7 +67,7 @@ abstract class AbstractGeneratedFactory
      * Resolve generated class name
      *
      * @param class-string $dataClassName DTO class name to handle
-     * @return class-string<T>
+     * @return string
      */
     public final function resolveClassName(string $dataClassName): string
     {

@@ -10,14 +10,13 @@ use ReflectionClass;
 final class RuntimeInstantiatorFactory implements InstantiatorFactoryInterface
 {
     /**
-     * @var array<string, callable>
-     * @psalm-var class-string-map<T, callable(class-string):T>
+     * @var array<class-string<InstantiatorInterface>, callable(class-string):InstantiatorInterface>
      */
     private array $factories = [];
 
     public function __construct()
     {
-        $this->factories[PublicPropertyInstantiator::class] = fn (string $className) => new PublicPropertyInstantiator($className);
+        $this->factories[PublicPropertyInstantiator::class] = fn (string $className) => /* @phpstan-ignore-line */ new PublicPropertyInstantiator($className);
     }
 
     /**

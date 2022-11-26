@@ -23,6 +23,7 @@ final class ContainerRegistry implements FieldTransformerRegistryInterface, Cons
      */
     public function getValidator(string $className): ConstraintValidatorInterface
     {
+        // @phpstan-ignore-next-line
         return $this->container->get($className);
     }
 
@@ -31,6 +32,7 @@ final class ContainerRegistry implements FieldTransformerRegistryInterface, Cons
      */
     public function getTransformer(string $className): ConfigurableFieldTransformerInterface
     {
+        // @phpstan-ignore-next-line
         return $this->container->get($className);
     }
 }

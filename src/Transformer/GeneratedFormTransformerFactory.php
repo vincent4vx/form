@@ -78,6 +78,6 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
      */
     protected function generate(string $generatedClassName, object $runtime): ?string
     {
-        return $this->generator->generate($generatedClassName, $runtime);
+        return $runtime instanceof RuntimeFormTransformer ? $this->generator->generate($generatedClassName, $runtime) : null;
     }
 }
