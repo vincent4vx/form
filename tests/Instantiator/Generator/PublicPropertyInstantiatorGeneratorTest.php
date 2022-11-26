@@ -28,7 +28,7 @@ class InstantiatorTestGenerateSimple implements Quatrevieux\Form\Instantiator\In
     }
 
     /**
-     * @param array $fields
+     * @param array<string, mixed> $fields
      * @return T
      */
     function instantiate(array $fields): object
@@ -41,7 +41,7 @@ class InstantiatorTestGenerateSimple implements Quatrevieux\Form\Instantiator\In
 
     /**
      * @param T $data
-     * @return array
+     * @return array<string, mixed>
      */
     function export(object $data): array
     {

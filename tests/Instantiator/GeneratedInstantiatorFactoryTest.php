@@ -50,7 +50,7 @@ class TestSimpleRequestInstantiator implements Quatrevieux\Form\Instantiator\Ins
     }
 
     /**
-     * @param array $fields
+     * @param array<string, mixed> $fields
      * @return T
      */
     function instantiate(array $fields): object
@@ -63,7 +63,7 @@ class TestSimpleRequestInstantiator implements Quatrevieux\Form\Instantiator\Ins
 
     /**
      * @param T $data
-     * @return array
+     * @return array<string, mixed>
      */
     function export(object $data): array
     {
