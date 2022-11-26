@@ -13,7 +13,7 @@ class GeneratedInstantiatorFactoryTest extends TestCase
     {
         $this->factory = new GeneratedInstantiatorFactory(
             savePathResolver: fn(string $className) => __DIR__.'/_tmp/'.$className.'.php',
-            classNameGenerator: fn(string $dataClass) => 'Test'.(new \ReflectionClass($dataClass))->getShortName().'Instantiator'
+            classNameResolver: fn(string $dataClass) => 'Test'.(new \ReflectionClass($dataClass))->getShortName().'Instantiator'
         );
     }
 

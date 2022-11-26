@@ -3,28 +3,18 @@
 namespace Quatrevieux\Form\Validator;
 
 use Closure;
+use Quatrevieux\Form\Util\AbstractGeneratedFactory;
+use Quatrevieux\Form\Util\Functions;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 /**
  * Implentation of InstantiatorFactoryInterface using generated instantiator instead of runtime one
+ *
+ * @extends AbstractGeneratedFactory<ValidatorInterface>
  */
-final class GeneratedValidatorFactory implements ValidatorFactoryInterface
+final class GeneratedValidatorFactory extends AbstractGeneratedFactory implements ValidatorFactoryInterface
 {
-    /**
-     * Resolve instatiator class file path using instantiator class name as parameter
-     *
-     * @var Closure(string):string
-     */
-    private readonly Closure $savePathResolver;
-
-    /**
-     * Resolve instantiator class name using DTO class name as parameter
-     *
-     * @var Closure(string):string
-     */
-    private readonly Closure $classNameGenerator;
-
     /**
      * Fallback instantiator factory
      *
@@ -44,16 +34,19 @@ final class GeneratedValidatorFactory implements ValidatorFactoryInterface
      * @param ValidatorFactoryInterface $factory Fallback instantiator factory.
      * @param ValidatorGenerator $generator Code generator instance.
      * @param (Closure(string):string)|null $savePathResolver Resolve instatiator class file path using instantiator class name as parameter. By default, save into `sys_get_temp_dir()`
-     * @param (Closure(string):string)|null $classNameGenerator Resolve instantiator class name using DTO class name as parameter. By default, replace namespace seprator by "_", and add "Instantiator" suffix
+     * @param (Closure(string):string)|null $classNameResolver Resolve instantiator class name using DTO class name as parameter. By default, replace namespace seprator by "_", and add "Instantiator" suffix
      */
-    public function __construct(ValidatorFactoryInterface $factory, ValidatorGenerator $generator, ConstraintValidatorRegistryInterface $validatorRegistry, ?Closure $savePathResolver = null, ?Closure $classNameGenerator = null)
+    public function __construct(ValidatorFactoryInterface $factory, ValidatorGenerator $generator, ConstraintValidatorRegistryInterface $validatorRegistry, ?Closure $savePathResolver = null, ?Closure $classNameResolver = null)
     {
+        parent::__construct(
+            $savePathResolver ?? Functions::savePathResolver(),
+            $classNameResolver ?? Functions::classNameResolver('Validator'),
+            ValidatorInterface::class
+        );
+
         $this->factory = $factory;
         $this->generator = $generator;
         $this->validatorRegistry = $validatorRegistry;
-
-        $this->savePathResolver = $savePathResolver ?? fn (string $className) => sys_get_temp_dir() . DIRECTORY_SEPARATOR . str_replace('\\', '_', $className) . '.php';
-        $this->classNameGenerator = $classNameGenerator ?? fn (string $dataClassName) => str_replace('\\', '_', $dataClassName) . 'Validator';
     }
 
     /**
@@ -61,55 +54,30 @@ final class GeneratedValidatorFactory implements ValidatorFactoryInterface
      */
     public function create(string $dataClass): ValidatorInterface
     {
-        $className = $this->resolveClassName($dataClass);
-
-        if ($validator = $this->instantiate($className)) {
-            return $validator;
-        }
-
-        $fileName = ($this->savePathResolver)($className);
-
-        if (is_file($fileName)) {
-            require_once $fileName;
-
-            if ($validator = $this->instantiate($className)) {
-                return $validator;
-            }
-        }
-
-        $validator = $this->factory->create($dataClass);
-        $code = $this->generator->generate($className, $validator);
-
-        if ($code) {
-            if (!is_dir(dirname($fileName))) {
-                mkdir(dirname($fileName), 0777, true);
-            }
-
-            file_put_contents($fileName, $code);
-        }
-
-        return $validator;
+        return $this->createOrGenerate($dataClass);
     }
 
     /**
-     * Resolve generated instantiator class name
-     *
-     * @param class-string $dataClassName DTO class name to handle
-     * @return class-string<ValidatorInterface<T>>
-     *
-     * @template T as object
+     * {@inheritdoc}
      */
-    public function resolveClassName(string $dataClassName): string
+    protected function callConstructor(string $generatedClass): ValidatorInterface
     {
-        return ($this->classNameGenerator)($dataClassName);
+        return new $generatedClass($this->validatorRegistry);
     }
 
-    private function instantiate(string $instantiatorClass): ?ValidatorInterface
+    /**
+     * {@inheritdoc}
+     */
+    protected function createRuntime(string $dataClass): ValidatorInterface
     {
-        if (class_exists($instantiatorClass, false) && is_subclass_of($instantiatorClass, ValidatorInterface::class)) {
-            return new $instantiatorClass($this->validatorRegistry);
-        }
+        return $this->factory->create($dataClass);
+    }
 
-        return null;
+    /**
+     * {@inheritdoc}
+     */
+    protected function generate(string $generatedClassName, object $runtime): ?string
+    {
+        return $this->generator->generate($generatedClassName, $runtime);
     }
 }
