@@ -36,7 +36,7 @@ class RuntimeValidator implements ValidatorInterface
             $fieldValue = $data->$fieldName ?? null;
 
             foreach ($constraints as $constraint) {
-                $error = $constraint->getValidator($registry)->validate($constraint, $fieldValue);
+                $error = $constraint->getValidator($registry)->validate($constraint, $fieldValue, $data);
 
                 if ($error) {
                     $errors[$fieldName] = $error;

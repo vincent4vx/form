@@ -8,6 +8,7 @@ use Psr\Container\ContainerInterface;
 use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
 use Quatrevieux\Form\Transformer\GeneratedFormTransformerFactory;
 use Quatrevieux\Form\Transformer\RuntimeFormTransformerFactory;
+use Quatrevieux\Form\Util\Functions;
 use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 use Quatrevieux\Form\Validator\RuntimeValidatorFactory;
@@ -29,7 +30,7 @@ class FormTestCase extends TestCase
 
         $this->runtimeFormFactory = DefaultFormFactory::runtime($this->container);
 
-        $savePathResolver = fn (string $class) => self::GENERATED_DIR . '/' . str_replace('\\', '_', $class) . '.php';
+        $savePathResolver = Functions::savePathResolver(self::GENERATED_DIR);
 
         $this->generatedFormFactory = new DefaultFormFactory(
             new GeneratedInstantiatorFactory(savePathResolver: $savePathResolver),

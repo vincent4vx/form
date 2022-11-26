@@ -53,6 +53,22 @@ final class FormTransformerClass
     }
 
     /**
+     * Declare a field existence
+     *
+     * All fields must be declared to be handled by transformer,
+     * otherwise fields without transformers will be ignored.
+     *
+     * @param string $fieldName Field name to declare
+     *
+     * @return void
+     */
+    public function declareField(string $fieldName): void
+    {
+        $this->fromHttpFieldsTransformationExpressions[$fieldName] = [];
+        $this->toHttpFieldsTransformationExpressions[$fieldName] = [];
+    }
+
+    /**
      * Add new field transformer expressions for both from and to http
      *
      * @param string $fieldName DTO property name

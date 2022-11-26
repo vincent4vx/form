@@ -27,7 +27,7 @@ final class Length extends SelfValidatedConstraint implements ConstraintValidato
     /**
      * {@inheritdoc}
      */
-    public function validate(ConstraintInterface $constraint, mixed $value): ?FieldError
+    public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
     {
         if (!is_string($value)) {
             return null;

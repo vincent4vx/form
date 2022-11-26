@@ -41,7 +41,7 @@ class TestingValidatorGeneratorValidatorClass implements Quatrevieux\Form\Valida
             $errors['foo'] = $__error_foo;
         }
 
-        if ($__error_bar = (($__constraint_e1771d42830cea409755e777bda75cbb = new \Quatrevieux\Form\Validator\Generator\ConstraintWithoutGenerator())->getValidator($this->validatorRegistry)->validate($__constraint_e1771d42830cea409755e777bda75cbb, ($data->bar ?? null)))) {
+        if ($__error_bar = (($__constraint_e1771d42830cea409755e777bda75cbb = new \Quatrevieux\Form\Validator\Generator\ConstraintWithoutGenerator())->validate($__constraint_e1771d42830cea409755e777bda75cbb, ($data->bar ?? null), $data))) {
             $errors['bar'] = $__error_bar;
         }
 
@@ -65,7 +65,7 @@ PHP
 
 class ConstraintWithoutGenerator extends SelfValidatedConstraint
 {
-    public function validate(ConstraintInterface $constraint, mixed $value): ?FieldError
+    public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
     {
         return null;
     }

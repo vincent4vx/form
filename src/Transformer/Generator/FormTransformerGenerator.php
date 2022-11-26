@@ -27,6 +27,8 @@ final class FormTransformerGenerator
         $classHelper = new FormTransformerClass($transformerClassName);
 
         foreach ($transformer->getFieldsTransformers() as $fieldName => $transformers) {
+            $classHelper->declareField($fieldName);
+
             foreach ($transformers as $transformer) {
                 if ($transformer instanceof DelegatedFieldTransformerInterface) {
                     $generator = new DelegatedFieldTransformerGenerator(); // @todo keep instance

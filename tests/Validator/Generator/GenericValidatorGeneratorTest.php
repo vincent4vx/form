@@ -16,8 +16,8 @@ class GenericValidatorGeneratorTest extends FormTestCase
 {
     public function test_generate()
     {
-        $this->assertSame("(\$__constraint_16146ff2d6723a9f78e7f45b3871c5bf = new \Quatrevieux\Form\Validator\Constraint\Length(min: 5, max: NULL, message: 'Invalid length'))->getValidator(\$this->validatorRegistry)->validate(\$__constraint_16146ff2d6723a9f78e7f45b3871c5bf, \$data->foo ?? null)", (new GenericValidatorGenerator())->generate(new Length(min: 5), '$data->foo ?? null'));
-        $this->assertSame("(\$__constraint_63ba69d6fe3ff5f84a29bcaaaeae7448 = new \Quatrevieux\Form\Validator\Generator\MyCustomConstraint(foo: 5))->getValidator(\$this->validatorRegistry)->validate(\$__constraint_63ba69d6fe3ff5f84a29bcaaaeae7448, \$data->foo ?? null)", (new GenericValidatorGenerator())->generate(new MyCustomConstraint(foo: 5), '$data->foo ?? null'));
+        $this->assertSame("(\$__constraint_16146ff2d6723a9f78e7f45b3871c5bf = new \Quatrevieux\Form\Validator\Constraint\Length(min: 5, max: NULL, message: 'Invalid length'))->validate(\$__constraint_16146ff2d6723a9f78e7f45b3871c5bf, \$data->foo ?? null, \$data)", (new GenericValidatorGenerator())->generate(new Length(min: 5), '$data->foo ?? null'));
+        $this->assertSame("(\$__constraint_63ba69d6fe3ff5f84a29bcaaaeae7448 = new \Quatrevieux\Form\Validator\Generator\MyCustomConstraint(foo: 5))->getValidator(\$this->validatorRegistry)->validate(\$__constraint_63ba69d6fe3ff5f84a29bcaaaeae7448, \$data->foo ?? null, \$data)", (new GenericValidatorGenerator())->generate(new MyCustomConstraint(foo: 5), '$data->foo ?? null'));
     }
 
     public function test_functional()
@@ -51,7 +51,7 @@ class MyCustomConstraintValidator implements ConstraintValidatorInterface
     /**
      * @param MyCustomConstraint $constraint
      */
-    public function validate(ConstraintInterface $constraint, mixed $value): ?FieldError
+    public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
     {
         if (($constraint->foo % $value) !== 1) {
             return new FieldError('My error');
@@ -69,7 +69,7 @@ class MyCustomSelfConstraint extends SelfValidatedConstraint
     ) {
     }
 
-    public function validate(ConstraintInterface $constraint, mixed $value): ?FieldError
+    public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
     {
         if (($constraint->foo % $value) !== 1) {
             return new FieldError('My error 2');

@@ -38,7 +38,7 @@ class ConfiguredLengthValidator implements ConstraintValidatorInterface
     ) {
     }
 
-    public function validate(ConstraintInterface $constraint, mixed $value): ?FieldError
+    public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
     {
         $len = strlen($value);
 

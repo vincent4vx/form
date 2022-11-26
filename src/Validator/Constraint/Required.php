@@ -19,7 +19,7 @@ final class Required extends SelfValidatedConstraint implements ConstraintValida
     /**
      * {@inheritdoc}
      */
-    public function validate(ConstraintInterface $constraint, mixed $value): ?FieldError
+    public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
     {
         if ($value === null || $value === '' || $value === []) {
             return new FieldError($this->message);
