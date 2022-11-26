@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [ 'master' ]
+  pull_request:
+    branches: [ 'master' ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions: ['8.1']
+    name: PHP ${{ matrix.php-versions }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Timezone
+        uses: szenius/set-timezone@v1.0
+        with:
+          timezoneLinux: "Europe/Paris"
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: json
+          ini-values: date.timezone=Europe/Paris
+      - name: Check PHP Version
+        run: php -v
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
+      # Docs: https://getcomposer.org/doc/articles/scripts.md
+
+      - name: Run test suite
+        run: vendor/bin/phpunit
+
+  analysis:
+    name: Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Timezone
+        uses: szenius/set-timezone@v1.0
+        with:
+          timezoneLinux: "Europe/Paris"
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          extensions: json
+          ini-values: date.timezone=Europe/Paris
+      #
+      #    - name: Install Infection
+      #      run: composer global require infection/infection
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run type coverage
+        run: ./vendor/bin/phpstan
+
+#
+#    - name: Run Infection
+#      run: |
+#        git fetch --depth=1 origin $GITHUB_BASE_REF
+#        ~/.composer/vendor/bin/infection --logger-github --git-diff-filter=AM
