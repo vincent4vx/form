@@ -18,7 +18,7 @@ class SimpleFormBench extends BenchUtils
     public function benchRuntimeValid()
     {
         $form = $this->runtimeForm(SimpleForm::class);
-        $submitted = $form->submit(['firstName' => 'John', 'lastName' => 'Doe', 'age' => '42']);
+        $submitted = $form->submit(['first_name' => 'John', 'last_name' => 'Doe', 'age' => '42']);
 
         if (!$submitted->valid()) {
             throw new \RuntimeException();
@@ -33,7 +33,7 @@ class SimpleFormBench extends BenchUtils
     public function benchGeneratedValid()
     {
         $form = $this->generatedForm(SimpleForm::class);
-        $submitted = $form->submit(['firstName' => 'John', 'lastName' => 'Doe', 'age' => '42']);
+        $submitted = $form->submit(['first_name' => 'John', 'last_name' => 'Doe', 'age' => '42']);
 
         if (!$submitted->valid()) {
             throw new \RuntimeException();
@@ -48,7 +48,7 @@ class SimpleFormBench extends BenchUtils
     public function benchSymfonyValid()
     {
         $form = $this->symfonyForm(SimpleFormSymfony::class);
-        $submitted = $form->submit(['firstName' => 'John', 'lastName' => 'Doe', 'age' => '42']);
+        $submitted = $form->submit(['first_name' => 'John', 'last_name' => 'Doe', 'age' => '42']);
 
         if (!$submitted->isValid()) {
             throw new \RuntimeException();
@@ -65,7 +65,7 @@ class SimpleFormBench extends BenchUtils
     public function benchRuntimeInvalid()
     {
         $form = $this->runtimeForm(SimpleForm::class);
-        $submitted = $form->submit(['firstName' => 'a', 'lastName' => 'b']);
+        $submitted = $form->submit(['first_name' => 'a', 'last_name' => 'b']);
 
         assert(!$submitted->valid());
         assert(isset($submitted->errors()['firstName']));
@@ -77,7 +77,7 @@ class SimpleFormBench extends BenchUtils
     public function benchGeneratedInvalid()
     {
         $form = $this->generatedForm(SimpleForm::class);
-        $submitted = $form->submit(['firstName' => 'a', 'lastName' => 'b']);
+        $submitted = $form->submit(['first_name' => 'a', 'last_name' => 'b']);
 
         assert(!$submitted->valid());
         assert(isset($submitted->errors()['firstName']));
@@ -89,11 +89,11 @@ class SimpleFormBench extends BenchUtils
     public function benchSymfonyInvalid()
     {
         $form = $this->symfonyForm(SimpleFormSymfony::class);
-        $submitted = $form->submit(['firstName' => 'a', 'lastName' => 'b']);
+        $submitted = $form->submit(['first_name' => 'a', 'last_name' => 'b']);
 
         assert(!$submitted->isValid());
-        assert(isset($submitted->getErrors()['firstName']));
-        assert(isset($submitted->getErrors()['lastName']));
+        assert(isset($submitted->getErrors()['first_name']));
+        assert(isset($submitted->getErrors()['last_name']));
         assert(!isset($submitted->getErrors()['age']));
     }
 }

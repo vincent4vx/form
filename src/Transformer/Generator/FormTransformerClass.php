@@ -9,6 +9,7 @@ use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
+use Quatrevieux\Form\Util\Code;
 
 /**
  * Class generator helper for generates {@see FormTransformerInterface} class
@@ -19,6 +20,11 @@ final class FormTransformerClass
     public readonly ClassType $class;
     public readonly Method $fromHttpMethod;
     public readonly Method $toHttpMethod;
+
+    /**
+     * @var array<string, string>
+     */
+    private array $propertyNameToHttpFieldName = [];
 
     /**
      * @var array<string, list<Closure(string):string>>
@@ -62,8 +68,9 @@ final class FormTransformerClass
      *
      * @return void
      */
-    public function declareField(string $fieldName): void
+    public function declareField(string $fieldName, string $httpFieldName): void
     {
+        $this->propertyNameToHttpFieldName[$fieldName] = $httpFieldName;
         $this->fromHttpFieldsTransformationExpressions[$fieldName] = [];
         $this->toHttpFieldsTransformationExpressions[$fieldName] = [];
     }
@@ -91,8 +98,10 @@ final class FormTransformerClass
         $code = 'return [' . PHP_EOL;
 
         foreach ($this->fromHttpFieldsTransformationExpressions as $fieldName => $expressions) {
-            $fieldNameString = var_export($fieldName, true);
-            $fieldExpression = '$value[' . $fieldNameString . '] ?? null';
+            $fieldNameString = Code::value($fieldName);
+            $httpFieldString = Code::value($this->propertyNameToHttpFieldName[$fieldName] ?? $fieldName);
+
+            $fieldExpression = '$value[' . $httpFieldString . '] ?? null';
 
             foreach ($expressions as $expression) {
                 $fieldExpression = $expression($fieldExpression);
@@ -114,14 +123,16 @@ final class FormTransformerClass
         $code = 'return [' . PHP_EOL;
 
         foreach ($this->toHttpFieldsTransformationExpressions as $fieldName => $expressions) {
-            $fieldNameString = var_export($fieldName, true);
+            $fieldNameString = Code::value($fieldName);
+            $httpFieldString = Code::value($this->propertyNameToHttpFieldName[$fieldName] ?? $fieldName);
+
             $fieldExpression = '$value[' . $fieldNameString . '] ?? null';
 
             foreach (array_reverse($expressions) as $expression) {
                 $fieldExpression = $expression($fieldExpression);
             }
 
-            $code .= '    ' . $fieldNameString . ' => ' . $fieldExpression . ',' . PHP_EOL;
+            $code .= '    ' . $httpFieldString . ' => ' . $fieldExpression . ',' . PHP_EOL;
         }
 
         $code .= '];';

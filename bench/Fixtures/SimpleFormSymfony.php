@@ -14,8 +14,8 @@ class SimpleFormSymfony extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('firstName', TextType::class, ['constraints' => [new Length(min: 2)]])
-            ->add('lastName', TextType::class, ['constraints' => [new Length(min: 2)]])
+            ->add('first_name', TextType::class, ['constraints' => [new Length(min: 2)], 'property_path' => 'firstName'])
+            ->add('last_name', TextType::class, ['constraints' => [new Length(min: 2)], 'property_path' => 'lastName'])
             ->add('age', IntegerType::class, ['required' => false])
         ;
     }

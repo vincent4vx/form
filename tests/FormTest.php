@@ -15,7 +15,7 @@ class FormTest extends TestCase
     public function test_submit_simple_success_should_instantiate_dto()
     {
         $form = new Form(
-            new RuntimeFormTransformer(['foo' => [], 'bar' => []], $this->createMock(FieldTransformerRegistryInterface::class)),
+            new RuntimeFormTransformer($this->createMock(FieldTransformerRegistryInterface::class), ['foo' => [], 'bar' => []], []),
             new PublicPropertyInstantiator(SimpleRequest::class),
             new RuntimeValidator(new NullConstraintValidatorRegistry(), []),
         );

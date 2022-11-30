@@ -9,6 +9,7 @@ use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\Fixtures\TestConfig;
 use Quatrevieux\Form\Fixtures\WithExternalDependencyConstraintRequest;
 use Quatrevieux\Form\Fixtures\WithExternalDependencyTransformerRequest;
+use Quatrevieux\Form\Fixtures\WithFieldNameMapping;
 use Quatrevieux\Form\Fixtures\WithTransformerRequest;
 
 class FunctionalTest extends FormTestCase
@@ -130,6 +131,22 @@ class FunctionalTest extends FormTestCase
         $this->assertFalse($submitted->valid());
         $this->assertSame('barbaz', $submitted->value()->foo);
         $this->assertEquals('Invalid length', $submitted->errors()['foo']);
+    }
+
+    public function test_http_field_mapping()
+    {
+        $form = $this->form(WithFieldNameMapping::class);
+
+        $submitted = $form->submit(['my_complex_name' => 'foo', 'other' => 123]);
+
+        $this->assertSame('foo', $submitted->value()->myComplexName);
+        $this->assertSame(123, $submitted->value()->otherField);
+
+        $obj = new WithFieldNameMapping();
+        $obj->myComplexName = 'bar';
+        $obj->otherField = 456;
+
+        $this->assertSame(['my_complex_name' => 'bar', 'other' => 456], $form->import($obj)->httpValue());
     }
 
     public function form(string $dataClass): FormInterface

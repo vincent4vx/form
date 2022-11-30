@@ -7,6 +7,7 @@ use Quatrevieux\Form\Transformer\Field\CastType;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
+use Quatrevieux\Form\Transformer\Field\HttpField;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -35,11 +36,16 @@ final class RuntimeFormTransformerFactory implements FormTransformerFactoryInter
     {
         $reflectionClass = new ReflectionClass($dataClassName);
         $fieldsTransformers = [];
+        $fieldsNameMapping = [];
 
         foreach ($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
             /** @var list<FieldTransformerInterface|DelegatedFieldTransformerInterface> $transformers */
             $transformers = [];
             $needCast = $property->hasType();
+
+            foreach ($property->getAttributes(HttpField::class) as $attribute) {
+                $fieldsNameMapping[$property->name] = $attribute->newInstance()->name;
+            }
 
             foreach ($property->getAttributes() as $attribute) {
                 $className = $attribute->getName();
@@ -65,6 +71,6 @@ final class RuntimeFormTransformerFactory implements FormTransformerFactoryInter
             $fieldsTransformers[$property->name] = $transformers;
         }
 
-        return new RuntimeFormTransformer($fieldsTransformers, $this->registry);
+        return new RuntimeFormTransformer($this->registry, $fieldsTransformers, $fieldsNameMapping);
     }
 }

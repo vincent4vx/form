@@ -17,11 +17,15 @@ use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 final class RuntimeFormTransformer implements FormTransformerInterface
 {
     public function __construct(
+        private readonly FieldTransformerRegistryInterface $registry,
         /**
          * @var array<string, list<FieldTransformerInterface|DelegatedFieldTransformerInterface>>
          */
         private readonly array $fieldsTransformers,
-        private readonly FieldTransformerRegistryInterface $registry,
+        /**
+         * @var array<string, string>
+         */
+        private readonly array $fieldsNameMapping,
     ) {
     }
 
@@ -35,7 +39,8 @@ final class RuntimeFormTransformer implements FormTransformerInterface
         $normalized = [];
 
         foreach ($this->fieldsTransformers as $fieldName => $transformers) {
-            $fieldValue = $value[$fieldName] ?? null;
+            $httpFieldName = $this->fieldsNameMapping[$fieldName] ?? $fieldName;
+            $fieldValue = $value[$httpFieldName] ?? null;
 
             /** @var FieldTransformerInterface|DelegatedFieldTransformerInterface $transformer */
             foreach ($transformers as $transformer) {
@@ -71,7 +76,8 @@ final class RuntimeFormTransformer implements FormTransformerInterface
                 }
             }
 
-            $normalized[$fieldName] = $fieldValue;
+            $httpFieldName = $this->fieldsNameMapping[$fieldName] ?? $fieldName;
+            $normalized[$httpFieldName] = $fieldValue;
         }
 
         return $normalized;
@@ -85,5 +91,13 @@ final class RuntimeFormTransformer implements FormTransformerInterface
     public function getFieldsTransformers(): array
     {
         return $this->fieldsTransformers;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getFieldsNameMapping(): array
+    {
+        return $this->fieldsNameMapping;
     }
 }

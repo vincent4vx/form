@@ -25,9 +25,10 @@ final class FormTransformerGenerator
     public function generate(string $transformerClassName, RuntimeFormTransformer $transformer): string
     {
         $classHelper = new FormTransformerClass($transformerClassName);
+        $fieldNameMapping = $transformer->getFieldsNameMapping();
 
         foreach ($transformer->getFieldsTransformers() as $fieldName => $transformers) {
-            $classHelper->declareField($fieldName);
+            $classHelper->declareField($fieldName, $fieldNameMapping[$fieldName] ?? $fieldName);
 
             foreach ($transformers as $transformer) {
                 if ($transformer instanceof DelegatedFieldTransformerInterface) {
