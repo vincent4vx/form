@@ -48,6 +48,8 @@ final class EqualsWith extends SelfValidatedConstraint implements ConstraintVali
 
     /**
      * {@inheritdoc}
+     *
+     * @param EqualsWith $constraint
      */
     public function generate(ConstraintInterface $constraint, string $fieldAccessor): string
     {
