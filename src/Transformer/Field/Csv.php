@@ -58,8 +58,8 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
     public function generateTransformFromHttp(FieldTransformerInterface $transformer, string $previousExpression): string
     {
         $expressionVarName = Code::varName($previousExpression);
-        $separator = var_export($transformer->separator, true);
-        $enclosure = var_export($transformer->enclosure, true);
+        $separator = Code::value($transformer->separator);
+        $enclosure = Code::value($transformer->enclosure);
 
         return "(is_string($expressionVarName = $previousExpression) ? str_getcsv($expressionVarName, $separator, $enclosure, '') : null)";
     }

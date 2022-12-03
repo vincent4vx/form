@@ -52,7 +52,7 @@ final class Length extends SelfValidatedConstraint implements ConstraintValidato
         $lenVarName = Code::varName($fieldAccessor, 'len');
         $lenVarNameInit = "$lenVarName = strlen($fieldAccessor)";
         $expression = '';
-        $errorMessage = var_export($constraint->message, true);
+        $errorMessage = Code::value($constraint->message);
 
         if ($constraint->min !== null) {
             $expression .= "({$lenVarNameInit}) < {$constraint->min}";

@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Validator\Constraint;
 
 use Attribute;
+use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 
@@ -33,7 +34,7 @@ final class Required extends SelfValidatedConstraint implements ConstraintValida
      */
     public function generate(ConstraintInterface $constraint, string $fieldAccessor): string
     {
-        $errorMessage = var_export($constraint->message, true);
+        $errorMessage = Code::value($constraint->message);
 
         return "$fieldAccessor === null || $fieldAccessor === '' || $fieldAccessor === [] ? new FieldError($errorMessage) : null";
     }

@@ -14,6 +14,11 @@ use Quatrevieux\Form\Transformer\RuntimeFormTransformer;
  */
 final class FormTransformerGenerator
 {
+    public function __construct(
+        private readonly FieldTransformerGeneratorInterface $genericTransformerGenerator = new GenericFieldTransformerGenerator(),
+        private readonly DelegatedFieldTransformerGenerator $delegatedFieldTransformerGenerator = new DelegatedFieldTransformerGenerator(),
+    ) {}
+
     /**
      * Compile given FormTransformer to a class
      *
@@ -32,7 +37,7 @@ final class FormTransformerGenerator
 
             foreach ($transformers as $transformer) {
                 if ($transformer instanceof DelegatedFieldTransformerInterface) {
-                    $generator = new DelegatedFieldTransformerGenerator(); // @todo keep instance
+                    $generator = $this->delegatedFieldTransformerGenerator;
 
                     $classHelper->addFieldTransformationExpression(
                         $fieldName,
@@ -40,7 +45,7 @@ final class FormTransformerGenerator
                         fn(string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression)
                     );
                 } else {
-                    $generator = $transformer instanceof FieldTransformerGeneratorInterface ? $transformer : new GenericFieldTransformerGenerator(); // @todo keep instance
+                    $generator = $transformer instanceof FieldTransformerGeneratorInterface ? $transformer : $this->genericTransformerGenerator;
 
                     $classHelper->addFieldTransformationExpression(
                         $fieldName,

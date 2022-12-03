@@ -8,6 +8,7 @@ use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
 use Quatrevieux\Form\Instantiator\InstantiatorInterface;
+use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\ValidatorInterface;
@@ -72,7 +73,7 @@ final class ValidatorClass
         foreach ($this->fieldsConstraintsExpressions as $fieldName => $expressions) {
             $expressions = array_map(fn (string $expression) => "($expression)", $expressions);
             $expressions = implode(' ?? ', $expressions);
-            $fieldNameString = var_export($fieldName, true);
+            $fieldNameString = Code::value($fieldName);
 
             $this->validateMethod->addBody(<<<PHP
             if (\$__error_{$fieldName} = {$expressions}) {
