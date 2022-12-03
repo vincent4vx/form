@@ -9,6 +9,8 @@ use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 
 /**
  * The current field value must be equals to other field value
+ *
+ * @implements ConstraintValidatorGeneratorInterface<self>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class EqualsWith extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface
