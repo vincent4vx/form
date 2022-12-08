@@ -17,7 +17,7 @@ use RecursiveIteratorIterator;
 
 class FormTestCase extends TestCase
 {
-    private const GENERATED_DIR = __DIR__ . '/_tmp';
+    protected const GENERATED_DIR = __DIR__ . '/_tmp';
 
     protected FormFactoryInterface $runtimeFormFactory;
     protected FormFactoryInterface $generatedFormFactory;
@@ -91,6 +91,7 @@ class FormTestCase extends TestCase
 
         $this->assertFileExists($baseName . 'Instantiator.php');
         $this->assertFileExists($baseName . 'Validator.php');
+        $this->assertFileExists($baseName . 'Transformer.php');
     }
 
     public function assertGeneratedClass(string $code, string $className, array|string $interfaces = []): void
