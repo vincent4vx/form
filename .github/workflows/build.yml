@@ -74,6 +74,13 @@ jobs:
       - name: Run type coverage
         run: ./vendor/bin/phpstan
 
+      - name: Run test coverage
+        run: ./vendor/bin/phpunit --coverage-clover=coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          files: coverage.xml
 #
 #    - name: Run Infection
 #      run: |
