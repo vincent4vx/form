@@ -5,10 +5,16 @@ namespace Quatrevieux\Form\Validator;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
 use Quatrevieux\Form\Validator\Constraint\Required;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionProperty;
+use function array_unshift;
 
-class RuntimeValidatorFactory implements ValidatorFactoryInterface
+/**
+ * Loads a {@see RuntimeValidator} instance depending on defined attributes on fields
+ * By default, {@see Required} is added on non-nullable fields
+ */
+final class RuntimeValidatorFactory implements ValidatorFactoryInterface
 {
     public function __construct(
         private readonly ConstraintValidatorRegistryInterface $validatorRegistry
@@ -33,7 +39,7 @@ class RuntimeValidatorFactory implements ValidatorFactoryInterface
             $requiredShouldBeAdded = ($type = $property->getType()) && !$type->allowsNull();
             $fieldConstraints = [];
 
-            foreach ($property->getAttributes(ConstraintInterface::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            foreach ($property->getAttributes(ConstraintInterface::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                 $fieldConstraints[] = $attribute->newInstance();
 
                 if ($requiredShouldBeAdded && $attribute->getName() === Required::class) {

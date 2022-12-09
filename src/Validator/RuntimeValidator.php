@@ -6,14 +6,19 @@ use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
 
 /**
+ * Simple runtime implementation of form validator using associative array to map constraints on each field.
+ * Field validation will be stopped on the first constraint violation.
+ *
  * @template T as object
  * @implements ValidatorInterface<T>
  */
-class RuntimeValidator implements ValidatorInterface
+final class RuntimeValidator implements ValidatorInterface
 {
     public function __construct(
         private readonly ConstraintValidatorRegistryInterface $validatorRegistry,
         /**
+         * Map field name to list of constraints
+         *
          * @var array<string, list<ConstraintInterface>>
          */
         private readonly array $fieldsConstraints,
@@ -30,7 +35,7 @@ class RuntimeValidator implements ValidatorInterface
 
         /**
          * @var string $fieldName
-         * @var ConstraintInterface[] $constraints
+         * @var list<ConstraintInterface> $constraints
          */
         foreach ($this->fieldsConstraints as $fieldName => $constraints) {
             $fieldValue = $data->$fieldName ?? null;
@@ -49,6 +54,8 @@ class RuntimeValidator implements ValidatorInterface
     }
 
     /**
+     * Get configured constraints indexed by field name
+     *
      * @return array<string, list<ConstraintInterface>>
      */
     public function getFieldsConstraints(): array
