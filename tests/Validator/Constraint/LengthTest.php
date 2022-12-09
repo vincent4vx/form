@@ -15,6 +15,14 @@ class LengthTest extends FormTestCase
         $this->generatedForm = $this->generatedForm(LengthTestRequest::class);
     }
 
+    public function test_missing_min_and_max()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('At least one of parameters "min" or "max" must be set');
+
+        new Length();
+    }
+
     /**
      * @testWith [false]
      *           [true]

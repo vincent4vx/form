@@ -3,17 +3,22 @@
 namespace Quatrevieux\Form\Validator;
 
 /**
- * @template T as object
+ * Type for validate a form data class
  *
- * @todo class name as method ?
+ * @template T as object
  */
 interface ValidatorInterface
 {
     /**
-     * @param T $data
-     * @return array<string, FieldError>
+     * Validate DTO fields values
      *
-     * @todo embedded
+     * This method should return an empty array if the DTO is valid
+     * The validation of each field must stop at the first error
+     *
+     * @param T $data Object to validate
+     * @param array<string, FieldError> $previousErrors Errors occurring on previous stages (ex: transformation errors)
+     *
+     * @return array<string, FieldError> Errors for each field, indexed by the field name
      */
-    public function validate(object $data): array;
+    public function validate(object $data, array $previousErrors = []): array;
 }

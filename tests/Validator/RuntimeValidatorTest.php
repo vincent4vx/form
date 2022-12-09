@@ -15,6 +15,7 @@ class RuntimeValidatorTest extends FormTestCase
         $o = (object) ['foo' => 'bar'];
 
         $this->assertSame([], $validator->validate($o));
+        $this->assertEquals(['foo' => new FieldError('my transformer error')], $validator->validate($o, ['foo' => new FieldError('my transformer error')]));
     }
 
     public function test_validate_single_constraint()
@@ -25,6 +26,7 @@ class RuntimeValidatorTest extends FormTestCase
 
         $this->assertSame([], $validator->validate((object) ['foo' => 'bar']));
         $this->assertEquals(['foo' => 'Invalid length'], $validator->validate((object) ['foo' => 'ba']));
+        $this->assertEquals(['foo' => new FieldError('my transformer error')], $validator->validate((object) ['foo' => 'ba'], ['foo' => new FieldError('my transformer error')]));
     }
 
     public function test_validate_should_stop_at_first_field_violation()

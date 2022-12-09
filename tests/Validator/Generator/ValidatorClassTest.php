@@ -21,15 +21,9 @@ use Quatrevieux\Form\Validator\FieldError;
 
 class TestingEmptyValidatorClass implements Quatrevieux\Form\Validator\ValidatorInterface
 {
-    /**
-     * @param T $data
-     * @return array<string, FieldError>
-     *
-     * @todo embedded
-     */
-    function validate(object $data): array
+    function validate(object $data, array $previousErrors = []): array
     {
-        $errors = [];
+        $errors = $previousErrors;
         return $errors;
     }
 
@@ -59,16 +53,10 @@ use Quatrevieux\Form\Validator\FieldError;
 
 class TestingWithConstraintCodeValidatorClass implements Quatrevieux\Form\Validator\ValidatorInterface
 {
-    /**
-     * @param T $data
-     * @return array<string, FieldError>
-     *
-     * @todo embedded
-     */
-    function validate(object $data): array
+    function validate(object $data, array $previousErrors = []): array
     {
-        $errors = [];
-        if ($__error_test = (($data->test ?? null) === 123 ? new FieldError("error") : null)) {
+        $errors = $previousErrors;
+        if (!isset($previousErrors['test']) && $__error_test = (($data->test ?? null) === 123 ? new FieldError("error") : null)) {
             $errors['test'] = $__error_test;
         }
 

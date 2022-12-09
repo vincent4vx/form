@@ -35,15 +35,9 @@ use Quatrevieux\Form\Validator\FieldError;
 
 class Quatrevieux_Form_Fixtures_SimpleRequestValidatorGeneratorTest implements Quatrevieux\Form\Validator\ValidatorInterface
 {
-    /**
-     * @param T $data
-     * @return array<string, FieldError>
-     *
-     * @todo embedded
-     */
-    function validate(object $data): array
+    function validate(object $data, array $previousErrors = []): array
     {
-        $errors = [];
+        $errors = $previousErrors;
         return $errors;
     }
 
@@ -58,6 +52,7 @@ PHP
         $validator = $factory->create(SimpleRequest::class);
 
         $this->assertEmpty($validator->validate(new SimpleRequest()));
+        $this->assertEquals(['foo' => new FieldError('my transformer error')], $validator->validate(new SimpleRequest(), ['foo' => new FieldError('my transformer error')]));
     }
 
     public function test_create_with_constraints()
@@ -80,20 +75,14 @@ use Quatrevieux\Form\Validator\FieldError;
 
 class Quatrevieux_Form_Fixtures_RequiredParametersRequestValidatorGeneratorTest implements Quatrevieux\Form\Validator\ValidatorInterface
 {
-    /**
-     * @param T $data
-     * @return array<string, FieldError>
-     *
-     * @todo embedded
-     */
-    function validate(object $data): array
+    function validate(object $data, array $previousErrors = []): array
     {
-        $errors = [];
-        if ($__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required') : null)) {
+        $errors = $previousErrors;
+        if (!isset($previousErrors['foo']) && $__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required') : null)) {
             $errors['foo'] = $__error_foo;
         }
 
-        if ($__error_bar = (($data->bar ?? null) === null || ($data->bar ?? null) === '' || ($data->bar ?? null) === [] ? new FieldError('bar must be set') : null) ?? (is_string(($data->bar ?? null)) && (($__len_722af90ac1a42c8c3ad647bfd63cd459 = strlen(($data->bar ?? null))) < 3) ? new FieldError('Invalid length') : null)) {
+        if (!isset($previousErrors['bar']) && $__error_bar = (($data->bar ?? null) === null || ($data->bar ?? null) === '' || ($data->bar ?? null) === [] ? new FieldError('bar must be set') : null) ?? (is_string(($data->bar ?? null)) && (($__len_722af90ac1a42c8c3ad647bfd63cd459 = strlen(($data->bar ?? null))) < 3) ? new FieldError('Invalid length') : null)) {
             $errors['bar'] = $__error_bar;
         }
 
@@ -122,6 +111,11 @@ PHP
         $this->assertEquals([
             'bar' => new FieldError('Invalid length'),
         ], $validator->validate($o));
+        
+        $this->assertEquals([
+            'foo' => new FieldError('transformer error'),
+            'bar' => new FieldError('Invalid length'),
+        ], $validator->validate($o, ['foo' => new FieldError('transformer error')]));
 
         $o->bar = 'aaaa';
         $this->assertEmpty($validator->validate($o));
@@ -149,16 +143,10 @@ use Quatrevieux\Form\Validator\FieldError;
 
 class Quatrevieux_Form_Fixtures_WithExternalDependencyConstraintRequestValidatorGeneratorTest implements Quatrevieux\Form\Validator\ValidatorInterface
 {
-    /**
-     * @param T $data
-     * @return array<string, FieldError>
-     *
-     * @todo embedded
-     */
-    function validate(object $data): array
+    function validate(object $data, array $previousErrors = []): array
     {
-        $errors = [];
-        if ($__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required') : null) ?? (($__constraint_eead8f4bada4cb985586965f0b2d57c9 = new \Quatrevieux\Form\Fixtures\ConfiguredLength(key: 'foo.length'))->getValidator($this->validatorRegistry)->validate($__constraint_eead8f4bada4cb985586965f0b2d57c9, ($data->foo ?? null), $data))) {
+        $errors = $previousErrors;
+        if (!isset($previousErrors['foo']) && $__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required') : null) ?? (($__constraint_eead8f4bada4cb985586965f0b2d57c9 = new \Quatrevieux\Form\Fixtures\ConfiguredLength(key: 'foo.length'))->getValidator($this->validatorRegistry)->validate($__constraint_eead8f4bada4cb985586965f0b2d57c9, ($data->foo ?? null), $data))) {
             $errors['foo'] = $__error_foo;
         }
 

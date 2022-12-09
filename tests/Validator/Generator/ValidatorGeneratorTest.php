@@ -28,20 +28,14 @@ use Quatrevieux\Form\Validator\FieldError;
 
 class TestingValidatorGeneratorValidatorClass implements Quatrevieux\Form\Validator\ValidatorInterface
 {
-    /**
-     * @param T $data
-     * @return array<string, FieldError>
-     *
-     * @todo embedded
-     */
-    function validate(object $data): array
+    function validate(object $data, array $previousErrors = []): array
     {
-        $errors = [];
-        if ($__error_foo = (is_string(($data->foo ?? null)) && (($__len_a3aa3c8caea059c99a14cd36eaceca72 = strlen(($data->foo ?? null))) < 3) ? new FieldError('Invalid length') : null)) {
+        $errors = $previousErrors;
+        if (!isset($previousErrors['foo']) && $__error_foo = (is_string(($data->foo ?? null)) && (($__len_a3aa3c8caea059c99a14cd36eaceca72 = strlen(($data->foo ?? null))) < 3) ? new FieldError('Invalid length') : null)) {
             $errors['foo'] = $__error_foo;
         }
 
-        if ($__error_bar = (($__constraint_e1771d42830cea409755e777bda75cbb = new \Quatrevieux\Form\Validator\Generator\ConstraintWithoutGenerator())->validate($__constraint_e1771d42830cea409755e777bda75cbb, ($data->bar ?? null), $data))) {
+        if (!isset($previousErrors['bar']) && $__error_bar = (($__constraint_e1771d42830cea409755e777bda75cbb = new \Quatrevieux\Form\Validator\Generator\ConstraintWithoutGenerator())->validate($__constraint_e1771d42830cea409755e777bda75cbb, ($data->bar ?? null), $data))) {
             $errors['bar'] = $__error_bar;
         }
 

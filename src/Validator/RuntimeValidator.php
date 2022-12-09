@@ -28,16 +28,20 @@ final class RuntimeValidator implements ValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validate(object $data): array
+    public function validate(object $data, array $previousErrors = []): array
     {
         $registry = $this->validatorRegistry;
-        $errors = [];
+        $errors = $previousErrors;
 
         /**
          * @var string $fieldName
          * @var list<ConstraintInterface> $constraints
          */
         foreach ($this->fieldsConstraints as $fieldName => $constraints) {
+            if (isset($previousErrors[$fieldName])) {
+                continue;
+            }
+
             $fieldValue = $data->$fieldName ?? null;
 
             foreach ($constraints as $constraint) {

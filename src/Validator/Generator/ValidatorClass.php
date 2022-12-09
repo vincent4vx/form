@@ -35,7 +35,7 @@ final class ValidatorClass
         $this->file = new PhpFile();
         $this->class = $this->file->addClass($className);
 
-        $this->validateMethod = Method::from([ValidatorInterface::class, 'validate']);
+        $this->validateMethod = Method::from([ValidatorInterface::class, 'validate'])->setComment(null);
 
         $this->class->addImplement(ValidatorInterface::class);
         $this->class->addMember($this->validateMethod);
@@ -68,7 +68,7 @@ final class ValidatorClass
      */
     public function generate(): void
     {
-        $this->validateMethod->addBody('$errors = [];');
+        $this->validateMethod->addBody('$errors = $previousErrors;');
 
         foreach ($this->fieldsConstraintsExpressions as $fieldName => $expressions) {
             $expressions = array_map(fn (string $expression) => "($expression)", $expressions);
@@ -76,7 +76,7 @@ final class ValidatorClass
             $fieldNameString = Code::value($fieldName);
 
             $this->validateMethod->addBody(<<<PHP
-            if (\$__error_{$fieldName} = {$expressions}) {
+            if (!isset(\$previousErrors[{$fieldNameString}]) && \$__error_{$fieldName} = {$expressions}) {
                 \$errors[{$fieldNameString}] = \$__error_{$fieldName};
             }
 
