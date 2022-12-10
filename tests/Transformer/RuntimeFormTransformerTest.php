@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form\Transformer;
 
+use Exception;
 use Quatrevieux\Form\ContainerRegistry;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Transformer\Field\Cast;
@@ -9,8 +10,10 @@ use Quatrevieux\Form\Transformer\Field\CastType;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\Csv;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
+use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Transformer\Field\NullFieldTransformerRegistry;
+use Quatrevieux\Form\Validator\FieldError;
 
 class RuntimeFormTransformerTest extends FormTestCase
 {
@@ -43,6 +46,19 @@ class RuntimeFormTransformerTest extends FormTestCase
 
         $this->assertEquals(new TransformationResult(['foo' => 'bar'], []), $transformer->transformFromHttp(['foo' => 'bar', 'other' => 'ignored']));
         $this->assertEquals(['foo' => 'bar'], $transformer->transformToHttp(['foo' => 'bar', 'other' => 'ignored']));
+    }
+
+    public function test_with_transformation_error()
+    {
+        $transformer = new RuntimeFormTransformer(
+            new NullFieldTransformerRegistry(),
+            [
+                'foo' => [new FailingTransformer()],
+            ],
+            []
+        );
+
+        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my transformation error')]), $transformer->transformFromHttp(['foo' => 'bar']));
     }
 
     public function test_with_field_mapping()
@@ -113,5 +129,23 @@ class MyDelegatedTransformerImpl implements ConfigurableFieldTransformerInterfac
     public function transformToHttp(DelegatedFieldTransformerInterface $configuration, mixed $value): mixed
     {
         return base64_encode($value);
+    }
+}
+
+class FailingTransformer implements FieldTransformerInterface
+{
+    public function transformFromHttp(mixed $value): mixed
+    {
+        throw new Exception('my transformation error');
+    }
+
+    public function transformToHttp(mixed $value): mixed
+    {
+        return $value;
+    }
+
+    public function canThrowError(): bool
+    {
+        return true;
     }
 }

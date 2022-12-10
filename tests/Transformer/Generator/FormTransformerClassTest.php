@@ -25,6 +25,7 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         $errors = [];
         $transformed = [
         ];
+
         return new TransformationResult($transformed, $errors);
     }
 
@@ -68,6 +69,7 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
             'foo' => $value['bar'] ?? null,
             'baz' => $value['rab'] ?? null,
         ];
+
         return new TransformationResult($transformed, $errors);
     }
 
@@ -92,8 +94,8 @@ PHP
     {
         $class = new FormTransformerClass('ClassName');
 
-        $class->addFieldTransformationExpression('foo', fn ($v) => "(string) ($v)", fn ($v) => "$v");
-        $class->addFieldTransformationExpression('foo', fn ($v) => "base64_decode($v)", fn ($v) => "base64_encode($v)");
+        $class->addFieldTransformationExpression('foo', fn ($v) => "(string) ($v)", fn ($v) => "$v", false);
+        $class->addFieldTransformationExpression('foo', fn ($v) => "base64_decode($v)", fn ($v) => "base64_encode($v)", false);
 
         $class->generateToHttp();
         $class->generateFromHttp();
@@ -112,6 +114,57 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         $transformed = [
             'foo' => base64_decode((string) ($value['foo'] ?? null)),
         ];
+
+        return new TransformationResult($transformed, $errors);
+    }
+
+    function transformToHttp(array $value): array
+    {
+        return [
+            'foo' => base64_encode($value['foo'] ?? null),
+        ];
+    }
+
+    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    {
+    }
+}
+
+PHP
+        , $class->code());
+    }
+
+    public function test_addFieldTransformationExpression_with_canThrowError()
+    {
+        $class = new FormTransformerClass('ClassName');
+
+        $class->addFieldTransformationExpression('foo', fn ($v) => "(string) ($v)", fn ($v) => "$v", true);
+        $class->addFieldTransformationExpression('foo', fn ($v) => "base64_decode($v)", fn ($v) => "base64_encode($v)", false);
+
+        $class->generateToHttp();
+        $class->generateFromHttp();
+
+        $this->assertSame(<<<'PHP'
+<?php
+
+use Quatrevieux\Form\Transformer\TransformationResult;
+use Quatrevieux\Form\Validator\FieldError;
+
+class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
+{
+    function transformFromHttp(array $value): TransformationResult
+    {
+        $errors = [];
+        $transformed = [
+        ];
+
+        try {
+            $transformed['foo'] = base64_decode((string) ($value['foo'] ?? null));
+        } catch (\Exception $e) {
+            $errors['foo'] = new FieldError($e->getMessage());
+            $transformed['foo'] = null;
+        }
+
         return new TransformationResult($transformed, $errors);
     }
 

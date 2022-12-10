@@ -34,6 +34,11 @@ final class FormTransformerClass
     private array $fromHttpFieldsTransformationExpressions = [];
 
     /**
+     * @var array<string, bool>
+     */
+    private array $fieldTransformersCanThrowError = [];
+
+    /**
      * @var array<string, list<Closure(string):string>>
      */
     private array $toHttpFieldsTransformationExpressions = [];
@@ -86,13 +91,18 @@ final class FormTransformerClass
      * @param string $fieldName DTO property name
      * @param Closure(string):string $fromHttpExpression Generator of transformFromHttp expression. Takes as parameter the previous expression or HTTP field value
      * @param Closure(string):string $toHttpExpression Generator of transformToHttp expression. Takes as parameter the previous expression or DTO property value
+     * @param bool $canThrowError Whether the transformer can throw an error. See {@see FormTransformerInterface::transformFromHttp()}.
      *
      * @return void
      */
-    public function addFieldTransformationExpression(string $fieldName, Closure $fromHttpExpression, Closure $toHttpExpression): void
+    public function addFieldTransformationExpression(string $fieldName, Closure $fromHttpExpression, Closure $toHttpExpression, bool $canThrowError): void
     {
         $this->fromHttpFieldsTransformationExpressions[$fieldName][] = $fromHttpExpression;
         $this->toHttpFieldsTransformationExpressions[$fieldName][] = $toHttpExpression;
+
+        if (empty($this->fieldTransformersCanThrowError[$fieldName])) {
+            $this->fieldTransformersCanThrowError[$fieldName] = $canThrowError;
+        }
     }
 
     /**
@@ -102,6 +112,7 @@ final class FormTransformerClass
     {
         $this->fromHttpMethod->addBody('$errors = [];');
         $this->fromHttpMethod->addBody('$transformed = ' . $this->generateInlineFromHttpArray() . ';');
+        $this->fromHttpMethod->addBody($this->generateUnsafeFromHttpTransformations());
         $this->fromHttpMethod->addBody('return new TransformationResult($transformed, $errors);');
     }
 
@@ -143,8 +154,14 @@ final class FormTransformerClass
     private function generateInlineFromHttpArray(): string
     {
         $code = '[' . PHP_EOL;
+        $unsafeFields = $this->fieldTransformersCanThrowError;
 
         foreach ($this->fromHttpFieldsTransformationExpressions as $fieldName => $expressions) {
+            // Ignore all fields that can throw any error
+            if (!empty($unsafeFields[$fieldName])) {
+                continue;
+            }
+
             $fieldNameString = Code::value($fieldName);
             $httpFieldString = Code::value($this->propertyNameToHttpFieldName[$fieldName] ?? $fieldName);
 
@@ -158,5 +175,40 @@ final class FormTransformerClass
         }
 
         return $code . ']';
+    }
+
+    private function generateUnsafeFromHttpTransformations(): string
+    {
+        $code = '';
+        $unsafeFields = $this->fieldTransformersCanThrowError;
+
+        foreach ($this->fromHttpFieldsTransformationExpressions as $fieldName => $expressions) {
+            // Safe fields are already handled in generateInlineFromHttpArray()
+            if (empty($unsafeFields[$fieldName])) {
+                continue;
+            }
+
+            $fieldNameString = Code::value($fieldName);
+            $httpFieldString = Code::value($this->propertyNameToHttpFieldName[$fieldName] ?? $fieldName);
+
+            $fieldExpression = '$value[' . $httpFieldString . '] ?? null';
+
+            foreach ($expressions as $expression) {
+                $fieldExpression = $expression($fieldExpression);
+            }
+
+            $code .= <<<PHP
+
+            try {
+                \$transformed[{$fieldNameString}] = {$fieldExpression};
+            } catch (\Exception \$e) {
+                \$errors[{$fieldNameString}] = new FieldError(\$e->getMessage());
+                \$transformed[{$fieldNameString}] = null;
+            }
+
+            PHP;
+        }
+
+        return $code;
     }
 }

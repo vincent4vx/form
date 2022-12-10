@@ -42,7 +42,8 @@ final class FormTransformerGenerator
                     $classHelper->addFieldTransformationExpression(
                         $fieldName,
                         fn(string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression),
-                        fn(string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression)
+                        fn(string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression),
+                        true
                     );
                 } else {
                     $generator = $transformer instanceof FieldTransformerGeneratorInterface ? $transformer : $this->genericTransformerGenerator;
@@ -50,7 +51,8 @@ final class FormTransformerGenerator
                     $classHelper->addFieldTransformationExpression(
                         $fieldName,
                         fn(string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression),
-                        fn(string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression)
+                        fn(string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression),
+                        $transformer->canThrowError()
                     );
                 }
             }

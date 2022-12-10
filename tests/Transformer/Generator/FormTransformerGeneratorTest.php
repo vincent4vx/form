@@ -14,6 +14,7 @@ use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Transformer\Field\NullFieldTransformerRegistry;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Transformer\RuntimeFormTransformer;
+use Quatrevieux\Form\Validator\FieldError;
 
 class FormTransformerGeneratorTest extends FormTestCase
 {
@@ -45,6 +46,7 @@ class TestingTransformerWithoutFieldTransformers implements Quatrevieux\Form\Tra
             'foo' => $value['foo'] ?? null,
             'bar' => $value['bar'] ?? null,
         ];
+
         return new TransformationResult($transformed, $errors);
     }
 
@@ -107,6 +109,7 @@ class TestingTransformerWithFieldMapping implements Quatrevieux\Form\Transformer
             'foo' => $value['f_o_o'] ?? null,
             'bar' => $value['b_a_r'] ?? null,
         ];
+
         return new TransformationResult($transformed, $errors);
     }
 
@@ -165,6 +168,7 @@ class TestingTransformerWithTransformers implements Quatrevieux\Form\Transformer
             'foo' => (($__tmp_0f0c348b6cd003c8ae635417270d3a4d = (is_string($__tmp_5c44ecf262daa39f16eef451ec5e7c55 = $value['f_o_o'] ?? null) ? str_getcsv($__tmp_5c44ecf262daa39f16eef451ec5e7c55, ',', '', '') : null)) !== null ? (array) $__tmp_0f0c348b6cd003c8ae635417270d3a4d : null),
             'bar' => (is_scalar($__tmp_f36c42ca1e803ec1f4684adea78ba7dc = $value['b_a_r'] ?? null) ? (int) $__tmp_f36c42ca1e803ec1f4684adea78ba7dc : null),
         ];
+
         return new TransformationResult($transformed, $errors);
     }
 
@@ -216,8 +220,15 @@ class TestingTransformerWithDelegatedTransformer implements Quatrevieux\Form\Tra
     {
         $errors = [];
         $transformed = [
-            'foo' => ($__transformer_80b8193e49fb60b95b7a65153fe6724c = new \Quatrevieux\Form\Transformer\Generator\DelegatedTransformerParameters(a: 'z'))->getTransformer($this->registry)->transformFromHttp($__transformer_80b8193e49fb60b95b7a65153fe6724c, $value['foo'] ?? null),
         ];
+
+        try {
+            $transformed['foo'] = ($__transformer_80b8193e49fb60b95b7a65153fe6724c = new \Quatrevieux\Form\Transformer\Generator\DelegatedTransformerParameters(a: 'z'))->getTransformer($this->registry)->transformFromHttp($__transformer_80b8193e49fb60b95b7a65153fe6724c, $value['foo'] ?? null);
+        } catch (\Exception $e) {
+            $errors['foo'] = new FieldError($e->getMessage());
+            $transformed['foo'] = null;
+        }
+
         return new TransformationResult($transformed, $errors);
     }
 
@@ -270,6 +281,7 @@ class TestingTransformerWithGenericTransformerGenerator implements Quatrevieux\F
         $transformed = [
             'foo' => (new \Quatrevieux\Form\Transformer\Generator\WithoutGenerator(value: 5))->transformFromHttp($value['foo'] ?? null),
         ];
+
         return new TransformationResult($transformed, $errors);
     }
 
@@ -295,6 +307,73 @@ PHP
         $this->assertEmpty($transformer->transformFromHttp(['foo' => 12])->errors);
         $this->assertSame(['foo' => 12], $transformer->transformToHttp(['foo' => 17]));
     }
+
+    public function test_generate_with_unsafe_transformer()
+    {
+        $generator = new FormTransformerGenerator();
+
+        $code = $generator->generate('TestingTransformerWithUnsafeTransformers', new RuntimeFormTransformer(
+            new NullFieldTransformerRegistry(),
+            [
+                'foo' => [new FailingTransformer()],
+                'bar' => [],
+            ],
+            []
+        ));
+
+        $this->assertSame(<<<'PHP'
+<?php
+
+use Quatrevieux\Form\Transformer\TransformationResult;
+use Quatrevieux\Form\Validator\FieldError;
+
+class TestingTransformerWithUnsafeTransformers implements Quatrevieux\Form\Transformer\FormTransformerInterface
+{
+    function transformFromHttp(array $value): TransformationResult
+    {
+        $errors = [];
+        $transformed = [
+            'bar' => $value['bar'] ?? null,
+        ];
+
+        try {
+            $transformed['foo'] = (new \Quatrevieux\Form\Transformer\Generator\FailingTransformer())->transformFromHttp($value['foo'] ?? null);
+        } catch (\Exception $e) {
+            $errors['foo'] = new FieldError($e->getMessage());
+            $transformed['foo'] = null;
+        }
+
+        return new TransformationResult($transformed, $errors);
+    }
+
+    function transformToHttp(array $value): array
+    {
+        return [
+            'foo' => (new \Quatrevieux\Form\Transformer\Generator\FailingTransformer())->transformToHttp($value['foo'] ?? null),
+            'bar' => $value['bar'] ?? null,
+        ];
+    }
+
+    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    {
+    }
+}
+
+PHP
+            , $code);
+
+        $this->assertGeneratedClass($code, 'TestingTransformerWithUnsafeTransformers', FormTransformerInterface::class);
+        $transformer = new \TestingTransformerWithUnsafeTransformers(new NullFieldTransformerRegistry());
+
+        $this->assertSame(['bar' => null, 'foo' => null], $transformer->transformFromHttp([])->values);
+        $this->assertEquals(['foo' => new FieldError('my error')], $transformer->transformFromHttp([])->errors);
+        $this->assertSame(['bar' => 456, 'foo' => null], $transformer->transformFromHttp(['foo' => 123, 'bar' => 456])->values);
+        $this->assertEquals(['foo' => new FieldError('my error')], $transformer->transformFromHttp([])->errors);
+
+        $this->assertSame(['foo' => null, 'bar' => null], $transformer->transformToHttp([]));
+        $this->assertSame(['foo' => 123, 'bar' => 456], $transformer->transformToHttp(['foo' => 123, 'bar' => 456]));
+    }
+
 }
 
 class DelegatedTransformerParameters implements DelegatedFieldTransformerInterface
@@ -338,5 +417,31 @@ class WithoutGenerator implements FieldTransformerInterface
     public function transformToHttp(mixed $value): mixed
     {
         return $value - $this->value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function canThrowError(): bool
+    {
+        return false;
+    }
+}
+
+class FailingTransformer implements FieldTransformerInterface
+{
+    public function transformFromHttp(mixed $value): mixed
+    {
+        throw new \Exception('my error');
+    }
+
+    public function transformToHttp(mixed $value): mixed
+    {
+        return $value;
+    }
+
+    public function canThrowError(): bool
+    {
+        return true;
     }
 }

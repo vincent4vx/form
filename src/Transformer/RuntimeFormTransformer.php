@@ -2,9 +2,11 @@
 
 namespace Quatrevieux\Form\Transformer;
 
+use Exception;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
+use Quatrevieux\Form\Validator\FieldError;
 
 /**
  * Transformer implementation using transformer instance resolved at runtime using reflection API and Attributes
@@ -32,7 +34,7 @@ final class RuntimeFormTransformer implements FormTransformerInterface
     /**
      * {@inheritdoc}
      *
-     * @todo handle exception
+     * @todo customize error handling
      */
     public function transformFromHttp(array $value): TransformationResult
     {
@@ -41,18 +43,14 @@ final class RuntimeFormTransformer implements FormTransformerInterface
 
         foreach ($this->fieldsTransformers as $fieldName => $transformers) {
             $httpFieldName = $this->fieldsNameMapping[$fieldName] ?? $fieldName;
-            $fieldValue = $value[$httpFieldName] ?? null;
 
-            /** @var FieldTransformerInterface|DelegatedFieldTransformerInterface $transformer */
-            foreach ($transformers as $transformer) {
-                if ($transformer instanceof DelegatedFieldTransformerInterface) {
-                    $fieldValue = $transformer->getTransformer($this->registry)->transformFromHttp($transformer, $fieldValue);
-                } else {
-                    $fieldValue = $transformer->transformFromHttp($fieldValue);
-                }
+            try {
+                $fieldValue = $this->callFromHttpTransformer($value[$httpFieldName] ?? null, $transformers);
+                $normalized[$fieldName] = $fieldValue;
+            } catch (Exception $e) {
+                $errors[$fieldName] = new FieldError($e->getMessage());
+                $normalized[$fieldName] = null;
             }
-
-            $normalized[$fieldName] = $fieldValue;
         }
 
         return new TransformationResult($normalized, $errors);
@@ -100,5 +98,23 @@ final class RuntimeFormTransformer implements FormTransformerInterface
     public function getFieldsNameMapping(): array
     {
         return $this->fieldsNameMapping;
+    }
+
+    /**
+     * @param mixed $fieldValue
+     * @param list<FieldTransformerInterface|DelegatedFieldTransformerInterface> $transformers
+     * @return mixed
+     */
+    private function callFromHttpTransformer(mixed $fieldValue, array $transformers): mixed
+    {
+        foreach ($transformers as $transformer) {
+            if ($transformer instanceof DelegatedFieldTransformerInterface) {
+                $fieldValue = $transformer->getTransformer($this->registry)->transformFromHttp($transformer, $fieldValue);
+            } else {
+                $fieldValue = $transformer->transformFromHttp($fieldValue);
+            }
+        }
+
+        return $fieldValue;
     }
 }

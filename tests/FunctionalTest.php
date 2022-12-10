@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form;
 
 use Quatrevieux\Form\Fixtures\ConfiguredLengthValidator;
+use Quatrevieux\Form\Fixtures\FailingTransformerRequest;
 use Quatrevieux\Form\Fixtures\FooImplementation;
 use Quatrevieux\Form\Fixtures\RequiredParametersRequest;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
@@ -11,6 +12,7 @@ use Quatrevieux\Form\Fixtures\WithExternalDependencyConstraintRequest;
 use Quatrevieux\Form\Fixtures\WithExternalDependencyTransformerRequest;
 use Quatrevieux\Form\Fixtures\WithFieldNameMapping;
 use Quatrevieux\Form\Fixtures\WithTransformerRequest;
+use Quatrevieux\Form\Validator\FieldError;
 
 class FunctionalTest extends FormTestCase
 {
@@ -147,6 +149,26 @@ class FunctionalTest extends FormTestCase
         $obj->otherField = 456;
 
         $this->assertSame(['my_complex_name' => 'bar', 'other' => 456], $form->import($obj)->httpValue());
+    }
+
+    public function test_with_transformation_error()
+    {
+        $form = $this->form(FailingTransformerRequest::class);
+
+        $submitted = $form->submit(['foo' => 'foo']);
+        $this->assertFalse($submitted->valid());
+        $this->assertFalse(isset($submitted->value()->foo));
+        $this->assertEquals(['foo' => new FieldError('Syntax error')], $submitted->errors());
+
+        $submitted = $form->submit(['foo' => '123']);
+        $this->assertFalse($submitted->valid());
+        $this->assertFalse(isset($submitted->value()->foo));
+        $this->assertEquals(['foo' => new FieldError('Invalid JSON object')], $submitted->errors());
+
+        $submitted = $form->submit(['foo' => '{"foo":"bar"}']);
+        $this->assertTrue($submitted->valid());
+        $this->assertEquals((object) ['foo' => 'bar'], $submitted->value()->foo);
+        $this->assertEmpty($submitted->errors());
     }
 
     public function form(string $dataClass): FormInterface

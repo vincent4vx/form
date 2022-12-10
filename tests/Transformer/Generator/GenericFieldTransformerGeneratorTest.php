@@ -51,6 +51,14 @@ class MyCustomTransformer implements FieldTransformerInterface
     {
         return $value - $this->foo;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function canThrowError(): bool
+    {
+        return false;
+    }
 }
 
 class TestRequestWithGenericTransformer

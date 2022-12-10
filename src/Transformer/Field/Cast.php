@@ -72,4 +72,12 @@ final class Cast implements FieldTransformerInterface, FieldTransformerGenerator
         $expressionVarName = Code::varName($previousExpression);
         return "(($expressionVarName = $previousExpression) === null || is_scalar($expressionVarName) ? $expressionVarName : (array) $expressionVarName)";
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function canThrowError(): bool
+    {
+        return false;
+    }
 }

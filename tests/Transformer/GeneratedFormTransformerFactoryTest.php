@@ -36,6 +36,7 @@ class Quatrevieux_Form_Fixtures_SimpleRequestTransformerGeneratorTesting impleme
             'foo' => (is_scalar($__tmp_8f4ee22287b10f019cf66bcea64b29b1 = $value['foo'] ?? null) || $__tmp_8f4ee22287b10f019cf66bcea64b29b1 instanceof \Stringable ? (string) $__tmp_8f4ee22287b10f019cf66bcea64b29b1 : null),
             'bar' => (is_scalar($__tmp_18be4920f0fd7449d8f97cd9dcd226d5 = $value['bar'] ?? null) || $__tmp_18be4920f0fd7449d8f97cd9dcd226d5 instanceof \Stringable ? (string) $__tmp_18be4920f0fd7449d8f97cd9dcd226d5 : null),
         ];
+
         return new TransformationResult($transformed, $errors);
     }
 
@@ -103,6 +104,7 @@ class Quatrevieux_Form_Fixtures_WithTransformerRequestTransformerGeneratorTestin
         $transformed = [
             'list' => (($__tmp_d2f1517cbdc1e8f0e3107ec10dc0e518 = (is_string($__tmp_ccc11a38b775e3f7281e431235032257 = $value['list'] ?? null) ? str_getcsv($__tmp_ccc11a38b775e3f7281e431235032257, ',', '"', '') : null)) !== null ? (array) $__tmp_d2f1517cbdc1e8f0e3107ec10dc0e518 : null),
         ];
+
         return new TransformationResult($transformed, $errors);
     }
 

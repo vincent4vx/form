@@ -83,6 +83,14 @@ final class ArrayCast implements FieldTransformerInterface, FieldTransformerGene
 
     /**
      * {@inheritdoc}
+     */
+    public function canThrowError(): bool
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * @param ArrayCast $transformer
      */

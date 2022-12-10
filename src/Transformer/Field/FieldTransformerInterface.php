@@ -26,4 +26,10 @@ interface FieldTransformerInterface
      * @return mixed Normalized HTTP value
      */
     public function transformToHttp(mixed $value): mixed;
+
+    /**
+     * Does this transformer can throw an error during "from HTTP" transformation ?
+     * If true, calls to {@see FieldTransformerInterface::transformFromHttp()} should be wrapped in a try/catch block
+     */
+    public function canThrowError(): bool;
 }

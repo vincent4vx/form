@@ -52,6 +52,14 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
 
     /**
      * {@inheritdoc}
+     */
+    public function canThrowError(): bool
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * @param Csv $transformer
      */
