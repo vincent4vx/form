@@ -26,7 +26,7 @@ class RuntimeFormTransformerFactoryTest extends FormTestCase
         ], $transformer->transformFromHttp([
             'foo' => 'foo',
             'bar' => 'bar',
-        ]));
+        ])->values);
         $this->assertSame([
             'foo' => 'foo',
             'bar' => 'bar',
@@ -55,7 +55,7 @@ class RuntimeFormTransformerFactoryTest extends FormTestCase
             'list' => ['foo', 'bar'],
         ], $transformer->transformFromHttp([
             'list' => 'foo,bar',
-        ]));
+        ])->values);
 
         $this->assertSame([
             'list' => 'foo,bar',

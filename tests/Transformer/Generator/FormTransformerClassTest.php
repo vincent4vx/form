@@ -15,28 +15,19 @@ class FormTransformerClassTest extends FormTestCase
         $this->assertSame(<<<'PHP'
 <?php
 
+use Quatrevieux\Form\Transformer\TransformationResult;
+use Quatrevieux\Form\Validator\FieldError;
+
 class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
 {
-    /**
-     * Transform raw HTTP value to array of data object properties values
-     *
-     * @param mixed[] $value Raw HTTP value
-     *
-     * @return mixed[] PHP properties values
-     */
-    function transformFromHttp(array $value): array
+    function transformFromHttp(array $value): TransformationResult
     {
-        return [
+        $errors = [];
+        $transformed = [
         ];
+        return new TransformationResult($transformed, $errors);
     }
 
-    /**
-     * Transform data object properties values to normalized HTTP fields
-     *
-     * @param mixed[] $value Array of properties values
-     *
-     * @return mixed[] Normalized HTTP fields value
-     */
     function transformToHttp(array $value): array
     {
         return [
@@ -65,30 +56,21 @@ PHP
         $this->assertSame(<<<'PHP'
 <?php
 
+use Quatrevieux\Form\Transformer\TransformationResult;
+use Quatrevieux\Form\Validator\FieldError;
+
 class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
 {
-    /**
-     * Transform raw HTTP value to array of data object properties values
-     *
-     * @param mixed[] $value Raw HTTP value
-     *
-     * @return mixed[] PHP properties values
-     */
-    function transformFromHttp(array $value): array
+    function transformFromHttp(array $value): TransformationResult
     {
-        return [
+        $errors = [];
+        $transformed = [
             'foo' => $value['bar'] ?? null,
             'baz' => $value['rab'] ?? null,
         ];
+        return new TransformationResult($transformed, $errors);
     }
 
-    /**
-     * Transform data object properties values to normalized HTTP fields
-     *
-     * @param mixed[] $value Array of properties values
-     *
-     * @return mixed[] Normalized HTTP fields value
-     */
     function transformToHttp(array $value): array
     {
         return [
@@ -119,29 +101,20 @@ PHP
         $this->assertSame(<<<'PHP'
 <?php
 
+use Quatrevieux\Form\Transformer\TransformationResult;
+use Quatrevieux\Form\Validator\FieldError;
+
 class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
 {
-    /**
-     * Transform raw HTTP value to array of data object properties values
-     *
-     * @param mixed[] $value Raw HTTP value
-     *
-     * @return mixed[] PHP properties values
-     */
-    function transformFromHttp(array $value): array
+    function transformFromHttp(array $value): TransformationResult
     {
-        return [
+        $errors = [];
+        $transformed = [
             'foo' => base64_decode((string) ($value['foo'] ?? null)),
         ];
+        return new TransformationResult($transformed, $errors);
     }
 
-    /**
-     * Transform data object properties values to normalized HTTP fields
-     *
-     * @param mixed[] $value Array of properties values
-     *
-     * @return mixed[] Normalized HTTP fields value
-     */
     function transformToHttp(array $value): array
     {
         return [

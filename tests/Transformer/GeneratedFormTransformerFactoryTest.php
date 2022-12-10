@@ -24,30 +24,21 @@ class GeneratedFormTransformerFactoryTest extends FormTestCase
         $this->assertEquals(<<<'PHP'
 <?php
 
+use Quatrevieux\Form\Transformer\TransformationResult;
+use Quatrevieux\Form\Validator\FieldError;
+
 class Quatrevieux_Form_Fixtures_SimpleRequestTransformerGeneratorTesting implements Quatrevieux\Form\Transformer\FormTransformerInterface
 {
-    /**
-     * Transform raw HTTP value to array of data object properties values
-     *
-     * @param mixed[] $value Raw HTTP value
-     *
-     * @return mixed[] PHP properties values
-     */
-    function transformFromHttp(array $value): array
+    function transformFromHttp(array $value): TransformationResult
     {
-        return [
+        $errors = [];
+        $transformed = [
             'foo' => (is_scalar($__tmp_8f4ee22287b10f019cf66bcea64b29b1 = $value['foo'] ?? null) || $__tmp_8f4ee22287b10f019cf66bcea64b29b1 instanceof \Stringable ? (string) $__tmp_8f4ee22287b10f019cf66bcea64b29b1 : null),
             'bar' => (is_scalar($__tmp_18be4920f0fd7449d8f97cd9dcd226d5 = $value['bar'] ?? null) || $__tmp_18be4920f0fd7449d8f97cd9dcd226d5 instanceof \Stringable ? (string) $__tmp_18be4920f0fd7449d8f97cd9dcd226d5 : null),
         ];
+        return new TransformationResult($transformed, $errors);
     }
 
-    /**
-     * Transform data object properties values to normalized HTTP fields
-     *
-     * @param mixed[] $value Array of properties values
-     *
-     * @return mixed[] Normalized HTTP fields value
-     */
     function transformToHttp(array $value): array
     {
         return [
@@ -72,7 +63,11 @@ PHP
         ], $transformer->transformFromHttp([
             'foo' => 'foo',
             'bar' => 'bar',
-        ]));
+        ])->values);
+        $this->assertEmpty($transformer->transformFromHttp([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ])->errors);
 
         $this->assertSame([
             'foo' => 'foo',
@@ -97,29 +92,20 @@ PHP
         $this->assertEquals(<<<'PHP'
 <?php
 
+use Quatrevieux\Form\Transformer\TransformationResult;
+use Quatrevieux\Form\Validator\FieldError;
+
 class Quatrevieux_Form_Fixtures_WithTransformerRequestTransformerGeneratorTesting implements Quatrevieux\Form\Transformer\FormTransformerInterface
 {
-    /**
-     * Transform raw HTTP value to array of data object properties values
-     *
-     * @param mixed[] $value Raw HTTP value
-     *
-     * @return mixed[] PHP properties values
-     */
-    function transformFromHttp(array $value): array
+    function transformFromHttp(array $value): TransformationResult
     {
-        return [
+        $errors = [];
+        $transformed = [
             'list' => (($__tmp_d2f1517cbdc1e8f0e3107ec10dc0e518 = (is_string($__tmp_ccc11a38b775e3f7281e431235032257 = $value['list'] ?? null) ? str_getcsv($__tmp_ccc11a38b775e3f7281e431235032257, ',', '"', '') : null)) !== null ? (array) $__tmp_d2f1517cbdc1e8f0e3107ec10dc0e518 : null),
         ];
+        return new TransformationResult($transformed, $errors);
     }
 
-    /**
-     * Transform data object properties values to normalized HTTP fields
-     *
-     * @param mixed[] $value Array of properties values
-     *
-     * @return mixed[] Normalized HTTP fields value
-     */
     function transformToHttp(array $value): array
     {
         return [
@@ -141,7 +127,10 @@ PHP
             'list' => ['foo', 'bar'],
         ], $transformer->transformFromHttp([
             'list' => 'foo,bar',
-        ]));
+        ])->values);
+        $this->assertEmpty($transformer->transformFromHttp([
+            'list' => 'foo,bar',
+        ])->errors);
 
         $this->assertSame([
             'list' => 'foo,bar',

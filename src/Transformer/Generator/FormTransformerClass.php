@@ -9,7 +9,9 @@ use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
+use Quatrevieux\Form\Transformer\TransformationResult;
 use Quatrevieux\Form\Util\Code;
+use Quatrevieux\Form\Validator\FieldError;
 
 /**
  * Class generator helper for generates {@see FormTransformerInterface} class
@@ -44,8 +46,11 @@ final class FormTransformerClass
         $this->file = new PhpFile();
         $this->class = $this->file->addClass($className);
 
-        $this->fromHttpMethod = Method::from([FormTransformerInterface::class, 'transformFromHttp']);
-        $this->toHttpMethod = Method::from([FormTransformerInterface::class, 'transformToHttp']);
+        $this->file->addUse(TransformationResult::class);
+        $this->file->addUse(FieldError::class);
+
+        $this->fromHttpMethod = Method::from([FormTransformerInterface::class, 'transformFromHttp'])->setComment(null);
+        $this->toHttpMethod = Method::from([FormTransformerInterface::class, 'transformToHttp'])->setComment(null);
 
         $this->class->addImplement(FormTransformerInterface::class);
         $this->class->addMember($this->fromHttpMethod);
@@ -95,24 +100,9 @@ final class FormTransformerClass
      */
     public function generateFromHttp(): void
     {
-        $code = 'return [' . PHP_EOL;
-
-        foreach ($this->fromHttpFieldsTransformationExpressions as $fieldName => $expressions) {
-            $fieldNameString = Code::value($fieldName);
-            $httpFieldString = Code::value($this->propertyNameToHttpFieldName[$fieldName] ?? $fieldName);
-
-            $fieldExpression = '$value[' . $httpFieldString . '] ?? null';
-
-            foreach ($expressions as $expression) {
-                $fieldExpression = $expression($fieldExpression);
-            }
-
-            $code .= '    ' . $fieldNameString . ' => ' . $fieldExpression . ',' . PHP_EOL;
-        }
-
-        $code .= '];';
-
-        $this->fromHttpMethod->addBody($code);
+        $this->fromHttpMethod->addBody('$errors = [];');
+        $this->fromHttpMethod->addBody('$transformed = ' . $this->generateInlineFromHttpArray() . ';');
+        $this->fromHttpMethod->addBody('return new TransformationResult($transformed, $errors);');
     }
 
     /**
@@ -148,5 +138,25 @@ final class FormTransformerClass
     public function code(): string
     {
         return (new PsrPrinter())->printFile($this->file);
+    }
+
+    private function generateInlineFromHttpArray(): string
+    {
+        $code = '[' . PHP_EOL;
+
+        foreach ($this->fromHttpFieldsTransformationExpressions as $fieldName => $expressions) {
+            $fieldNameString = Code::value($fieldName);
+            $httpFieldString = Code::value($this->propertyNameToHttpFieldName[$fieldName] ?? $fieldName);
+
+            $fieldExpression = '$value[' . $httpFieldString . '] ?? null';
+
+            foreach ($expressions as $expression) {
+                $fieldExpression = $expression($fieldExpression);
+            }
+
+            $code .= '    ' . $fieldNameString . ' => ' . $fieldExpression . ',' . PHP_EOL;
+        }
+
+        return $code . ']';
     }
 }

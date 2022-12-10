@@ -19,9 +19,9 @@ interface FormTransformerInterface
      *
      * @param mixed[] $value Raw HTTP value
      *
-     * @return mixed[] PHP properties values
+     * @return TransformationResult Result of transformation process. Contains properties values and transformation errors
      */
-    public function transformFromHttp(array $value): array;
+    public function transformFromHttp(array $value): TransformationResult;
 
     /**
      * Transform data object properties values to normalized HTTP fields

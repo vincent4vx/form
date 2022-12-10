@@ -37,9 +37,9 @@ final class Form implements FormInterface
      */
     public function submit(array $data): SubmittedFormInterface
     {
-        $data = $this->transformer->transformFromHttp($data);
-        $dto = $this->instantiator->instantiate($data);
-        $errors = $this->validator->validate($dto);
+        $transformation = $this->transformer->transformFromHttp($data);
+        $dto = $this->instantiator->instantiate($transformation->values);
+        $errors = $this->validator->validate($dto, $transformation->errors);
 
         return new SubmittedForm($dto, $errors);
     }

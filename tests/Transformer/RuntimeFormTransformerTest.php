@@ -41,7 +41,7 @@ class RuntimeFormTransformerTest extends FormTestCase
             []
         );
 
-        $this->assertEquals(['foo' => 'bar'], $transformer->transformFromHttp(['foo' => 'bar', 'other' => 'ignored']));
+        $this->assertEquals(new TransformationResult(['foo' => 'bar'], []), $transformer->transformFromHttp(['foo' => 'bar', 'other' => 'ignored']));
         $this->assertEquals(['foo' => 'bar'], $transformer->transformToHttp(['foo' => 'bar', 'other' => 'ignored']));
     }
 
@@ -57,7 +57,7 @@ class RuntimeFormTransformerTest extends FormTestCase
             ]
         );
 
-        $this->assertEquals(['foo' => 'bar'], $transformer->transformFromHttp(['bar' => 'bar', 'other' => 'ignored']));
+        $this->assertEquals(new TransformationResult(['foo' => 'bar'], []), $transformer->transformFromHttp(['bar' => 'bar', 'other' => 'ignored']));
         $this->assertEquals(['bar' => 'bar'], $transformer->transformToHttp(['foo' => 'bar', 'other' => 'ignored']));
     }
 
@@ -74,7 +74,7 @@ class RuntimeFormTransformerTest extends FormTestCase
             ]
         );
 
-        $this->assertEquals(['foo' => ['bar', 'baz'], 'bar' => 42], $transformer->transformFromHttp(['__foo' => 'bar,baz', 'bar' => '42']));
+        $this->assertEquals(new TransformationResult(['foo' => ['bar', 'baz'], 'bar' => 42], []), $transformer->transformFromHttp(['__foo' => 'bar,baz', 'bar' => '42']));
         $this->assertEquals(['__foo' => 'bar,baz', 'bar' => '42'], $transformer->transformToHttp(['foo' => ['bar', 'baz'], 'bar' => 42]));
     }
 
@@ -90,7 +90,7 @@ class RuntimeFormTransformerTest extends FormTestCase
             []
         );
 
-        $this->assertEquals(['foo' => 'bar'], $transformer->transformFromHttp(['foo' => base64_encode('bar')]));
+        $this->assertEquals(new TransformationResult(['foo' => 'bar'], []), $transformer->transformFromHttp(['foo' => base64_encode('bar')]));
         $this->assertEquals(['foo' => base64_encode('bar')], $transformer->transformToHttp(['foo' => 'bar']));
     }
 }

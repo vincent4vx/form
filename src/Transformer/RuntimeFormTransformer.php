@@ -34,9 +34,10 @@ final class RuntimeFormTransformer implements FormTransformerInterface
      *
      * @todo handle exception
      */
-    public function transformFromHttp(array $value): array
+    public function transformFromHttp(array $value): TransformationResult
     {
         $normalized = [];
+        $errors = [];
 
         foreach ($this->fieldsTransformers as $fieldName => $transformers) {
             $httpFieldName = $this->fieldsNameMapping[$fieldName] ?? $fieldName;
@@ -54,7 +55,7 @@ final class RuntimeFormTransformer implements FormTransformerInterface
             $normalized[$fieldName] = $fieldValue;
         }
 
-        return $normalized;
+        return new TransformationResult($normalized, $errors);
     }
 
     /**
