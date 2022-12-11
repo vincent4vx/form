@@ -75,7 +75,8 @@ final class ValidatorClass
             $expressions = implode(' ?? ', $expressions);
             $fieldNameString = Code::value($fieldName);
 
-            $this->validateMethod->addBody(<<<PHP
+            $this->validateMethod->addBody(
+                <<<PHP
             if (!isset(\$previousErrors[{$fieldNameString}]) && \$__error_{$fieldName} = {$expressions}) {
                 \$errors[{$fieldNameString}] = \$__error_{$fieldName};
             }

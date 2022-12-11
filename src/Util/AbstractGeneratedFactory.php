@@ -69,7 +69,7 @@ abstract class AbstractGeneratedFactory
      * @param class-string $dataClassName DTO class name to handle
      * @return string
      */
-    public final function resolveClassName(string $dataClassName): string
+    final public function resolveClassName(string $dataClassName): string
     {
         return ($this->classNameResolver)($dataClassName);
     }
@@ -82,7 +82,7 @@ abstract class AbstractGeneratedFactory
      *
      * @return T Requested module instance
      */
-    protected final function createOrGenerate(string $dataClass): object
+    final protected function createOrGenerate(string $dataClass): object
     {
         $className = $this->resolveClassName($dataClass);
 

@@ -17,7 +17,8 @@ final class FormTransformerGenerator
     public function __construct(
         private readonly FieldTransformerGeneratorInterface $genericTransformerGenerator = new GenericFieldTransformerGenerator(),
         private readonly DelegatedFieldTransformerGenerator $delegatedFieldTransformerGenerator = new DelegatedFieldTransformerGenerator(),
-    ) {}
+    ) {
+    }
 
     /**
      * Compile given FormTransformer to a class
@@ -46,8 +47,8 @@ final class FormTransformerGenerator
 
                     $classHelper->addFieldTransformationExpression(
                         $fieldName,
-                        fn(string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression),
-                        fn(string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression),
+                        fn (string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression),
+                        fn (string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression),
                         true
                     );
                 } else {
@@ -55,8 +56,8 @@ final class FormTransformerGenerator
 
                     $classHelper->addFieldTransformationExpression(
                         $fieldName,
-                        fn(string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression),
-                        fn(string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression),
+                        fn (string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression),
+                        fn (string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression),
                         $transformer->canThrowError()
                     );
                 }

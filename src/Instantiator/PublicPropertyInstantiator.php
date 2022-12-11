@@ -16,7 +16,6 @@ final class PublicPropertyInstantiator implements InstantiatorInterface
          */
         private readonly string $className,
     ) {
-
     }
 
     /**

@@ -71,6 +71,9 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
+      - name: Run checkstyle
+        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff
+
       - name: Run type coverage
         run: ./vendor/bin/phpstan
 

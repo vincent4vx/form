@@ -12,7 +12,7 @@ abstract class SelfValidatedConstraint implements ConstraintInterface, Constrain
     /**
      * {@inheritdoc}
      */
-    public final function getValidator(ConstraintValidatorRegistryInterface $registry): ConstraintValidatorInterface
+    final public function getValidator(ConstraintValidatorRegistryInterface $registry): ConstraintValidatorInterface
     {
         return $this;
     }

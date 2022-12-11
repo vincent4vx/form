@@ -15,7 +15,8 @@ final class Required extends SelfValidatedConstraint implements ConstraintValida
 {
     public function __construct(
         public readonly string $message = 'This value is required',
-    ) {}
+    ) {
+    }
 
     /**
      * {@inheritdoc}

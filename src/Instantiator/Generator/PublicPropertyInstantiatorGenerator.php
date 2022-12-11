@@ -40,12 +40,14 @@ final class PublicPropertyInstantiatorGenerator implements InstantiatorTypeGener
             } else {
                 $tmpVarname = '___tmp' . bin2hex(random_bytes(8));
 
-                $class->addInstantiateBody(<<<'PHP'
+                $class->addInstantiateBody(
+                    <<<'PHP'
                     if (($? = $fields[?] \?\? null) !== null) {
                         $object->? = $?;
                     }
                     PHP
-                    , [$tmpVarname, $property->name, $property->name, $tmpVarname]
+                    ,
+                    [$tmpVarname, $property->name, $property->name, $tmpVarname]
                 );
             }
         }

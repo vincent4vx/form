@@ -8,7 +8,6 @@ class FieldError
     public function __construct(
         public readonly string $message,
     ) {
-
     }
 
     public function __toString(): string

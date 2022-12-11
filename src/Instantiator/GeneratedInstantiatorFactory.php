@@ -39,7 +39,7 @@ final class GeneratedInstantiatorFactory extends AbstractGeneratedFactory implem
         parent::__construct(
             $savePathResolver ?? Functions::savePathResolver(),
             $classNameResolver ?? Functions::classNameResolver('Instantiator'),
-                InstantiatorInterface::class
+            InstantiatorInterface::class
         );
 
         $this->factory = $factory ?? new RuntimeInstantiatorFactory();

@@ -18,7 +18,6 @@ final class ValidatorGenerator
         private readonly ConstraintValidatorRegistryInterface $validatorRegistry,
         private readonly ConstraintValidatorGeneratorInterface $genericValidatorGenerator = new GenericValidatorGenerator(),
     ) {
-
     }
 
     /**
