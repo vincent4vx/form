@@ -28,8 +28,6 @@ final class RuntimeValidatorFactory implements ValidatorFactoryInterface
      * @param class-string<T> $dataClass
      * @template T as object
      * @return ValidatorInterface<T>
-     *
-     * @todo null validator for optimisations
      */
     public function create(string $dataClass): ValidatorInterface
     {
