@@ -31,9 +31,14 @@ final class FormTransformerGenerator
     {
         $classHelper = new FormTransformerClass($transformerClassName);
         $fieldNameMapping = $transformer->getFieldsNameMapping();
+        $fieldErrorConfigurations = $transformer->getFieldsTransformationErrors();
 
         foreach ($transformer->getFieldsTransformers() as $fieldName => $transformers) {
-            $classHelper->declareField($fieldName, $fieldNameMapping[$fieldName] ?? $fieldName);
+            $classHelper->declareField(
+                $fieldName,
+                $fieldNameMapping[$fieldName] ?? $fieldName,
+                $fieldErrorConfigurations[$fieldName] ?? null
+            );
 
             foreach ($transformers as $transformer) {
                 if ($transformer instanceof DelegatedFieldTransformerInterface) {

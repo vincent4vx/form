@@ -8,8 +8,10 @@ use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Transformer\Field\HttpField;
+use Quatrevieux\Form\Transformer\Field\TransformationError;
 use ReflectionClass;
 use ReflectionProperty;
+use function is_subclass_of;
 
 /**
  * Factory for form transformer resolving in runtime transformers by using attributes and reflection API
@@ -29,48 +31,96 @@ final class RuntimeFormTransformerFactory implements FormTransformerFactoryInter
 
     /**
      * {@inheritdoc}
-     *
-     * @todo handle field name mapping
      */
     public function create(string $dataClassName): FormTransformerInterface
     {
         $reflectionClass = new ReflectionClass($dataClassName);
         $fieldsTransformers = [];
         $fieldsNameMapping = [];
+        $fieldsTransformationErrors = [];
 
         foreach ($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            /** @var list<FieldTransformerInterface|DelegatedFieldTransformerInterface> $transformers */
-            $transformers = [];
-            $needCast = $property->hasType();
+            $fieldName = $property->name;
 
-            foreach ($property->getAttributes(HttpField::class) as $attribute) {
-                $fieldsNameMapping[$property->name] = $attribute->newInstance()->name;
+            if ($httpField = $this->fieldNameMapping($property)) {
+                $fieldsNameMapping[$fieldName] = $httpField;
             }
 
-            foreach ($property->getAttributes() as $attribute) {
-                $className = $attribute->getName();
-
-                if (!is_subclass_of($className, FieldTransformerInterface::class) && !is_subclass_of($className, DelegatedFieldTransformerInterface::class)) {
-                    continue;
-                }
-
-                /** @var FieldTransformerInterface|DelegatedFieldTransformerInterface $transformer */
-                $transformer = $attribute->newInstance();
-                $transformers[] = $transformer;
-
-                if ($needCast && $className === Cast::class) {
-                    $needCast = false;
-                }
+            if ($transformationErrorConfig = $this->transformationErrorConfiguration($property)) {
+                $fieldsTransformationErrors[$fieldName] = $transformationErrorConfig;
             }
 
-            if ($needCast) {
-                /** @phpstan-ignore-next-line $property->getType() is not null */
-                $transformers[] = new Cast(CastType::fromReflectionType($property->getType()));
-            }
-
-            $fieldsTransformers[$property->name] = $transformers;
+            $fieldsTransformers[$fieldName] = $this->fieldTransformers($property);
         }
 
-        return new RuntimeFormTransformer($this->registry, $fieldsTransformers, $fieldsNameMapping);
+        return new RuntimeFormTransformer($this->registry, $fieldsTransformers, $fieldsNameMapping, $fieldsTransformationErrors);
+    }
+
+    /**
+     * Extract HTTP field name from property using attribute {@see HttpField}
+     *
+     * @param ReflectionProperty $property
+     * @return string|null
+     */
+    private function fieldNameMapping(ReflectionProperty $property): ?string
+    {
+        foreach ($property->getAttributes(HttpField::class) as $attribute) {
+            return $attribute->newInstance()->name;
+        }
+
+        return null;
+    }
+
+    /**
+     * Extract attribute value of {@see TransformationError}
+     *
+     * @param ReflectionProperty $property
+     * @return TransformationError|null
+     */
+    private function transformationErrorConfiguration(ReflectionProperty $property): ?TransformationError
+    {
+        foreach ($property->getAttributes(TransformationError::class) as $attribute) {
+            return $attribute->newInstance();
+        }
+
+        return null;
+    }
+
+    /**
+     * Extract transformers from property attributes
+     *
+     * Note: Extract all attributes and filter them using `is_subclass_of` instead of using `getAttributes` with a class name
+     *       to ensure than the order of attributes is respected between FieldTransformerInterface and DelegatedFieldTransformerInterface
+     *
+     * @param ReflectionProperty $property
+     * @return list<FieldTransformerInterface|DelegatedFieldTransformerInterface>
+     */
+    private function fieldTransformers(ReflectionProperty $property): array
+    {
+        $transformers = [];
+        $needCast = $property->hasType();
+
+        foreach ($property->getAttributes() as $attribute) {
+            $className = $attribute->getName();
+
+            if (!is_subclass_of($className, FieldTransformerInterface::class) && !is_subclass_of($className, DelegatedFieldTransformerInterface::class)) {
+                continue;
+            }
+
+            /** @var FieldTransformerInterface|DelegatedFieldTransformerInterface $transformer */
+            $transformer = $attribute->newInstance();
+            $transformers[] = $transformer;
+
+            if ($needCast && $className === Cast::class) {
+                $needCast = false;
+            }
+        }
+
+        if ($needCast) {
+            /** @phpstan-ignore-next-line $property->getType() is not null */
+            $transformers[] = new Cast(CastType::fromReflectionType($property->getType()));
+        }
+
+        return $transformers;
     }
 }

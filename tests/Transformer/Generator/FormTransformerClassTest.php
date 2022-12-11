@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Transformer\Generator;
 
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\Transformer\Field\TransformationError;
 
 class FormTransformerClassTest extends FormTestCase
 {
@@ -172,6 +173,67 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
     {
         return [
             'foo' => base64_encode($value['foo'] ?? null),
+        ];
+    }
+
+    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    {
+    }
+}
+
+PHP
+        , $class->code());
+    }
+
+    public function test_custom_error_handling()
+    {
+        $class = new FormTransformerClass('ClassName');
+
+        $class->declareField('foo', 'foo', new TransformationError(message: 'my transformation error', keepOriginalValue: true));
+        $class->declareField('bar', 'bar', new TransformationError(ignore: true));
+
+        $class->addFieldTransformationExpression('foo', fn ($v) => "(string) ($v)", fn ($v) => "$v", true);
+        $class->addFieldTransformationExpression('bar', fn ($v) => "base64_decode($v)", fn ($v) => "base64_encode($v)", true);
+
+        $class->generateToHttp();
+        $class->generateFromHttp();
+
+        $this->assertSame(<<<'PHP'
+<?php
+
+use Quatrevieux\Form\Transformer\TransformationResult;
+use Quatrevieux\Form\Validator\FieldError;
+
+class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
+{
+    function transformFromHttp(array $value): TransformationResult
+    {
+        $errors = [];
+        $transformed = [
+        ];
+
+        try {
+            $transformed['foo'] = (string) ($value['foo'] ?? null);
+        } catch (\Exception $e) {
+            $errors['foo'] = new FieldError('my transformation error');
+            $transformed['foo'] = $value['foo'] ?? null;
+        }
+
+        try {
+            $transformed['bar'] = base64_decode($value['bar'] ?? null);
+        } catch (\Exception $e) {
+
+            $transformed['bar'] = null;
+        }
+
+        return new TransformationResult($transformed, $errors);
+    }
+
+    function transformToHttp(array $value): array
+    {
+        return [
+            'foo' => $value['foo'] ?? null,
+            'bar' => base64_encode($value['bar'] ?? null),
         ];
     }
 

@@ -13,6 +13,7 @@ use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Transformer\Field\NullFieldTransformerRegistry;
+use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Validator\FieldError;
 
 class RuntimeFormTransformerTest extends FormTestCase
@@ -27,11 +28,15 @@ class RuntimeFormTransformerTest extends FormTestCase
             ],
             $mapping = [
                 'foo' => '__foo',
-            ]
+            ],
+            $errorConfig = [
+                'bar' => new TransformationError(message: 'bar error'),
+            ],
         );
 
         $this->assertEquals($transformers, $transformer->getFieldsTransformers());
         $this->assertEquals($mapping, $transformer->getFieldsNameMapping());
+        $this->assertEquals($errorConfig, $transformer->getFieldsTransformationErrors());
     }
 
     public function test_without_transformers()
@@ -41,6 +46,7 @@ class RuntimeFormTransformerTest extends FormTestCase
             [
                 'foo' => [],
             ],
+            [],
             []
         );
 
@@ -55,10 +61,75 @@ class RuntimeFormTransformerTest extends FormTestCase
             [
                 'foo' => [new FailingTransformer()],
             ],
+            [],
             []
         );
 
         $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my transformation error')]), $transformer->transformFromHttp(['foo' => 'bar']));
+    }
+
+    public function test_with_transformation_error_custom_message()
+    {
+        $transformer = new RuntimeFormTransformer(
+            new NullFieldTransformerRegistry(),
+            [
+                'foo' => [new FailingTransformer()],
+            ],
+            [],
+            [
+                'foo' => new TransformationError(message: 'my custom error'),
+            ]
+        );
+
+        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my custom error')]), $transformer->transformFromHttp(['foo' => 'bar']));
+    }
+
+    public function test_with_transformation_error_ignored()
+    {
+        $transformer = new RuntimeFormTransformer(
+            new NullFieldTransformerRegistry(),
+            [
+                'foo' => [new FailingTransformer()],
+            ],
+            [],
+            [
+                'foo' => new TransformationError(ignore: true),
+            ]
+        );
+
+        $this->assertEquals(new TransformationResult(['foo' => null], []), $transformer->transformFromHttp(['foo' => 'bar']));
+    }
+
+    public function test_with_transformation_keep_original_value()
+    {
+        $transformer = new RuntimeFormTransformer(
+            new NullFieldTransformerRegistry(),
+            [
+                'foo' => [new FailingTransformer()],
+            ],
+            [],
+            [
+                'foo' => new TransformationError(keepOriginalValue: true),
+            ]
+        );
+
+        $this->assertEquals(new TransformationResult(['foo' => 'bar'], ['foo' => new FieldError('my transformation error')]), $transformer->transformFromHttp(['foo' => 'bar']));
+    }
+
+    public function test_with_transformation_error_ignored_and_keep_original_value()
+    {
+        $transformer = new RuntimeFormTransformer(
+            new NullFieldTransformerRegistry(),
+            [
+                'foo' => [new FailingTransformer()],
+            ],
+            [],
+            [
+                'foo' => new TransformationError(ignore: true, keepOriginalValue: true),
+            ]
+        );
+
+        $this->assertEquals(new TransformationResult(['foo' => 'bar'], []), $transformer->transformFromHttp(['foo' => 'bar']));
     }
 
     public function test_with_field_mapping()
@@ -70,7 +141,8 @@ class RuntimeFormTransformerTest extends FormTestCase
             ],
             [
                 'foo' => 'bar',
-            ]
+            ],
+            []
         );
 
         $this->assertEquals(new TransformationResult(['foo' => 'bar'], []), $transformer->transformFromHttp(['bar' => 'bar', 'other' => 'ignored']));
@@ -87,7 +159,8 @@ class RuntimeFormTransformerTest extends FormTestCase
             ],
             [
                 'foo' => '__foo',
-            ]
+            ],
+            []
         );
 
         $this->assertEquals(new TransformationResult(['foo' => ['bar', 'baz'], 'bar' => 42], []), $transformer->transformFromHttp(['__foo' => 'bar,baz', 'bar' => '42']));
@@ -103,6 +176,7 @@ class RuntimeFormTransformerTest extends FormTestCase
             [
                 'foo' => [new MyDelegatedTransformer()]
             ],
+            [],
             []
         );
 

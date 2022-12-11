@@ -3,13 +3,17 @@
 namespace Quatrevieux\Form\Transformer;
 
 use Quatrevieux\Form\ContainerRegistry;
+use Quatrevieux\Form\Fixtures\FailingTransformerRequest;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
+use Quatrevieux\Form\Fixtures\UnsafeBase64;
+use Quatrevieux\Form\Fixtures\UnsafeJsonTransformer;
 use Quatrevieux\Form\Fixtures\WithFieldNameMapping;
 use Quatrevieux\Form\Fixtures\WithTransformerRequest;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Transformer\Field\Cast;
 use Quatrevieux\Form\Transformer\Field\CastType;
 use Quatrevieux\Form\Transformer\Field\Csv;
+use Quatrevieux\Form\Transformer\Field\TransformationError;
 
 class RuntimeFormTransformerFactoryTest extends FormTestCase
 {
@@ -36,6 +40,7 @@ class RuntimeFormTransformerFactoryTest extends FormTestCase
         ]));
 
         $this->assertEquals([], $transformer->getFieldsNameMapping());
+        $this->assertEquals([], $transformer->getFieldsTransformationErrors());
 
         $this->assertEquals([
             'foo' => [new Cast(CastType::String)],
@@ -64,9 +69,28 @@ class RuntimeFormTransformerFactoryTest extends FormTestCase
         ]));
 
         $this->assertEquals([], $transformer->getFieldsNameMapping());
+        $this->assertEquals([], $transformer->getFieldsTransformationErrors());
         $this->assertEquals([
             'list' => [new Csv(enclosure: '"'), new Cast(CastType::Array)],
         ], $transformer->getFieldsTransformers());
+    }
+
+    public function test_create_with_transformation_error_configuration()
+    {
+        $factory = new RuntimeFormTransformerFactory(new ContainerRegistry($this->container));
+
+        $transformer = $factory->create(FailingTransformerRequest::class);
+
+        $this->assertEquals([], $transformer->getFieldsNameMapping());
+        $this->assertEquals([
+            'foo' => [new UnsafeJsonTransformer(), new Cast(CastType::Object)],
+            'customTransformerErrorHandling' => [new UnsafeBase64(), new Cast(CastType::String)],
+            'ignoreError' => [new UnsafeBase64(), new Cast(CastType::String)],
+        ], $transformer->getFieldsTransformers());
+        $this->assertEquals([
+            'customTransformerErrorHandling' => new TransformationError(message: 'invalid data', keepOriginalValue: true),
+            'ignoreError' => new TransformationError(ignore: true),
+        ], $transformer->getFieldsTransformationErrors());
     }
 
     public function test_create_with_field_name_mapping()

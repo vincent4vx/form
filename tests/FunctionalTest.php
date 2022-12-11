@@ -169,6 +169,22 @@ class FunctionalTest extends FormTestCase
         $this->assertTrue($submitted->valid());
         $this->assertEquals((object) ['foo' => 'bar'], $submitted->value()->foo);
         $this->assertEmpty($submitted->errors());
+
+        $submitted = $form->submit(['foo' => '{"foo":"bar"}', 'customTransformerErrorHandling' => '____']);
+        $this->assertFalse($submitted->valid());
+        $this->assertSame('____', $submitted->value()->customTransformerErrorHandling);
+        $this->assertEquals(['customTransformerErrorHandling' => new FieldError('invalid data')], $submitted->errors());
+
+        $submitted = $form->submit(['foo' => '{"foo":"bar"}', 'customTransformerErrorHandling' => base64_encode('foo')]);
+        $this->assertTrue($submitted->valid());
+        $this->assertSame('foo', $submitted->value()->customTransformerErrorHandling);
+        $this->assertEmpty($submitted->errors());
+
+        $submitted = $form->submit(['foo' => '{"foo":"bar"}', 'ignoreError' => '____']);
+        $this->assertTrue($submitted->valid());
+        $this->assertNull($submitted->value()->ignoreError);
+        $this->assertEmpty($submitted->errors());
+
     }
 
     public function form(string $dataClass): FormInterface

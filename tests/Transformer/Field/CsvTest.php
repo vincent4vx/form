@@ -35,7 +35,9 @@ class CsvTest extends FormTestCase
         $this->assertNull($form->import(new CsvTestRequest())->httpValue()['withEnclosure']);
 
         $this->assertSame('foo,bar', $form->import(CsvTestRequest::simple(['foo', 'bar']))->httpValue()['simple']);
+        $this->assertSame('12,34', $form->import(CsvTestRequest::simple([12, 34]))->httpValue()['simple']);
         $this->assertSame('foo;bar', $form->import(CsvTestRequest::withEnclosure(['foo', 'bar']))->httpValue()['withEnclosure']);
+        $this->assertSame('12;34', $form->import(CsvTestRequest::withEnclosure([12, 34]))->httpValue()['withEnclosure']);
         $this->assertSame('foo;"b;ar"', $form->import(CsvTestRequest::withEnclosure(['foo', 'b;ar']))->httpValue()['withEnclosure']);
         $this->assertSame('foo;"b""ar"', $form->import(CsvTestRequest::withEnclosure(['foo', 'b"ar']))->httpValue()['withEnclosure']);
         $this->assertSame('foo;"b'."\n".'ar"', $form->import(CsvTestRequest::withEnclosure(['foo', "b\nar"]))->httpValue()['withEnclosure']);

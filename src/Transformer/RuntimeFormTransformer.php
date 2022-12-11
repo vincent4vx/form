@@ -6,6 +6,7 @@ use Exception;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
+use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Validator\FieldError;
 
 /**
@@ -21,20 +22,30 @@ final class RuntimeFormTransformer implements FormTransformerInterface
     public function __construct(
         private readonly FieldTransformerRegistryInterface $registry,
         /**
+         * Associate a field name with transformers to apply
+         *
          * @var array<string, list<FieldTransformerInterface|DelegatedFieldTransformerInterface>>
          */
         private readonly array $fieldsTransformers,
+
         /**
+         * Map DTO field name to HTTP field name
+         *
          * @var array<string, string>
          */
         private readonly array $fieldsNameMapping,
+
+        /**
+         * Associate a field name with its error handling configuration
+         *
+         * @var array<string, TransformationError>
+         */
+        private readonly array $fieldsTransformationErrors,
     ) {
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @todo customize error handling
      */
     public function transformFromHttp(array $value): TransformationResult
     {
@@ -43,13 +54,19 @@ final class RuntimeFormTransformer implements FormTransformerInterface
 
         foreach ($this->fieldsTransformers as $fieldName => $transformers) {
             $httpFieldName = $this->fieldsNameMapping[$fieldName] ?? $fieldName;
+            $originalValue = $value[$httpFieldName] ?? null;
 
             try {
-                $fieldValue = $this->callFromHttpTransformer($value[$httpFieldName] ?? null, $transformers);
+                $fieldValue = $this->callFromHttpTransformer($originalValue, $transformers);
                 $normalized[$fieldName] = $fieldValue;
             } catch (Exception $e) {
-                $errors[$fieldName] = new FieldError($e->getMessage());
-                $normalized[$fieldName] = null;
+                $errorHandlingConfigurator = $this->fieldsTransformationErrors[$fieldName] ?? null;
+
+                if (!$errorHandlingConfigurator?->ignore) {
+                    $errors[$fieldName] = new FieldError($errorHandlingConfigurator?->message ?? $e->getMessage());
+                }
+
+                $normalized[$fieldName] = $errorHandlingConfigurator?->keepOriginalValue ? $originalValue : null;
             }
         }
 
@@ -93,11 +110,23 @@ final class RuntimeFormTransformer implements FormTransformerInterface
     }
 
     /**
+     * Get the mapping of DTO field name to HTTP field name
+     *
      * @return array<string, string>
      */
     public function getFieldsNameMapping(): array
     {
         return $this->fieldsNameMapping;
+    }
+
+    /**
+     * Get the error handling configuration for each field
+     *
+     * @return array<string, TransformationError>
+     */
+    public function getFieldsTransformationErrors(): array
+    {
+        return $this->fieldsTransformationErrors;
     }
 
     /**

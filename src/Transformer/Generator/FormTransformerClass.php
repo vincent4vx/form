@@ -8,6 +8,7 @@ use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
+use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Transformer\TransformationResult;
 use Quatrevieux\Form\Util\Code;
@@ -37,6 +38,11 @@ final class FormTransformerClass
      * @var array<string, bool>
      */
     private array $fieldTransformersCanThrowError = [];
+
+    /**
+     * @var array<string, TransformationError|null>
+     */
+    private array $fieldTransformersErrorHandling = [];
 
     /**
      * @var array<string, list<Closure(string):string>>
@@ -75,14 +81,17 @@ final class FormTransformerClass
      * otherwise fields without transformers will be ignored.
      *
      * @param string $fieldName Field name to declare
+     * @param string $httpFieldName Mapped HTTP field name
+     * @param TransformationError|null $errorHandling Error handling configuration
      *
      * @return void
      */
-    public function declareField(string $fieldName, string $httpFieldName): void
+    public function declareField(string $fieldName, string $httpFieldName, ?TransformationError $errorHandling = null): void
     {
         $this->propertyNameToHttpFieldName[$fieldName] = $httpFieldName;
         $this->fromHttpFieldsTransformationExpressions[$fieldName] = [];
         $this->toHttpFieldsTransformationExpressions[$fieldName] = [];
+        $this->fieldTransformersErrorHandling[$fieldName] = $errorHandling;
     }
 
     /**
@@ -188,10 +197,19 @@ final class FormTransformerClass
                 continue;
             }
 
+            $errorHandlingConfiguration = $this->fieldTransformersErrorHandling[$fieldName] ?? null;
+
             $fieldNameString = Code::value($fieldName);
             $httpFieldString = Code::value($this->propertyNameToHttpFieldName[$fieldName] ?? $fieldName);
 
             $fieldExpression = '$value[' . $httpFieldString . '] ?? null';
+
+            $errorValue = $errorHandlingConfiguration?->keepOriginalValue ? $fieldExpression : 'null';
+            $errorMessage = $errorHandlingConfiguration?->message ? Code::value($errorHandlingConfiguration->message) : '$e->getMessage()';
+            $setErrorExpression = $errorHandlingConfiguration?->ignore
+                ? ''
+                : '$errors[' . $fieldNameString . '] = new FieldError(' . $errorMessage . ');'
+            ;
 
             foreach ($expressions as $expression) {
                 $fieldExpression = $expression($fieldExpression);
@@ -202,8 +220,8 @@ final class FormTransformerClass
             try {
                 \$transformed[{$fieldNameString}] = {$fieldExpression};
             } catch (\Exception \$e) {
-                \$errors[{$fieldNameString}] = new FieldError(\$e->getMessage());
-                \$transformed[{$fieldNameString}] = null;
+                {$setErrorExpression}
+                \$transformed[{$fieldNameString}] = {$errorValue};
             }
 
             PHP;
