@@ -6,6 +6,7 @@ use Attribute;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
+use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 /**
  * Validate a field value using a method call.
@@ -113,7 +114,7 @@ final class ValidationMethod extends SelfValidatedConstraint implements Constrai
     /**
      * {@inheritdoc}
      */
-    public function generate(ConstraintInterface $constraint, string $fieldAccessor): string
+    public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
     {
         $className = $constraint->class;
         $methodName = $constraint->method;

@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\Validator\Constraint;
 
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\FieldError;
+use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 class RequiredTest extends FormTestCase
 {
@@ -38,11 +39,12 @@ class RequiredTest extends FormTestCase
 
     public function test_generated_code()
     {
+        $generator = new ValidatorGenerator(new NullConstraintValidatorRegistry());
         $defaultMessage = new Required();
-        $this->assertEquals('($data->field ?? null) === null || ($data->field ?? null) === \'\' || ($data->field ?? null) === [] ? new FieldError(\'This value is required\') : null', $defaultMessage->generate($defaultMessage, '($data->field ?? null)'));
+        $this->assertEquals('($data->field ?? null) === null || ($data->field ?? null) === \'\' || ($data->field ?? null) === [] ? new FieldError(\'This value is required\') : null', $defaultMessage->generate($defaultMessage, '($data->field ?? null)', $generator));
 
         $customMessage = new Required('my error');
-        $this->assertEquals('($data->field ?? null) === null || ($data->field ?? null) === \'\' || ($data->field ?? null) === [] ? new FieldError(\'my error\') : null', $customMessage->generate($customMessage, '($data->field ?? null)'));
+        $this->assertEquals('($data->field ?? null) === null || ($data->field ?? null) === \'\' || ($data->field ?? null) === [] ? new FieldError(\'my error\') : null', $customMessage->generate($customMessage, '($data->field ?? null)', $generator));
     }
 }
 

@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\Validator\Constraint;
 
 use Quatrevieux\Form\FormInterface;
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 class EqualsWithTest extends FormTestCase
 {
@@ -49,11 +50,12 @@ class EqualsWithTest extends FormTestCase
 
     public function test_generated_code()
     {
+        $generator = new ValidatorGenerator(new NullConstraintValidatorRegistry());
         $strict = new EqualsWith('foo', 'my error', true);
         $notStrict = new EqualsWith('foo', 'my error', false);
 
-        $this->assertSame('($data->bar ?? null) !== ($data->foo ?? null) ? new FieldError(\'my error\') : null', $strict->generate($strict, '($data->bar ?? null)'));
-        $this->assertSame('($data->bar ?? null) != ($data->foo ?? null) ? new FieldError(\'my error\') : null', $notStrict->generate($notStrict, '($data->bar ?? null)'));
+        $this->assertSame('($data->bar ?? null) !== ($data->foo ?? null) ? new FieldError(\'my error\') : null', $strict->generate($strict, '($data->bar ?? null)', $generator));
+        $this->assertSame('($data->bar ?? null) != ($data->foo ?? null) ? new FieldError(\'my error\') : null', $notStrict->generate($notStrict, '($data->bar ?? null)', $generator));
     }
 }
 

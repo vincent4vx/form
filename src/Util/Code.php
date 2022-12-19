@@ -4,6 +4,12 @@ namespace Quatrevieux\Form\Util;
 
 use ReflectionClass;
 
+use function get_class;
+use function implode;
+use function is_string;
+use function md5;
+use function var_export;
+
 /**
  * Code generator utility class
  */
@@ -34,7 +40,14 @@ final class Code
      */
     public static function value(mixed $value): string
     {
-        return var_export($value, true);
+        $transformed = var_export($value, true);
+
+        // Replace LF by PHP_EOL constant to ensure that the generated string will be written on a single line
+        if (is_string($value)) {
+            $transformed = str_replace(PHP_EOL, '\' . PHP_EOL . \'', $transformed);
+        }
+
+        return $transformed;
     }
 
     /**
@@ -58,6 +71,31 @@ final class Code
             }
         }
 
-        return 'new \\'.get_class($o).'(' . implode(', ', $properties) . ')';
+        return 'new \\' . get_class($o) . '(' . implode(', ', $properties) . ')';
+    }
+
+    /**
+     * Generate PHP string expression which perform an inline version of `strtr()` function, using PHP expression as replacement values
+     *
+     * Example:
+     * `Code::inlineStrtr('Hello {{ name }} !', ['{{ name }}' => '$name'])` will generate `'Hello ' . $name . ' !'`
+     *
+     * @param string $string String to replace
+     * @param array<string, string> $replacementPair Replacement pairs expressions. The key is the string to replace, the value is the PHP expression of the replacement value.
+     *
+     * @return string PHP expression
+     */
+    public static function inlineStrtr(string $string, array $replacementPair): string
+    {
+        $expression = self::value($string);
+
+        foreach ($replacementPair as $search => $replace) {
+            $expression = str_replace($search, "' . {$replace} . '", $expression);
+        }
+
+        // Optimise the generated expression by removing the concatenation of empty strings
+        $expression = str_replace(' . \'\'', '', $expression);
+
+        return $expression;
     }
 }

@@ -21,6 +21,7 @@ class CodeTest extends TestCase
         $this->assertSame('false', Code::value(false));
         $this->assertSame('NULL', Code::value(null));
         $this->assertSame("'foo'", Code::value('foo'));
+        $this->assertSame("'foo' . PHP_EOL . 'bar'", Code::value('foo' . PHP_EOL . 'bar'));
         $this->assertSame("array (\n)", Code::value([]));
         $this->assertSame("array (\n  0 => 'foo',\n  1 => 123,\n)", Code::value(['foo', 123]));
     }
@@ -28,6 +29,15 @@ class CodeTest extends TestCase
     public function test_newExpression()
     {
         $this->assertSame("new \Quatrevieux\Form\Util\NewExprTestObject(pub: 'foo', prot: 123, priv: false)", Code::newExpression(new NewExprTestObject('foo', 123, false)));
+    }
+
+    public function test_inlineStrtr()
+    {
+        $this->assertSame("'Hello ' . \$name . ' !'", Code::inlineStrtr('Hello {{ name }} !', ['{{ name }}' => '$name']));
+        $this->assertSame("'Hello ' . \$name", Code::inlineStrtr('Hello {{ name }}', ['{{ name }}' => '$name']));
+        $this->assertSame("'Hello ' . \$firstName . ' ' . \$lastName . ' !'", Code::inlineStrtr('Hello {{ firstName }} {{ lastName }} !', ['{{ firstName }}' => '$firstName', '{{ lastName }}' => '$lastName']));
+        $this->assertSame("'Hello ' . \$firstName . \$lastName . ' !'", Code::inlineStrtr('Hello {{ firstName }}{{ lastName }} !', ['{{ firstName }}' => '$firstName', '{{ lastName }}' => '$lastName']));
+        $this->assertSame("'Hello ' . \$firstName . \$lastName", Code::inlineStrtr('Hello {{ firstName }}{{ lastName }}', ['{{ firstName }}' => '$firstName', '{{ lastName }}' => '$lastName']));
     }
 }
 

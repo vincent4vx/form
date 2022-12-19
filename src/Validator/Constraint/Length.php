@@ -7,6 +7,7 @@ use LogicException;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
+use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 /**
  * @implements ConstraintValidatorGeneratorInterface<static>
@@ -47,7 +48,7 @@ final class Length extends SelfValidatedConstraint implements ConstraintValidato
      *
      * @param Length $constraint
      */
-    public function generate(ConstraintInterface $constraint, string $fieldAccessor): string
+    public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
     {
         $lenVarName = Code::varName($fieldAccessor, 'len');
         $lenVarNameInit = "$lenVarName = strlen($fieldAccessor)";

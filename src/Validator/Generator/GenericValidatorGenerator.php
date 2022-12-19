@@ -18,7 +18,7 @@ final class GenericValidatorGenerator implements ConstraintValidatorGeneratorInt
     /**
      * {@inheritdoc}
      */
-    public function generate(ConstraintInterface $constraint, string $fieldAccessor): string
+    public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
     {
         $newConstraintExpression = Code::newExpression($constraint);
         $constraintVarName = Code::varName($newConstraintExpression, 'constraint');

@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\Validator\Constraint;
 
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\FieldError;
+use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 class LengthTest extends FormTestCase
 {
@@ -77,14 +78,15 @@ class LengthTest extends FormTestCase
 
     public function test_generated_code()
     {
+        $generator = new ValidatorGenerator(new NullConstraintValidatorRegistry());
         $onlyMin = new Length(min: 3, message: 'my error');
-        $this->assertEquals('is_string(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) < 3) ? new FieldError(\'my error\') : null', $onlyMin->generate($onlyMin, '($data->field ?? null)'));
+        $this->assertEquals('is_string(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) < 3) ? new FieldError(\'my error\') : null', $onlyMin->generate($onlyMin, '($data->field ?? null)', $generator));
 
         $onlyMax = new Length(max: 3, message: 'my error');
-        $this->assertEquals('is_string(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) > 3) ? new FieldError(\'my error\') : null', $onlyMax->generate($onlyMax, '($data->field ?? null)'));
+        $this->assertEquals('is_string(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) > 3) ? new FieldError(\'my error\') : null', $onlyMax->generate($onlyMax, '($data->field ?? null)', $generator));
 
         $both = new Length(min: 3, max: 6, message: 'my error');
-        $this->assertEquals('is_string(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) < 3 || $__len_1444ef036f9b3842b62162dc7f14342b > 6) ? new FieldError(\'my error\') : null', $both->generate($both, '($data->field ?? null)'));
+        $this->assertEquals('is_string(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) < 3 || $__len_1444ef036f9b3842b62162dc7f14342b > 6) ? new FieldError(\'my error\') : null', $both->generate($both, '($data->field ?? null)', $generator));
     }
 }
 

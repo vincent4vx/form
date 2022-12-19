@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\Validator\Constraint;
 
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\FieldError;
+use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 use RuntimeException;
 
 class ValidationMethodTest extends FormTestCase
@@ -42,10 +43,11 @@ class ValidationMethodTest extends FormTestCase
 
     public function test_generate()
     {
-        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo($data->foo ?? null, $data), \'Invalid value\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo'), '$data->foo ?? null'));
-        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo($data->foo ?? null, $data), \'other message\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo', message: 'other message'), '$data->foo ?? null'));
-        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError(\Quatrevieux\Form\Validator\Constraint\UtilityClass::foo($data->foo ?? null, $data), \'Invalid value\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo', class: UtilityClass::class), '$data->foo ?? null'));
-        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo($data->foo ?? null, $data, 123, \'foo\', false), \'Invalid value\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo', parameters: [123, 'foo', false]), '$data->foo ?? null'));
+        $generator = new ValidatorGenerator(new NullConstraintValidatorRegistry());
+        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo($data->foo ?? null, $data), \'Invalid value\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo'), '$data->foo ?? null', $generator));
+        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo($data->foo ?? null, $data), \'other message\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo', message: 'other message'), '$data->foo ?? null', $generator));
+        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError(\Quatrevieux\Form\Validator\Constraint\UtilityClass::foo($data->foo ?? null, $data), \'Invalid value\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo', class: UtilityClass::class), '$data->foo ?? null', $generator));
+        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo($data->foo ?? null, $data, 123, \'foo\', false), \'Invalid value\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo', parameters: [123, 'foo', false]), '$data->foo ?? null', $generator));
     }
 }
 

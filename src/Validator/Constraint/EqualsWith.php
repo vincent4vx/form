@@ -6,6 +6,7 @@ use Attribute;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
+use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 /**
  * The current field value must be equals to other field value
@@ -53,7 +54,7 @@ final class EqualsWith extends SelfValidatedConstraint implements ConstraintVali
      *
      * @param EqualsWith $constraint
      */
-    public function generate(ConstraintInterface $constraint, string $fieldAccessor): string
+    public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
     {
         $otherAccessor = '($data->' . $constraint->field . ' ?? null)';
         $error = 'new FieldError(' . Code::value($constraint->message) . ')';
