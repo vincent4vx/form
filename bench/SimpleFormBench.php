@@ -4,6 +4,7 @@ namespace Bench;
 
 use Bench\Fixtures\SimpleForm;
 use Bench\Fixtures\SimpleFormSymfony;
+use Bench\Fixtures\SimpleFormVanilla;
 use PhpBench\Attributes\AfterClassMethods;
 use PhpBench\Attributes\Groups;
 use PhpBench\Attributes\Iterations;
@@ -61,6 +62,21 @@ class SimpleFormBench extends BenchUtils
         assert($data->age === 42);
     }
 
+    #[Groups(['valid', 'vanilla'])]
+    public function benchVanillaValid()
+    {
+        $form = new SimpleFormVanilla();
+        $submitted = $form->submit(['first_name' => 'John', 'last_name' => 'Doe', 'age' => '42']);
+
+        if (!$submitted->valid()) {
+            throw new \RuntimeException();
+        }
+
+        assert($submitted->value->firstName === 'John');
+        assert($submitted->value->lastName === 'Doe');
+        assert($submitted->value->age === 42);
+    }
+
     #[Groups(['invalid', 'runtime'])]
     public function benchRuntimeInvalid()
     {
@@ -92,8 +108,21 @@ class SimpleFormBench extends BenchUtils
         $submitted = $form->submit(['first_name' => 'a', 'last_name' => 'b']);
 
         assert(!$submitted->isValid());
-        assert(isset($submitted->getErrors()['first_name']));
-        assert(isset($submitted->getErrors()['last_name']));
-        assert(!isset($submitted->getErrors()['age']));
+        assert(!$submitted->get('first_name')->isValid());
+        assert(!$submitted->get('last_name')->isValid());
+        assert($submitted->get('age')->isValid());
     }
+
+    #[Groups(['invalid', 'vanilla'])]
+    public function benchVanillaInvalid()
+    {
+        $form = new SimpleFormVanilla();
+        $submitted = $form->submit(['first_name' => 'a', 'last_name' => 'b']);
+
+        assert(!$submitted->valid());
+        assert(isset($submitted->errors['first_name']));
+        assert(isset($submitted->errors['last_name']));
+        assert(!isset($submitted->errors['age']));
+    }
+
 }
