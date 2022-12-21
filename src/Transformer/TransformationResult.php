@@ -22,7 +22,7 @@ final class TransformationResult
         /**
          * Transformation errors, indexed by field name
          *
-         * @var array<string, FieldError>
+         * @var array<string, FieldError|mixed[]>
          */
         public readonly array $errors,
     ) {

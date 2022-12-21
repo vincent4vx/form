@@ -27,8 +27,9 @@ interface SubmittedFormInterface
      * Get fields errors
      *
      * Errors are indexed by the field name
+     * If the field is an array or object, the value can be an array of errors.
      *
-     * @return array<string, FieldError>
+     * @return array<string, FieldError|mixed[]>
      */
     public function errors(): array;
 }

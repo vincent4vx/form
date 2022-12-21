@@ -18,7 +18,7 @@ interface ConstraintValidatorInterface
      * @param mixed $value Value to validate. null value must be handled by the validator.
      * @param object $data The DTO instance to validate.
      *
-     * @return FieldError|null The error, or null if there is no error
+     * @return FieldError|mixed[]|null The error, or null if there is no error. If the field is an array or object, the value may be an array of errors.
      */
-    public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError;
+    public function validate(ConstraintInterface $constraint, mixed $value, object $data): FieldError|array|null;
 }

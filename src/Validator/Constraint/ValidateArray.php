@@ -63,7 +63,7 @@ final class ValidateArray implements ConstraintInterface
          *
          * @var bool
          */
-        public bool $aggregateErrors = true,
+        public bool $aggregateErrors = false,
     ) {
     }
 

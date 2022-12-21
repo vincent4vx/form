@@ -11,24 +11,17 @@ use Quatrevieux\Form\Validator\FieldError;
  */
 final class SubmittedForm implements SubmittedFormInterface
 {
-    /**
-     * @var T
-     */
-    private readonly object $data;
+    public function __construct(
+        /**
+         * @var T
+         */
+        private readonly object $data,
 
-    /**
-     * @var array<string, FieldError>
-     */
-    private readonly array $errors;
-
-    /**
-     * @param T $data
-     * @param array<string, FieldError> $errors
-     */
-    public function __construct(object $data, array $errors)
-    {
-        $this->data = $data;
-        $this->errors = $errors;
+        /**
+         * @var array<string, FieldError|mixed[]>
+         */
+        private readonly array $errors
+    ) {
     }
 
     /**
