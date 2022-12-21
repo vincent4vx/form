@@ -3,6 +3,10 @@
 namespace Quatrevieux\Form\Util;
 
 use PHPUnit\Framework\TestCase;
+use Quatrevieux\Form\Transformer\Field\ArrayCast;
+use Quatrevieux\Form\Transformer\Field\Cast;
+use Quatrevieux\Form\Transformer\Field\CastType;
+use Quatrevieux\Form\Transformer\Field\Csv;
 
 class CodeTest extends TestCase
 {
@@ -22,8 +26,13 @@ class CodeTest extends TestCase
         $this->assertSame('NULL', Code::value(null));
         $this->assertSame("'foo'", Code::value('foo'));
         $this->assertSame("'foo' . PHP_EOL . 'bar'", Code::value('foo' . PHP_EOL . 'bar'));
-        $this->assertSame("array (\n)", Code::value([]));
-        $this->assertSame("array (\n  0 => 'foo',\n  1 => 123,\n)", Code::value(['foo', 123]));
+        $this->assertSame("[]", Code::value([]));
+        $this->assertSame("['foo', 123]", Code::value(['foo', 123]));
+        $this->assertSame("['foo' => 123, 'bar' => 456]", Code::value(['foo' => 123, 'bar' => 456]));
+        $this->assertSame("(object) ['foo' => 'bar']", Code::value((object) ['foo' => 'bar']));
+        $this->assertSame("new \Quatrevieux\Form\Transformer\Field\Csv(separator: ';', enclosure: '')", Code::value(new Csv(separator: ';')));
+        $this->assertSame("\Quatrevieux\Form\Transformer\Field\CastType::Int", Code::value(CastType::Int));
+        $this->assertSame("[new \Quatrevieux\Form\Transformer\Field\Csv(separator: ';', enclosure: ''), new \Quatrevieux\Form\Transformer\Field\ArrayCast(elementType: \Quatrevieux\Form\Transformer\Field\CastType::Int, preserveKeys: true)]", Code::value([new Csv(separator: ';'), new ArrayCast(CastType::Int)]));
     }
 
     public function test_newExpression()

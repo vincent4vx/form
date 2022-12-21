@@ -80,10 +80,10 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
     public function generateTransformToHttp(FieldTransformerInterface $transformer, string $previousExpression): string
     {
         $expressionVarName = Code::varName($previousExpression);
-        $separator = var_export($transformer->separator, true);
+        $separator = Code::value($transformer->separator);
 
         if ($transformer->enclosure) {
-            $enclosure = var_export($transformer->enclosure, true);
+            $enclosure = Code::value($transformer->enclosure);
             $expression = '\\' . self::class . '::toCsv(' . $expressionVarName . ', ' . $separator . ', ' . $enclosure . ')';
         } else {
             $expression = "implode($separator, $expressionVarName)";

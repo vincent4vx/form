@@ -4,6 +4,8 @@ namespace Quatrevieux\Form\Util;
 
 use ReflectionClass;
 
+use stdClass;
+use UnitEnum;
 use function get_class;
 use function implode;
 use function is_string;
@@ -32,22 +34,19 @@ final class Code
     /**
      * Get the PHP expression of the given value
      *
-     * @todo handle object expressions ?
-     *
      * @param mixed $value
      *
      * @return string
      */
     public static function value(mixed $value): string
     {
-        $transformed = var_export($value, true);
-
-        // Replace LF by PHP_EOL constant to ensure that the generated string will be written on a single line
-        if (is_string($value)) {
-            $transformed = str_replace(PHP_EOL, '\' . PHP_EOL . \'', $transformed);
-        }
-
-        return $transformed;
+        return match (true) {
+            // Replace LF by PHP_EOL constant to ensure that the generated string will be written on a single line
+            is_string($value) => str_replace(PHP_EOL, '\' . PHP_EOL . \'', var_export($value, true)),
+            is_object($value) => self::dumpObject($value),
+            is_array($value) => self::dumpArray($value),
+            default => var_export($value, true),
+        };
     }
 
     /**
@@ -97,5 +96,51 @@ final class Code
         $expression = str_replace(' . \'\'', '', $expression);
 
         return $expression;
+    }
+
+    /**
+     * Generate the PHP expression of the given object
+     *
+     * Handle the following cases:
+     * - enum: generate `Enum::VALUE` expression
+     * - stdClass: generate properties as array and then cast it to object : `(object) ['prop' => 'value']`
+     * - other: generate the constructor call using promoted properties
+     *
+     * @param object $value
+     * @return string
+     */
+    private static function dumpObject(object $value): string
+    {
+        if ($value instanceof stdClass) {
+            return '(object) ' . self::value((array) $value);
+        }
+
+        if ($value instanceof UnitEnum) {
+            return '\\' . get_class($value) . '::' . $value->name;
+        }
+
+        return self::newExpression($value);
+    }
+
+    /**
+     * Dump PHP expression of the given array
+     * Handle list and associative array
+     *
+     * @param mixed[] $value
+     * @return string
+     */
+    private static function dumpArray(array $value): string
+    {
+        if (array_is_list($value)) {
+            return '[' . implode(', ', array_map(self::value(...), $value)) . ']';
+        }
+
+        $items = [];
+
+        foreach ($value as $key => $item) {
+            $items[] = self::value($key) . ' => ' . self::value($item);
+        };
+
+        return '[' . implode(', ', $items) . ']';
     }
 }
