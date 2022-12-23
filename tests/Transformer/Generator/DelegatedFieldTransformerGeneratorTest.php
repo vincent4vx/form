@@ -9,6 +9,7 @@ use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
+use Quatrevieux\Form\Transformer\Field\NullFieldTransformerRegistry;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
@@ -20,8 +21,9 @@ class DelegatedFieldTransformerGeneratorTest extends FormTestCase
 {
     public function test_generate()
     {
-        $this->assertSame('($__transformer_ff4a55a184baa579d830825fffb6cff2 = new \Quatrevieux\Form\Transformer\Generator\MyCustomDelegatedTransformer(foo: 5))->getTransformer($this->registry)->transformToHttp($__transformer_ff4a55a184baa579d830825fffb6cff2, $data["foo"] ?? null)', (new DelegatedFieldTransformerGenerator())->generateTransformToHttp(new MyCustomDelegatedTransformer(5), '$data["foo"] ?? null'));
-        $this->assertSame('($__transformer_ff4a55a184baa579d830825fffb6cff2 = new \Quatrevieux\Form\Transformer\Generator\MyCustomDelegatedTransformer(foo: 5))->getTransformer($this->registry)->transformFromHttp($__transformer_ff4a55a184baa579d830825fffb6cff2, $data["foo"] ?? null)', (new DelegatedFieldTransformerGenerator())->generateTransformFromHttp(new MyCustomDelegatedTransformer(5), '$data["foo"] ?? null'));
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $this->assertSame('($__transformer_ff4a55a184baa579d830825fffb6cff2 = new \Quatrevieux\Form\Transformer\Generator\MyCustomDelegatedTransformer(foo: 5))->getTransformer($this->registry)->transformToHttp($__transformer_ff4a55a184baa579d830825fffb6cff2, $data["foo"] ?? null)', (new DelegatedFieldTransformerGenerator())->generateTransformToHttp(new MyCustomDelegatedTransformer(5), '$data["foo"] ?? null', $generator));
+        $this->assertSame('($__transformer_ff4a55a184baa579d830825fffb6cff2 = new \Quatrevieux\Form\Transformer\Generator\MyCustomDelegatedTransformer(foo: 5))->getTransformer($this->registry)->transformFromHttp($__transformer_ff4a55a184baa579d830825fffb6cff2, $data["foo"] ?? null)', (new DelegatedFieldTransformerGenerator())->generateTransformFromHttp(new MyCustomDelegatedTransformer(5), '$data["foo"] ?? null', $generator));
     }
 
     public function test_functional()

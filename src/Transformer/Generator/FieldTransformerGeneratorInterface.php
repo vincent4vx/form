@@ -22,10 +22,11 @@ interface FieldTransformerGeneratorInterface
      *
      * @param T $transformer Transformer instance to compile
      * @param string $previousExpression Expression of the previous transformer call, or HTTP field value
+     * @param FormTransformerGenerator $generator The generator instance for generating sub-transformers
      *
      * @return string Generated PHP expression
      */
-    public function generateTransformFromHttp(object $transformer, string $previousExpression): string;
+    public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string;
 
     /**
      * Generate the {@see FieldTransformerInterface::transformToHttp()} inlined code
@@ -35,8 +36,9 @@ interface FieldTransformerGeneratorInterface
      *
      * @param T $transformer Transformer instance to compile
      * @param string $previousExpression Expression of the previous transformer call, or DTO property value
+     * @param FormTransformerGenerator $generator The generator instance for generating sub-transformers
      *
      * @return string Generated PHP expression
      */
-    public function generateTransformToHttp(object $transformer, string $previousExpression): string;
+    public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string;
 }

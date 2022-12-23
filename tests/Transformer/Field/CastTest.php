@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Transformer\Field;
 
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 
 class CastTest extends FormTestCase
 {
@@ -38,12 +39,14 @@ class CastTest extends FormTestCase
 
     public function test_generateTransformFromHttp()
     {
-        $this->assertSame('(is_scalar($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? (int) $__tmp_4e6c78d168de10f915401b0dad567ede : null)', (new Cast(CastType::Int))->generateTransformFromHttp(new Cast(CastType::Int), '$data["foo"]'));
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $this->assertSame('(is_scalar($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? (int) $__tmp_4e6c78d168de10f915401b0dad567ede : null)', (new Cast(CastType::Int))->generateTransformFromHttp(new Cast(CastType::Int), '$data["foo"]', $generator));
     }
 
     public function test_generateTransformToHttp()
     {
-        $this->assertSame('(($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) === null || is_scalar($__tmp_4e6c78d168de10f915401b0dad567ede) ? $__tmp_4e6c78d168de10f915401b0dad567ede : (array) $__tmp_4e6c78d168de10f915401b0dad567ede)', (new Cast(CastType::Int))->generateTransformToHttp(new Cast(CastType::Int), '$data["foo"]'));
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $this->assertSame('(($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) === null || is_scalar($__tmp_4e6c78d168de10f915401b0dad567ede) ? $__tmp_4e6c78d168de10f915401b0dad567ede : (array) $__tmp_4e6c78d168de10f915401b0dad567ede)', (new Cast(CastType::Int))->generateTransformToHttp(new Cast(CastType::Int), '$data["foo"]', $generator));
     }
 }
 

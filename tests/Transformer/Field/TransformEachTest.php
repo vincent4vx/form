@@ -3,6 +3,9 @@
 namespace Quatrevieux\Form\Transformer\Field;
 
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
+use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
+use Quatrevieux\Form\Util\Code;
 
 class TransformEachTest extends FormTestCase
 {
@@ -36,6 +39,18 @@ class TransformEachTest extends FormTestCase
         $this->assertSame(['eyJmb28iOiJiYXIifQ==', 'eyJmaXJzdE5hbWUiOiJKb2huIiwibGFzdE5hbWUiOiJEb2UifQ=='], $form->import(new TransformEachTesting([['foo' => 'bar'], ['firstName' => 'John', 'lastName' => 'Doe']]))->httpValue()['values']);
         $this->assertSame(['a' => 'eyJmb28iOiJiYXIifQ=='], $form->import(new TransformEachTesting(['a' => ['foo' => 'bar']]))->httpValue()['values']);
     }
+
+    public function test_generate()
+    {
+        $transformer = new TransformEach([
+            new Base64Transformer(),
+            new JsonTransformer(),
+        ]);
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+
+        $this->assertSame('($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) === null ? null : \array_map(fn ($item) => (new \Quatrevieux\Form\Transformer\Field\JsonTransformer())->transformFromHttp((($__tmp_0f8134fb6038ebcd7155f1de5f067c73 = ($item)) ? base64_decode($__tmp_0f8134fb6038ebcd7155f1de5f067c73) : null)), (array) $__tmp_cf8d20da9cb97be602abb1ce003a22b3)', $transformer->getTransformer(new NullFieldTransformerRegistry())->generateTransformFromHttp($transformer, '$data["foo"] ?? null', $generator));
+        $this->assertSame('($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) === null ? null : \array_map(fn ($item) => (($__tmp_05f1b0308b35161ae3bf8b9998e27763 = ((new \Quatrevieux\Form\Transformer\Field\JsonTransformer())->transformToHttp($item))) ? base64_encode($__tmp_05f1b0308b35161ae3bf8b9998e27763) : null), (array) $__tmp_cf8d20da9cb97be602abb1ce003a22b3)', $transformer->getTransformer(new NullFieldTransformerRegistry())->generateTransformToHttp($transformer, '$data["foo"] ?? null', $generator));
+    }
 }
 
 class TransformEachTesting
@@ -55,7 +70,7 @@ class TransformEachTesting
     }
 }
 
-class Base64Transformer implements FieldTransformerInterface
+class Base64Transformer implements FieldTransformerInterface, FieldTransformerGeneratorInterface
 {
     public function transformFromHttp(mixed $value): ?string
     {
@@ -70,6 +85,20 @@ class Base64Transformer implements FieldTransformerInterface
     public function canThrowError(): bool
     {
         return false;
+    }
+
+    public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
+    {
+        $varName = Code::varName($previousExpression);
+
+        return "(({$varName} = ({$previousExpression})) ? base64_decode({$varName}) : null)";
+    }
+
+    public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
+    {
+        $varName = Code::varName($previousExpression);
+
+        return "(({$varName} = ({$previousExpression})) ? base64_encode({$varName}) : null)";
     }
 }
 

@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\Transformer\Field;
 
 use Attribute;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
+use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Util\Code;
 
 /**
@@ -63,7 +64,7 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
      *
      * @param Csv $transformer
      */
-    public function generateTransformFromHttp(object $transformer, string $previousExpression): string
+    public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $expressionVarName = Code::varName($previousExpression);
         $separator = Code::value($transformer->separator);
@@ -77,7 +78,7 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
      *
      * @param Csv $transformer
      */
-    public function generateTransformToHttp(object $transformer, string $previousExpression): string
+    public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $expressionVarName = Code::varName($previousExpression);
         $separator = Code::value($transformer->separator);

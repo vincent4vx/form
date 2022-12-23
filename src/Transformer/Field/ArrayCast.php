@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\Transformer\Field;
 
 use Attribute;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
+use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Util\Code;
 
 /**
@@ -92,7 +93,7 @@ final class ArrayCast implements FieldTransformerInterface, FieldTransformerGene
     /**
      * {@inheritdoc}
      */
-    public function generateTransformFromHttp(object $transformer, string $previousExpression): string
+    public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $elementTransformationExpression = $transformer->elementType->generateCastExpression('$value');
         $expressionVarName = Code::varName($previousExpression);
@@ -109,7 +110,7 @@ final class ArrayCast implements FieldTransformerInterface, FieldTransformerGene
     /**
      * {@inheritdoc}
      */
-    public function generateTransformToHttp(object $transformer, string $previousExpression): string
+    public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $expressionVarName = Code::varName($previousExpression);
         return "(($expressionVarName = $previousExpression) !== null ? (array) $expressionVarName : null)";

@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Transformer\Field;
 
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 
 class CsvTest extends FormTestCase
 {
@@ -45,14 +46,16 @@ class CsvTest extends FormTestCase
 
     public function test_generateTransformFromHttp()
     {
-        $this->assertSame('(is_string($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? str_getcsv($__tmp_4e6c78d168de10f915401b0dad567ede, \',\', \'\', \'\') : null)', (new Csv())->generateTransformFromHttp(new Csv(), '$data["foo"]'));
-        $this->assertSame('(is_string($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? str_getcsv($__tmp_4e6c78d168de10f915401b0dad567ede, \';\', \'"\', \'\') : null)', (new Csv())->generateTransformFromHttp(new Csv(separator: ';', enclosure: '"'), '$data["foo"]'));
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $this->assertSame('(is_string($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? str_getcsv($__tmp_4e6c78d168de10f915401b0dad567ede, \',\', \'\', \'\') : null)', (new Csv())->generateTransformFromHttp(new Csv(), '$data["foo"]', $generator));
+        $this->assertSame('(is_string($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? str_getcsv($__tmp_4e6c78d168de10f915401b0dad567ede, \';\', \'"\', \'\') : null)', (new Csv())->generateTransformFromHttp(new Csv(separator: ';', enclosure: '"'), '$data["foo"]', $generator));
     }
 
     public function test_generateTransformToHttp()
     {
-        $this->assertSame('(is_array($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? implode(\',\', $__tmp_4e6c78d168de10f915401b0dad567ede) : null)', (new Csv())->generateTransformToHttp(new Csv(), '$data["foo"]'));
-        $this->assertSame('(is_array($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? \Quatrevieux\Form\Transformer\Field\Csv::toCsv($__tmp_4e6c78d168de10f915401b0dad567ede, \';\', \'"\') : null)', (new Csv())->generateTransformToHttp(new Csv(separator: ';', enclosure: '"'), '$data["foo"]'));
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $this->assertSame('(is_array($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? implode(\',\', $__tmp_4e6c78d168de10f915401b0dad567ede) : null)', (new Csv())->generateTransformToHttp(new Csv(), '$data["foo"]', $generator));
+        $this->assertSame('(is_array($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? \Quatrevieux\Form\Transformer\Field\Csv::toCsv($__tmp_4e6c78d168de10f915401b0dad567ede, \';\', \'"\') : null)', (new Csv())->generateTransformToHttp(new Csv(separator: ';', enclosure: '"'), '$data["foo"]', $generator));
     }
 }
 

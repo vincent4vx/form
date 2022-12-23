@@ -517,6 +517,20 @@ PHP
         $this->assertSame(['foo' => null, 'bar' => null], $transformer->transformToHttp([]));
         $this->assertSame(['foo' => 123, 'bar' => 456], $transformer->transformToHttp(['foo' => 123, 'bar' => 456]));
     }
+
+    public function test_generateFromHttp()
+    {
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+
+        $this->assertSame('(is_string($__tmp_72c574c21812108f20992797675b2810 = $foo["bar"] ?? null) ? str_getcsv($__tmp_72c574c21812108f20992797675b2810, \',\', \'\', \'\') : null)', $generator->generateTransformFromHttp(new Csv(), '$foo["bar"] ?? null'));
+    }
+
+    public function test_generateToHttp()
+    {
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+
+        $this->assertSame('(is_array($__tmp_72c574c21812108f20992797675b2810 = $foo["bar"] ?? null) ? implode(\',\', $__tmp_72c574c21812108f20992797675b2810) : null)', $generator->generateTransformToHttp(new Csv(), '$foo["bar"] ?? null'));
+    }
 }
 
 class DelegatedTransformerParameters implements DelegatedFieldTransformerInterface
@@ -557,13 +571,13 @@ class DelegatedTransformerImplWithGenerator extends DelegatedTransformerImpl imp
         return trim($value, $configuration->a);
     }
 
-    public function generateTransformFromHttp(object $transformer, string $previousExpression): string
+    public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $a = Code::value($transformer->a);
         return "({$a} . ({$previousExpression}) . {$a})";
     }
 
-    public function generateTransformToHttp(object $transformer, string $previousExpression): string
+    public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $a = Code::value($transformer->a);
         return "trim({$previousExpression}, {$a})";

@@ -61,8 +61,8 @@ final class FormTransformerGenerator
 
                 $classHelper->addFieldTransformationExpression(
                     $fieldName,
-                    fn (string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression),
-                    fn (string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression),
+                    fn (string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression, $this),
+                    fn (string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression, $this),
                     $canThrowError
                 );
             }
@@ -72,6 +72,36 @@ final class FormTransformerGenerator
         $classHelper->generateToHttp();
 
         return $classHelper->code();
+    }
+
+    /**
+     * Compile given transformer to PHP expression for convert HTTP value to DTO value
+     *
+     * @param object $transformer Transformer to compile
+     * @param string $previousExpression Expression of the previous transformer call, or HTTP field value
+     *
+     * @return string
+     *
+     * @see FieldTransformerGeneratorInterface::generateTransformFromHttp()
+     */
+    public function generateTransformFromHttp(object $transformer, string $previousExpression): string
+    {
+        return $this->resolveGenerator($transformer)->generateTransformFromHttp($transformer, $previousExpression, $this);
+    }
+
+    /**
+     * Compile given transformer to PHP expression for convert DTO value to HTTP value
+     *
+     * @param object $transformer Transformer to compile
+     * @param string $previousExpression Expression of the previous transformer call, or DTO field value
+     *
+     * @return string
+     *
+     * @see FieldTransformerGeneratorInterface::generateTransformToHttp()
+     */
+    public function generateTransformToHttp(object $transformer, string $previousExpression): string
+    {
+        return $this->resolveGenerator($transformer)->generateTransformToHttp($transformer, $previousExpression, $this);
     }
 
     /**

@@ -21,7 +21,7 @@ final class GenericFieldTransformerGenerator implements FieldTransformerGenerato
     /**
      * {@inheritdoc}
      */
-    public function generateTransformFromHttp(object $transformer, string $previousExpression): string
+    public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $newTransformerExpression = Code::newExpression($transformer);
 
@@ -31,7 +31,7 @@ final class GenericFieldTransformerGenerator implements FieldTransformerGenerato
     /**
      * {@inheritdoc}
      */
-    public function generateTransformToHttp(object $transformer, string $previousExpression): string
+    public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $newTransformerExpression = Code::newExpression($transformer);
 
