@@ -13,13 +13,15 @@ use Quatrevieux\Form\Util\Code;
  *
  * Generated code example:
  * `(new MyTransformer(foo: "bar"))->transformFormHttp($data['foo'] ?? null)`
+ *
+ * @implements FieldTransformerGeneratorInterface<FieldTransformerInterface>
  */
 final class GenericFieldTransformerGenerator implements FieldTransformerGeneratorInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function generateTransformFromHttp(FieldTransformerInterface $transformer, string $previousExpression): string
+    public function generateTransformFromHttp(object $transformer, string $previousExpression): string
     {
         $newTransformerExpression = Code::newExpression($transformer);
 
@@ -29,7 +31,7 @@ final class GenericFieldTransformerGenerator implements FieldTransformerGenerato
     /**
      * {@inheritdoc}
      */
-    public function generateTransformToHttp(FieldTransformerInterface $transformer, string $previousExpression): string
+    public function generateTransformToHttp(object $transformer, string $previousExpression): string
     {
         $newTransformerExpression = Code::newExpression($transformer);
 

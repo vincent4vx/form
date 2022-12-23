@@ -7,10 +7,14 @@ use ReflectionClass;
 use stdClass;
 use UnitEnum;
 
+use function array_map;
 use function get_class;
 use function implode;
+use function is_array;
+use function is_object;
 use function is_string;
 use function md5;
+use function str_replace;
 use function var_export;
 
 /**

@@ -56,10 +56,8 @@ final class Cast implements FieldTransformerInterface, FieldTransformerGenerator
 
     /**
      * {@inheritdoc}
-     *
-     * @param Cast $transformer
      */
-    public function generateTransformFromHttp(FieldTransformerInterface $transformer, string $previousExpression): string
+    public function generateTransformFromHttp(object $transformer, string $previousExpression): string
     {
         return $transformer->type->generateCastExpression($previousExpression);
     }
@@ -67,7 +65,7 @@ final class Cast implements FieldTransformerInterface, FieldTransformerGenerator
     /**
      * {@inheritdoc}
      */
-    public function generateTransformToHttp(FieldTransformerInterface $transformer, string $previousExpression): string
+    public function generateTransformToHttp(object $transformer, string $previousExpression): string
     {
         $expressionVarName = Code::varName($previousExpression);
         return "(($expressionVarName = $previousExpression) === null || is_scalar($expressionVarName) ? $expressionVarName : (array) $expressionVarName)";

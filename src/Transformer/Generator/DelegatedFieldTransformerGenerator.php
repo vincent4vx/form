@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Transformer\Generator;
 
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
+use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Util\Code;
 
 /**
@@ -15,18 +16,14 @@ use Quatrevieux\Form\Util\Code;
  * `($__transformer_e78fe5 = new MyTransformer(foo: "bar"))->getTransformer($this->registry)->transformFormHttp($__transformer_e78fe5, $data['foo'] ?? null)`
  *
  * @see DelegatedFieldTransformerInterface
+ * @implements FieldTransformerGeneratorInterface<DelegatedFieldTransformerInterface>
  */
-final class DelegatedFieldTransformerGenerator
+final class DelegatedFieldTransformerGenerator implements FieldTransformerGeneratorInterface
 {
     /**
-     * Generate the transformFromHttp inlined code
-     *
-     * @param DelegatedFieldTransformerInterface $transformer Transformer instance to compile
-     * @param string $previousExpression Expression of the previous transformer call, or HTTP field value
-     *
-     * @return string Generated PHP expression
+     * {@inheritdoc}
      */
-    public function generateTransformFromHttp(DelegatedFieldTransformerInterface $transformer, string $previousExpression): string
+    public function generateTransformFromHttp(object $transformer, string $previousExpression): string
     {
         $newTransformerExpression = Code::newExpression($transformer);
         $tmpVarName = Code::varName($newTransformerExpression, 'transformer');
@@ -35,14 +32,9 @@ final class DelegatedFieldTransformerGenerator
     }
 
     /**
-     * Generate the transformToHttp inlined code
-     *
-     * @param DelegatedFieldTransformerInterface $transformer Transformer instance to compile
-     * @param string $previousExpression Expression of the previous transformer call, or DTO property value
-     *
-     * @return string Generated PHP expression
+     * {@inheritdoc}
      */
-    public function generateTransformToHttp(DelegatedFieldTransformerInterface $transformer, string $previousExpression): string
+    public function generateTransformToHttp(object $transformer, string $previousExpression): string
     {
         $newTransformerExpression = Code::newExpression($transformer);
         $tmpVarName = Code::varName($newTransformerExpression, 'transformer');

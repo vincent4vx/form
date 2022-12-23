@@ -45,7 +45,7 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
         );
 
         $this->factory = $factory ?? new RuntimeFormTransformerFactory($registry);
-        $this->generator = $generator ?? new FormTransformerGenerator();
+        $this->generator = $generator ?? new FormTransformerGenerator($registry);
         $this->registry = $registry;
     }
 

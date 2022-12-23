@@ -91,10 +91,8 @@ final class ArrayCast implements FieldTransformerInterface, FieldTransformerGene
 
     /**
      * {@inheritdoc}
-     *
-     * @param ArrayCast $transformer
      */
-    public function generateTransformFromHttp(FieldTransformerInterface $transformer, string $previousExpression): string
+    public function generateTransformFromHttp(object $transformer, string $previousExpression): string
     {
         $elementTransformationExpression = $transformer->elementType->generateCastExpression('$value');
         $expressionVarName = Code::varName($previousExpression);
@@ -111,7 +109,7 @@ final class ArrayCast implements FieldTransformerInterface, FieldTransformerGene
     /**
      * {@inheritdoc}
      */
-    public function generateTransformToHttp(FieldTransformerInterface $transformer, string $previousExpression): string
+    public function generateTransformToHttp(object $transformer, string $previousExpression): string
     {
         $expressionVarName = Code::varName($previousExpression);
         return "(($expressionVarName = $previousExpression) !== null ? (array) $expressionVarName : null)";

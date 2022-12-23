@@ -6,6 +6,7 @@ use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
 use Quatrevieux\Form\Instantiator\InstantiatorInterface;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
+use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Transformer\RuntimeFormTransformer;
 
@@ -15,8 +16,21 @@ use Quatrevieux\Form\Transformer\RuntimeFormTransformer;
 final class FormTransformerGenerator
 {
     public function __construct(
+        private readonly FieldTransformerRegistryInterface $registry,
+
+        /**
+         * Default code generator to use the field transformer do not implement {@see FieldTransformerGeneratorInterface}
+         *
+         * @var FieldTransformerGeneratorInterface<FieldTransformerInterface>
+         */
         private readonly FieldTransformerGeneratorInterface $genericTransformerGenerator = new GenericFieldTransformerGenerator(),
-        private readonly DelegatedFieldTransformerGenerator $delegatedFieldTransformerGenerator = new DelegatedFieldTransformerGenerator(),
+
+        /**
+         * Default code generator to use the field transformer implementation do not implement {@see FieldTransformerGeneratorInterface}
+         *
+         * @var FieldTransformerGeneratorInterface<DelegatedFieldTransformerInterface>
+         */
+        private readonly FieldTransformerGeneratorInterface $delegatedFieldTransformerGenerator = new DelegatedFieldTransformerGenerator(),
     ) {
     }
 
@@ -42,25 +56,15 @@ final class FormTransformerGenerator
             );
 
             foreach ($transformers as $transformer) {
-                if ($transformer instanceof DelegatedFieldTransformerInterface) {
-                    $generator = $this->delegatedFieldTransformerGenerator;
+                $generator = $this->resolveGenerator($transformer);
+                $canThrowError = !$transformer instanceof FieldTransformerInterface || $transformer->canThrowError();
 
-                    $classHelper->addFieldTransformationExpression(
-                        $fieldName,
-                        fn (string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression),
-                        fn (string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression),
-                        true
-                    );
-                } else {
-                    $generator = $transformer instanceof FieldTransformerGeneratorInterface ? $transformer : $this->genericTransformerGenerator;
-
-                    $classHelper->addFieldTransformationExpression(
-                        $fieldName,
-                        fn (string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression),
-                        fn (string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression),
-                        $transformer->canThrowError()
-                    );
-                }
+                $classHelper->addFieldTransformationExpression(
+                    $fieldName,
+                    fn (string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression),
+                    fn (string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression),
+                    $canThrowError
+                );
             }
         }
 
@@ -68,5 +72,31 @@ final class FormTransformerGenerator
         $classHelper->generateToHttp();
 
         return $classHelper->code();
+    }
+
+    /**
+     * Resolve the generator to use for given field transformer
+     * - If the field transformer implements {@see FieldTransformerGeneratorInterface}, use it
+     * - If the field transformer implements {@see DelegatedFieldTransformerInterface}, check if the delegate implements {@see FieldTransformerGeneratorInterface}
+     * - Otherwise, use the generic generator
+     *
+     * @param object $transformer
+     * @return FieldTransformerGeneratorInterface
+     */
+    private function resolveGenerator(object $transformer): FieldTransformerGeneratorInterface
+    {
+        if ($transformer instanceof FieldTransformerGeneratorInterface) {
+            return $transformer;
+        }
+
+        if ($transformer instanceof DelegatedFieldTransformerInterface) {
+            if (($generator = $transformer->getTransformer($this->registry)) instanceof FieldTransformerGeneratorInterface) {
+                return $generator;
+            }
+
+            return $this->delegatedFieldTransformerGenerator;
+        }
+
+        return $this->genericTransformerGenerator;
     }
 }

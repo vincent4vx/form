@@ -15,13 +15,14 @@ use Quatrevieux\Form\Transformer\Field\NullFieldTransformerRegistry;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Transformer\RuntimeFormTransformer;
+use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
 
 class FormTransformerGeneratorTest extends FormTestCase
 {
     public function test_generate_without_transformers()
     {
-        $generator = new FormTransformerGenerator();
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
 
         $code = $generator->generate('TestingTransformerWithoutFieldTransformers', new RuntimeFormTransformer(
             new NullFieldTransformerRegistry(),
@@ -82,7 +83,7 @@ PHP
 
     public function test_generate_with_field_mapping()
     {
-        $generator = new FormTransformerGenerator();
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
 
         $code = $generator->generate('TestingTransformerWithFieldMapping', new RuntimeFormTransformer(
             new NullFieldTransformerRegistry(),
@@ -142,7 +143,7 @@ PHP
 
     public function test_generate_with_transformers_and_field_mapping()
     {
-        $generator = new FormTransformerGenerator();
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
 
         $code = $generator->generate('TestingTransformerWithTransformers', new RuntimeFormTransformer(
             new NullFieldTransformerRegistry(),
@@ -202,7 +203,7 @@ PHP
 
     public function test_generate_with_delegated_transformer()
     {
-        $generator = new FormTransformerGenerator();
+        $generator = new FormTransformerGenerator(new ContainerRegistry($this->container));
 
         $this->container->set(DelegatedTransformerImpl::class, new DelegatedTransformerImpl());
 
@@ -260,9 +261,69 @@ PHP
         $this->assertSame(['foo' => 'bar'], $transformer->transformToHttp(['foo' => 'zbarz']));
     }
 
+    public function test_generate_with_delegated_transformer_using_custom_generator()
+    {
+        $generator = new FormTransformerGenerator(new ContainerRegistry($this->container));
+
+        $this->container->set(DelegatedTransformerImpl::class, new DelegatedTransformerImplWithGenerator());
+
+        $code = $generator->generate('TestingTransformerWithDelegatedTransformerAndGenerator', new RuntimeFormTransformer(
+            new ContainerRegistry($this->container),
+            ['foo' => [new DelegatedTransformerParameters('z')]],
+            [],
+            []
+        ));
+
+        $this->assertSame(<<<'PHP'
+<?php
+
+use Quatrevieux\Form\Transformer\TransformationResult;
+use Quatrevieux\Form\Validator\FieldError;
+
+class TestingTransformerWithDelegatedTransformerAndGenerator implements Quatrevieux\Form\Transformer\FormTransformerInterface
+{
+    function transformFromHttp(array $value): TransformationResult
+    {
+        $errors = [];
+        $transformed = [
+        ];
+
+        try {
+            $transformed['foo'] = ('z' . ($value['foo'] ?? null) . 'z');
+        } catch (\Exception $e) {
+            $errors['foo'] = new FieldError($e->getMessage());
+            $transformed['foo'] = null;
+        }
+
+        return new TransformationResult($transformed, $errors);
+    }
+
+    function transformToHttp(array $value): array
+    {
+        return [
+            'foo' => trim($value['foo'] ?? null, 'z'),
+        ];
+    }
+
+    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    {
+    }
+}
+
+PHP
+        , $code);
+
+        $this->assertGeneratedClass($code, 'TestingTransformerWithDelegatedTransformer', FormTransformerInterface::class);
+        $transformer = new \TestingTransformerWithDelegatedTransformer(new ContainerRegistry($this->container));
+
+        $this->assertSame(['foo' => 'zbarz'], $transformer->transformFromHttp(['foo' => 'bar'])->values);
+        $this->assertEmpty($transformer->transformFromHttp(['foo' => 'bar'])->errors);
+        $this->assertSame(['foo' => 'bar'], $transformer->transformToHttp(['foo' => 'zbarz']));
+    }
+
     public function test_generate_with_generic_transformer_generator()
     {
-        $generator = new FormTransformerGenerator();
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
 
         $this->container->set(DelegatedTransformerImpl::class, new DelegatedTransformerImpl());
 
@@ -316,7 +377,7 @@ PHP
 
     public function test_generate_with_unsafe_transformer()
     {
-        $generator = new FormTransformerGenerator();
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
 
         $code = $generator->generate('TestingTransformerWithUnsafeTransformers', new RuntimeFormTransformer(
             new NullFieldTransformerRegistry(),
@@ -383,7 +444,7 @@ PHP
 
     public function test_generate_with_unsafe_transformer_and_custom_error_handling()
     {
-        $generator = new FormTransformerGenerator();
+        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
 
         $code = $generator->generate('TestingTransformerWithCustomTransformationError', new RuntimeFormTransformer(
             new NullFieldTransformerRegistry(),
@@ -481,6 +542,31 @@ class DelegatedTransformerImpl implements ConfigurableFieldTransformerInterface
     public function transformToHttp(DelegatedFieldTransformerInterface $configuration, mixed $value): mixed
     {
         return trim($value, $configuration->a);
+    }
+}
+
+class DelegatedTransformerImplWithGenerator extends DelegatedTransformerImpl implements FieldTransformerGeneratorInterface
+{
+    public function transformFromHttp(DelegatedFieldTransformerInterface $configuration, mixed $value): mixed
+    {
+        return $configuration->a . $value . $configuration->a;
+    }
+
+    public function transformToHttp(DelegatedFieldTransformerInterface $configuration, mixed $value): mixed
+    {
+        return trim($value, $configuration->a);
+    }
+
+    public function generateTransformFromHttp(object $transformer, string $previousExpression): string
+    {
+        $a = Code::value($transformer->a);
+        return "({$a} . ({$previousExpression}) . {$a})";
+    }
+
+    public function generateTransformToHttp(object $transformer, string $previousExpression): string
+    {
+        $a = Code::value($transformer->a);
+        return "trim({$previousExpression}, {$a})";
     }
 }
 

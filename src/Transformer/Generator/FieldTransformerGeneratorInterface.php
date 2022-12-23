@@ -2,14 +2,15 @@
 
 namespace Quatrevieux\Form\Transformer\Generator;
 
+use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 
 /**
  * Code generator for a field transformer
- * This generator should be implemented by the {@see FieldTransformerInterface} class.
+ * This generator should be implemented by the {@see FieldTransformerInterface} or {@see ConfigurableFieldTransformerInterface} class.
  * If not {@see GenericFieldTransformerGenerator} will be used.
  *
- * @template T as FieldTransformerInterface
+ * @template T as object
  */
 interface FieldTransformerGeneratorInterface
 {
@@ -24,7 +25,7 @@ interface FieldTransformerGeneratorInterface
      *
      * @return string Generated PHP expression
      */
-    public function generateTransformFromHttp(FieldTransformerInterface $transformer, string $previousExpression): string;
+    public function generateTransformFromHttp(object $transformer, string $previousExpression): string;
 
     /**
      * Generate the {@see FieldTransformerInterface::transformToHttp()} inlined code
@@ -37,5 +38,5 @@ interface FieldTransformerGeneratorInterface
      *
      * @return string Generated PHP expression
      */
-    public function generateTransformToHttp(FieldTransformerInterface $transformer, string $previousExpression): string;
+    public function generateTransformToHttp(object $transformer, string $previousExpression): string;
 }
