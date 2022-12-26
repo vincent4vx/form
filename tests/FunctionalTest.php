@@ -50,7 +50,7 @@ class FunctionalTest extends FormTestCase
         $this->assertSame(3, $submitted->value()->foo);
         $this->assertSame('a', $submitted->value()->bar);
         $this->assertEquals([
-            'bar' => 'Invalid length',
+            'bar' => 'The value is too short. It should have 3 characters or more.',
         ], $submitted->errors());
     }
 

@@ -9,6 +9,28 @@ use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 /**
+ * Mark a field as required
+ * The field will be considered as valid if it is not null and not an empty string or array
+ * Any other value will be considered as valid, like 0, false, etc.
+ *
+ * Note: this constraint is not required if the field is typed as non-nullable
+ *
+ * Usage:
+ * <code>
+ * class MyForm
+ * {
+ *     // Explicitly mark the field as required because it is nullable
+ *     #[Required]
+ *     public $foo;
+ *
+ *     // The field is required because it is not nullable
+ *     public string $bar;
+ *
+ *    // You can define a custom error message to override the default one
+ *    #[Required('This field is required')]
+ *    public string $baz;
+ * }
+ *
  * @implements ConstraintValidatorGeneratorInterface<static>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]

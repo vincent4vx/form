@@ -11,6 +11,16 @@ use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 /**
  * The current field value must be equals to other field value
  *
+ * Usage:
+ * <code>
+ * class MyForm
+ * {
+ *     #[EqualsWith('password', message: 'Passwords must be equals')]
+ *     public string $passwordConfirm;
+ *     public string $password;
+ * }
+ * </code>
+ *
  * @implements ConstraintValidatorGeneratorInterface<self>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -25,6 +35,7 @@ final class EqualsWith extends SelfValidatedConstraint implements ConstraintVali
 
         /**
          * Error message displayed if values are different
+         * Use `{{ field }}` placeholder to display the other field name
          */
         public readonly string $message = 'Two fields are different',
 
@@ -40,10 +51,11 @@ final class EqualsWith extends SelfValidatedConstraint implements ConstraintVali
      */
     public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
     {
-        $other = $data->{$constraint->field} ?? null;
+        $field = $constraint->field;
+        $other = $data->{$field} ?? null;
 
         if ($constraint->strict ? $value !== $other : $value != $other) {
-            return new FieldError($this->message);
+            return new FieldError($this->message, ['field' => $field]);
         }
 
         return null;
@@ -57,7 +69,7 @@ final class EqualsWith extends SelfValidatedConstraint implements ConstraintVali
     public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
     {
         $otherAccessor = '($data->' . $constraint->field . ' ?? null)';
-        $error = 'new FieldError(' . Code::value($constraint->message) . ')';
+        $error = 'new FieldError(' . Code::value($constraint->message) . ', ' . Code::value(['field' => $constraint->field]) . ')';
 
         if ($constraint->strict) {
             return "$fieldAccessor !== $otherAccessor ? $error : null";

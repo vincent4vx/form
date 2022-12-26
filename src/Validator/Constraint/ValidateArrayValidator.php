@@ -71,7 +71,7 @@ final class ValidateArrayValidator implements ConstraintValidatorInterface, Cons
             ]);
         }
 
-        return new FieldError(strtr($message, ['{{ item_errors }}' => $itemErrors]));
+        return new FieldError($message, ['item_errors' => $itemErrors]);
     }
 
     /**
@@ -102,11 +102,7 @@ final class ValidateArrayValidator implements ConstraintValidatorInterface, Cons
             return '$errors';
         }
 
-        $message = Code::inlineStrtr($constraint->message, [
-            '{{ item_errors }}' => '$errors',
-        ]);
-
-        return 'new FieldError(' . $message . ')';
+        return 'new FieldError(' . Code::value($constraint->message) . ', [\'item_errors\' => $errors])';
     }
 
     private function generateItemErrorExpression(ValidateArray $constraint): string

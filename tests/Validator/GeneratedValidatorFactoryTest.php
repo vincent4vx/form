@@ -82,7 +82,7 @@ class Quatrevieux_Form_Fixtures_RequiredParametersRequestValidatorGeneratorTest 
             $errors['foo'] = $__error_foo;
         }
 
-        if (!isset($previousErrors['bar']) && $__error_bar = (($data->bar ?? null) === null || ($data->bar ?? null) === '' || ($data->bar ?? null) === [] ? new FieldError('bar must be set') : null) ?? (is_string(($data->bar ?? null)) && (($__len_722af90ac1a42c8c3ad647bfd63cd459 = strlen(($data->bar ?? null))) < 3) ? new FieldError('Invalid length') : null)) {
+        if (!isset($previousErrors['bar']) && $__error_bar = (($data->bar ?? null) === null || ($data->bar ?? null) === '' || ($data->bar ?? null) === [] ? new FieldError('bar must be set') : null) ?? (is_scalar(($data->bar ?? null)) && (($__len_722af90ac1a42c8c3ad647bfd63cd459 = strlen(($data->bar ?? null))) < 3) ? new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3]) : null)) {
             $errors['bar'] = $__error_bar;
         }
 
@@ -109,12 +109,12 @@ PHP
         $o->bar = 'b';
 
         $this->assertEquals([
-            'bar' => new FieldError('Invalid length'),
+            'bar' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3]),
         ], $validator->validate($o));
         
         $this->assertEquals([
             'foo' => new FieldError('transformer error'),
-            'bar' => new FieldError('Invalid length'),
+            'bar' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3]),
         ], $validator->validate($o, ['foo' => new FieldError('transformer error')]));
 
         $o->bar = 'aaaa';

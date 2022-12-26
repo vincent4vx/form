@@ -25,7 +25,7 @@ class RuntimeValidatorTest extends FormTestCase
         ]);
 
         $this->assertSame([], $validator->validate((object) ['foo' => 'bar']));
-        $this->assertEquals(['foo' => 'Invalid length'], $validator->validate((object) ['foo' => 'ba']));
+        $this->assertEquals(['foo' => 'The value is too short. It should have 3 characters or more.'], $validator->validate((object) ['foo' => 'ba']));
         $this->assertEquals(['foo' => new FieldError('my transformer error')], $validator->validate((object) ['foo' => 'ba'], ['foo' => new FieldError('my transformer error')]));
     }
 
@@ -37,7 +37,7 @@ class RuntimeValidatorTest extends FormTestCase
         ]);
 
         $this->assertEquals([
-            'foo' => 'Invalid length',
+            'foo' => 'The value is too short. It should have 3 characters or more.',
             'bar' => 'Two fields are different',
         ], $validator->validate((object) ['foo' => 'ba', 'bar' => 'aaa']));
     }
