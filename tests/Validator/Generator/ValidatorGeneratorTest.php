@@ -31,7 +31,7 @@ class TestingValidatorGeneratorValidatorClass implements Quatrevieux\Form\Valida
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
-        if (!isset($previousErrors['foo']) && $__error_foo = (is_scalar(($data->foo ?? null)) && (($__len_a3aa3c8caea059c99a14cd36eaceca72 = strlen(($data->foo ?? null))) < 3) ? new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3]) : null)) {
+        if (!isset($previousErrors['foo']) && $__error_foo = (is_scalar(($data->foo ?? null)) && (($__len_a3aa3c8caea059c99a14cd36eaceca72 = strlen(($data->foo ?? null))) < 3) ? new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], 'ecdd71f6-fa22-5564-bfc7-7e836dce3378') : null)) {
             $errors['foo'] = $__error_foo;
         }
 
@@ -53,7 +53,7 @@ PHP
 
         $this->assertGeneratedClass($code, 'TestingWithConstraintCodeValidatorClass', ValidatorInterface::class);
         $this->assertEmpty((new \TestingValidatorGeneratorValidatorClass(new NullConstraintValidatorRegistry()))->validate((object) ['foo' => 'aaaa', 'bar' => 'aaaa']));
-        $this->assertEquals(['foo' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3])], (new \TestingValidatorGeneratorValidatorClass(new NullConstraintValidatorRegistry()))->validate((object) ['foo' => 'a']));
+        $this->assertEquals(['foo' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE)], (new \TestingValidatorGeneratorValidatorClass(new NullConstraintValidatorRegistry()))->validate((object) ['foo' => 'a']));
     }
 }
 

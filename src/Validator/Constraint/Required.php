@@ -36,6 +36,8 @@ use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Required extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface
 {
+    public const CODE = 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5';
+
     public function __construct(
         public readonly string $message = 'This value is required',
     ) {
@@ -47,7 +49,7 @@ final class Required extends SelfValidatedConstraint implements ConstraintValida
     public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
     {
         if ($value === null || $value === '' || $value === []) {
-            return new FieldError($this->message);
+            return new FieldError($this->message, code: self::CODE);
         }
 
         return null;
@@ -59,7 +61,8 @@ final class Required extends SelfValidatedConstraint implements ConstraintValida
     public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
     {
         $errorMessage = Code::value($constraint->message);
+        $code = Code::value(self::CODE);
 
-        return "$fieldAccessor === null || $fieldAccessor === '' || $fieldAccessor === [] ? new FieldError($errorMessage) : null";
+        return "$fieldAccessor === null || $fieldAccessor === '' || $fieldAccessor === [] ? new FieldError($errorMessage, [], $code) : null";
     }
 }

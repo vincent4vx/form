@@ -22,8 +22,11 @@ class ValidateArrayTest extends FormTestCase
         $this->assertFalse($form->submit(['values' => ['abc']])->valid());
 
         $this->assertEquals(
-            new FieldError("Some values are invalid :\n{{ item_errors }}",
-            ['item_errors' => '- On item 0: The value is too short. It should have 3 characters or more.' . PHP_EOL . '- On item 1: The value is too short. It should have 3 characters or more.' . PHP_EOL]),
+            new FieldError(
+                "Some values are invalid :\n{{ item_errors }}",
+                ['item_errors' => '- On item 0: The value is too short. It should have 3 characters or more.' . PHP_EOL . '- On item 1: The value is too short. It should have 3 characters or more.' . PHP_EOL],
+                ValidateArray::CODE
+            ),
             $form->submit(['values' => ['12', '34']])->errors()['values']
         );
 
@@ -52,12 +55,12 @@ ERROR
         $this->assertEquals('My error', (string) $form->submit(['withoutPerItemError' => ['1', '2']])->errors()['withoutPerItemError']);
 
         $this->assertEquals([
-            0 => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3]),
-            1 => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3]),
+            0 => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE),
+            1 => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE),
         ], $form->submit(['arrayOfErrors' => ['12', '34']])->errors()['arrayOfErrors']);
 
         $this->assertEquals([
-            1 => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3]),
+            1 => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE),
         ], $form->submit(['arrayOfErrors' => ['123', '34']])->errors()['arrayOfErrors']);
 
         $this->assertTrue($form->submit(['arrayOfErrors' => ['123', '345']])->valid());
@@ -70,7 +73,7 @@ ERROR
             new ValidationMethod('validate'),
         ], aggregateErrors: true);
 
-        $this->assertEquals('!\is_array($__tmp_44e18f0f3b2a419fae74cbbaef66f40e = $data->foo ?? null) ? null : (function ($value) use($data) { $valid = true; $errors = \'\'; foreach ($value as $key => $item) { if ($error = is_scalar($item) && (($__len_0f8134fb6038ebcd7155f1de5f067c73 = strlen($item)) < 3) ? new FieldError(\'The value is too short. It should have {{ min }} characters or more.\', [\'min\' => 3]) : null ?? \Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->validate($item, $data), \'Invalid value\')) { $valid = false; $errors .= \'- On item \' . $key . \': \' . (\is_array($error) ? \'\' : $error) . PHP_EOL; } } return $valid ? null : new FieldError(\'Some values are invalid :\' . PHP_EOL . \'{{ item_errors }}\', [\'item_errors\' => $errors]); })($__tmp_44e18f0f3b2a419fae74cbbaef66f40e)', $constraint->getValidator(new NullConstraintValidatorRegistry())->generate($constraint, '$data->foo ?? null', new ValidatorGenerator(new NullConstraintValidatorRegistry())));
+        $this->assertEquals('!\is_array($__tmp_44e18f0f3b2a419fae74cbbaef66f40e = $data->foo ?? null) ? null : (function ($value) use($data) { $valid = true; $errors = \'\'; foreach ($value as $key => $item) { if ($error = is_scalar($item) && (($__len_0f8134fb6038ebcd7155f1de5f067c73 = strlen($item)) < 3) ? new FieldError(\'The value is too short. It should have {{ min }} characters or more.\', [\'min\' => 3], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null ?? \Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->validate($item, $data), \'Invalid value\', \'1b50e942-6acd-5b06-a581-d0819e7f1657\')) { $valid = false; $errors .= \'- On item \' . $key . \': \' . (\is_array($error) ? \'\' : $error) . PHP_EOL; } } return $valid ? null : new FieldError(\'Some values are invalid :\' . PHP_EOL . \'{{ item_errors }}\', [\'item_errors\' => $errors], \'1bfd08ad-82cf-57d0-a114-e9921e80986a\'); })($__tmp_44e18f0f3b2a419fae74cbbaef66f40e)', $constraint->getValidator(new NullConstraintValidatorRegistry())->generate($constraint, '$data->foo ?? null', new ValidatorGenerator(new NullConstraintValidatorRegistry())));
 
         $customMessage = new ValidateArray(
             constraints: [
@@ -81,14 +84,14 @@ ERROR
             aggregateErrors: true,
         );
 
-        $this->assertEquals('!\is_array($__tmp_44e18f0f3b2a419fae74cbbaef66f40e = $data->foo ?? null) ? null : (function ($value) use($data) { $valid = true; $errors = \'\'; foreach ($value as $key => $item) { if ($error = is_scalar($item) && (($__len_0f8134fb6038ebcd7155f1de5f067c73 = strlen($item)) < 3) ? new FieldError(\'The value is too short. It should have {{ min }} characters or more.\', [\'min\' => 3]) : null ?? \Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->validate($item, $data), \'Invalid value\')) { $valid = false; $errors .= \'- On item \' . $key . \': \' . (\is_array($error) ? \'\' : $error) . PHP_EOL; } } return $valid ? null : new FieldError(\'My error\', [\'item_errors\' => $errors]); })($__tmp_44e18f0f3b2a419fae74cbbaef66f40e)', $customMessage->getValidator(new NullConstraintValidatorRegistry())->generate($customMessage, '$data->foo ?? null', new ValidatorGenerator(new NullConstraintValidatorRegistry())));
+        $this->assertEquals('!\is_array($__tmp_44e18f0f3b2a419fae74cbbaef66f40e = $data->foo ?? null) ? null : (function ($value) use($data) { $valid = true; $errors = \'\'; foreach ($value as $key => $item) { if ($error = is_scalar($item) && (($__len_0f8134fb6038ebcd7155f1de5f067c73 = strlen($item)) < 3) ? new FieldError(\'The value is too short. It should have {{ min }} characters or more.\', [\'min\' => 3], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null ?? \Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->validate($item, $data), \'Invalid value\', \'1b50e942-6acd-5b06-a581-d0819e7f1657\')) { $valid = false; $errors .= \'- On item \' . $key . \': \' . (\is_array($error) ? \'\' : $error) . PHP_EOL; } } return $valid ? null : new FieldError(\'My error\', [\'item_errors\' => $errors], \'1bfd08ad-82cf-57d0-a114-e9921e80986a\'); })($__tmp_44e18f0f3b2a419fae74cbbaef66f40e)', $customMessage->getValidator(new NullConstraintValidatorRegistry())->generate($customMessage, '$data->foo ?? null', new ValidatorGenerator(new NullConstraintValidatorRegistry())));
 
         $constraint = new ValidateArray([
             new Length(min: 3),
             new ValidationMethod('validate'),
         ], aggregateErrors: false);
 
-        $this->assertEquals('!\is_array($__tmp_44e18f0f3b2a419fae74cbbaef66f40e = $data->foo ?? null) ? null : (function ($value) use($data) { $valid = true; $errors = []; foreach ($value as $key => $item) { if ($error = is_scalar($item) && (($__len_0f8134fb6038ebcd7155f1de5f067c73 = strlen($item)) < 3) ? new FieldError(\'The value is too short. It should have {{ min }} characters or more.\', [\'min\' => 3]) : null ?? \Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->validate($item, $data), \'Invalid value\')) { $valid = false; $errors[$key] = $error; } } return $valid ? null : $errors; })($__tmp_44e18f0f3b2a419fae74cbbaef66f40e)', $constraint->getValidator(new NullConstraintValidatorRegistry())->generate($constraint, '$data->foo ?? null', new ValidatorGenerator(new NullConstraintValidatorRegistry())));
+        $this->assertEquals('!\is_array($__tmp_44e18f0f3b2a419fae74cbbaef66f40e = $data->foo ?? null) ? null : (function ($value) use($data) { $valid = true; $errors = []; foreach ($value as $key => $item) { if ($error = is_scalar($item) && (($__len_0f8134fb6038ebcd7155f1de5f067c73 = strlen($item)) < 3) ? new FieldError(\'The value is too short. It should have {{ min }} characters or more.\', [\'min\' => 3], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null ?? \Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->validate($item, $data), \'Invalid value\', \'1b50e942-6acd-5b06-a581-d0819e7f1657\')) { $valid = false; $errors[$key] = $error; } } return $valid ? null : $errors; })($__tmp_44e18f0f3b2a419fae74cbbaef66f40e)', $constraint->getValidator(new NullConstraintValidatorRegistry())->generate($constraint, '$data->foo ?? null', new ValidatorGenerator(new NullConstraintValidatorRegistry())));
 
     }
 }

@@ -206,9 +206,10 @@ final class FormTransformerClass
 
             $errorValue = $errorHandlingConfiguration?->keepOriginalValue ? $fieldExpression : 'null';
             $errorMessage = $errorHandlingConfiguration?->message ? Code::value($errorHandlingConfiguration->message) : '$e->getMessage()';
+            $errorCode = Code::value($errorHandlingConfiguration?->code ?? TransformationError::CODE);
             $setErrorExpression = $errorHandlingConfiguration?->ignore
                 ? ''
-                : '$errors[' . $fieldNameString . '] = new FieldError(' . $errorMessage . ');'
+                : '$errors[' . $fieldNameString . '] = new FieldError(' . $errorMessage . ', [], ' . $errorCode . ');'
             ;
 
             foreach ($expressions as $expression) {

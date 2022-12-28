@@ -18,6 +18,8 @@ use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 final class Length extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface
 {
+    public const CODE = 'ecdd71f6-fa22-5564-bfc7-7e836dce3378';
+
     public const MIN_MESSAGE = 'The value is too short. It should have {{ min }} characters or more.';
     public const MAX_MESSAGE = 'The value is too long. It should have {{ max }} characters or less.';
     public const INTERVAL_MESSAGE = 'The value length is invalid. It should be between {{ min }} and {{ max }} characters long.';
@@ -78,7 +80,7 @@ final class Length extends SelfValidatedConstraint implements ConstraintValidato
             $params['max'] = $this->max;
         }
 
-        return new FieldError($this->message(), $params);
+        return new FieldError($this->message(), $params, self::CODE);
     }
 
     /**
@@ -110,8 +112,9 @@ final class Length extends SelfValidatedConstraint implements ConstraintValidato
         }
 
         $errorParams = Code::value($errorParams);
+        $code = Code::value(self::CODE);
 
-        return "is_scalar($fieldAccessor) && ($expression) ? new FieldError($errorMessage, $errorParams) : null";
+        return "is_scalar($fieldAccessor) && ($expression) ? new FieldError($errorMessage, $errorParams, $code) : null";
     }
 
     /**

@@ -30,8 +30,8 @@ class EqualsWithTest extends FormTestCase
 
         $this->assertTrue($form->submit([])->valid());
         $this->assertTrue($form->submit(['foo' => 'abc', 'bar' => 'abc'])->valid());
-        $this->assertEquals(['foo' => new FieldError('Two fields are different', ['field' => 'bar'])], $form->submit(['foo' => 'abc', 'bar' => 'bcd'])->errors());
-        $this->assertEquals(['foo' => new FieldError('Two fields are different', ['field' => 'bar'])], $form->submit(['foo' => ''])->errors());
+        $this->assertEquals(['foo' => new FieldError('Two fields are different', ['field' => 'bar'], EqualsWith::CODE)], $form->submit(['foo' => 'abc', 'bar' => 'bcd'])->errors());
+        $this->assertEquals(['foo' => new FieldError('Two fields are different', ['field' => 'bar'], EqualsWith::CODE)], $form->submit(['foo' => ''])->errors());
     }
 
     /**
@@ -44,9 +44,9 @@ class EqualsWithTest extends FormTestCase
 
         $this->assertTrue($form->submit([])->valid());
         $this->assertTrue($form->submit(['other' => 123, 'strict' => 123, 'notStrict' => 123])->valid());
-        $this->assertEquals(['strict' => new FieldError('Two fields are different', ['field' => 'other'])], $form->submit(['other' => ''])->errors());
-        $this->assertEquals(['strict' => new FieldError('Two fields are different', ['field' => 'other']), 'notStrict' => 'Two fields are different'], $form->submit(['other' => 123, 'strict' => 456, 'notStrict' => 789])->errors());
-        $this->assertEquals(['strict' => new FieldError('Two fields are different', ['field' => 'other'])], $form->submit(['other' => '123', 'strict' => 123, 'notStrict' => 123])->errors());
+        $this->assertEquals(['strict' => new FieldError('Two fields are different', ['field' => 'other'], EqualsWith::CODE)], $form->submit(['other' => ''])->errors());
+        $this->assertEquals(['strict' => new FieldError('Two fields are different', ['field' => 'other'], EqualsWith::CODE), 'notStrict' => 'Two fields are different'], $form->submit(['other' => 123, 'strict' => 456, 'notStrict' => 789])->errors());
+        $this->assertEquals(['strict' => new FieldError('Two fields are different', ['field' => 'other'], EqualsWith::CODE)], $form->submit(['other' => '123', 'strict' => 123, 'notStrict' => 123])->errors());
     }
 
     public function test_generated_code()
@@ -55,8 +55,8 @@ class EqualsWithTest extends FormTestCase
         $strict = new EqualsWith('foo', 'my error', true);
         $notStrict = new EqualsWith('foo', 'my error', false);
 
-        $this->assertSame('($data->bar ?? null) !== ($data->foo ?? null) ? new FieldError(\'my error\', [\'field\' => \'foo\']) : null', $strict->generate($strict, '($data->bar ?? null)', $generator));
-        $this->assertSame('($data->bar ?? null) != ($data->foo ?? null) ? new FieldError(\'my error\', [\'field\' => \'foo\']) : null', $notStrict->generate($notStrict, '($data->bar ?? null)', $generator));
+        $this->assertSame('($data->bar ?? null) !== ($data->foo ?? null) ? new FieldError(\'my error\', [\'field\' => \'foo\'], \'35ef0ca6-ee68-5f99-a87d-b2f635ea4a4a\') : null', $strict->generate($strict, '($data->bar ?? null)', $generator));
+        $this->assertSame('($data->bar ?? null) != ($data->foo ?? null) ? new FieldError(\'my error\', [\'field\' => \'foo\'], \'35ef0ca6-ee68-5f99-a87d-b2f635ea4a4a\') : null', $notStrict->generate($notStrict, '($data->bar ?? null)', $generator));
     }
 }
 

@@ -12,6 +12,7 @@ use Quatrevieux\Form\Fixtures\WithExternalDependencyConstraintRequest;
 use Quatrevieux\Form\Fixtures\WithExternalDependencyTransformerRequest;
 use Quatrevieux\Form\Fixtures\WithFieldNameMapping;
 use Quatrevieux\Form\Fixtures\WithTransformerRequest;
+use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Validator\FieldError;
 
 class FunctionalTest extends FormTestCase
@@ -158,12 +159,12 @@ class FunctionalTest extends FormTestCase
         $submitted = $form->submit(['foo' => 'foo']);
         $this->assertFalse($submitted->valid());
         $this->assertFalse(isset($submitted->value()->foo));
-        $this->assertEquals(['foo' => new FieldError('Syntax error')], $submitted->errors());
+        $this->assertEquals(['foo' => new FieldError('Syntax error', code: TransformationError::CODE)], $submitted->errors());
 
         $submitted = $form->submit(['foo' => '123']);
         $this->assertFalse($submitted->valid());
         $this->assertFalse(isset($submitted->value()->foo));
-        $this->assertEquals(['foo' => new FieldError('Invalid JSON object')], $submitted->errors());
+        $this->assertEquals(['foo' => new FieldError('Invalid JSON object', code: TransformationError::CODE)], $submitted->errors());
 
         $submitted = $form->submit(['foo' => '{"foo":"bar"}']);
         $this->assertTrue($submitted->valid());
@@ -173,7 +174,7 @@ class FunctionalTest extends FormTestCase
         $submitted = $form->submit(['foo' => '{"foo":"bar"}', 'customTransformerErrorHandling' => '____']);
         $this->assertFalse($submitted->valid());
         $this->assertSame('____', $submitted->value()->customTransformerErrorHandling);
-        $this->assertEquals(['customTransformerErrorHandling' => new FieldError('invalid data')], $submitted->errors());
+        $this->assertEquals(['customTransformerErrorHandling' => new FieldError('invalid data', code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6')], $submitted->errors());
 
         $submitted = $form->submit(['foo' => '{"foo":"bar"}', 'customTransformerErrorHandling' => base64_encode('foo')]);
         $this->assertTrue($submitted->valid());

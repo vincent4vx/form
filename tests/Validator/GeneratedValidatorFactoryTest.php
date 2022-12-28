@@ -9,8 +9,11 @@ use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\Fixtures\TestConfig;
 use Quatrevieux\Form\Fixtures\WithExternalDependencyConstraintRequest;
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Util\Functions;
+use Quatrevieux\Form\Validator\Constraint\Length;
 use Quatrevieux\Form\Validator\Constraint\NullConstraintValidatorRegistry;
+use Quatrevieux\Form\Validator\Constraint\Required;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 class GeneratedValidatorFactoryTest extends FormTestCase
@@ -78,11 +81,11 @@ class Quatrevieux_Form_Fixtures_RequiredParametersRequestValidatorGeneratorTest 
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
-        if (!isset($previousErrors['foo']) && $__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required') : null)) {
+        if (!isset($previousErrors['foo']) && $__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required', [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5') : null)) {
             $errors['foo'] = $__error_foo;
         }
 
-        if (!isset($previousErrors['bar']) && $__error_bar = (($data->bar ?? null) === null || ($data->bar ?? null) === '' || ($data->bar ?? null) === [] ? new FieldError('bar must be set') : null) ?? (is_scalar(($data->bar ?? null)) && (($__len_722af90ac1a42c8c3ad647bfd63cd459 = strlen(($data->bar ?? null))) < 3) ? new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3]) : null)) {
+        if (!isset($previousErrors['bar']) && $__error_bar = (($data->bar ?? null) === null || ($data->bar ?? null) === '' || ($data->bar ?? null) === [] ? new FieldError('bar must be set', [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5') : null) ?? (is_scalar(($data->bar ?? null)) && (($__len_722af90ac1a42c8c3ad647bfd63cd459 = strlen(($data->bar ?? null))) < 3) ? new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], 'ecdd71f6-fa22-5564-bfc7-7e836dce3378') : null)) {
             $errors['bar'] = $__error_bar;
         }
 
@@ -100,8 +103,8 @@ PHP
         $validator = $factory->create(RequiredParametersRequest::class);
 
         $this->assertEquals([
-            'foo' => new FieldError('This value is required'),
-            'bar' => new FieldError('bar must be set'),
+            'foo' => new FieldError('This value is required', code: Required::CODE),
+            'bar' => new FieldError('bar must be set', code: Required::CODE),
         ], $validator->validate(new RequiredParametersRequest()));
 
         $o = new RequiredParametersRequest();
@@ -109,13 +112,13 @@ PHP
         $o->bar = 'b';
 
         $this->assertEquals([
-            'bar' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3]),
+            'bar' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE),
         ], $validator->validate($o));
         
         $this->assertEquals([
-            'foo' => new FieldError('transformer error'),
-            'bar' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3]),
-        ], $validator->validate($o, ['foo' => new FieldError('transformer error')]));
+            'foo' => new FieldError('transformer error', code: TransformationError::CODE),
+            'bar' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE),
+        ], $validator->validate($o, ['foo' => new FieldError('transformer error', code: TransformationError::CODE)]));
 
         $o->bar = 'aaaa';
         $this->assertEmpty($validator->validate($o));
@@ -146,7 +149,7 @@ class Quatrevieux_Form_Fixtures_WithExternalDependencyConstraintRequestValidator
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
-        if (!isset($previousErrors['foo']) && $__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required') : null) ?? (($__constraint_eead8f4bada4cb985586965f0b2d57c9 = new \Quatrevieux\Form\Fixtures\ConfiguredLength(key: 'foo.length'))->getValidator($this->validatorRegistry)->validate($__constraint_eead8f4bada4cb985586965f0b2d57c9, ($data->foo ?? null), $data))) {
+        if (!isset($previousErrors['foo']) && $__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required', [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5') : null) ?? (($__constraint_eead8f4bada4cb985586965f0b2d57c9 = new \Quatrevieux\Form\Fixtures\ConfiguredLength(key: 'foo.length'))->getValidator($this->validatorRegistry)->validate($__constraint_eead8f4bada4cb985586965f0b2d57c9, ($data->foo ?? null), $data))) {
             $errors['foo'] = $__error_foo;
         }
 

@@ -63,7 +63,10 @@ final class RuntimeFormTransformer implements FormTransformerInterface
                 $errorHandlingConfigurator = $this->fieldsTransformationErrors[$fieldName] ?? null;
 
                 if (!$errorHandlingConfigurator?->ignore) {
-                    $errors[$fieldName] = new FieldError($errorHandlingConfigurator?->message ?? $e->getMessage());
+                    $errors[$fieldName] = new FieldError(
+                        message: $errorHandlingConfigurator?->message ?? $e->getMessage(),
+                        code: $errorHandlingConfigurator?->code ?? TransformationError::CODE,
+                    );
                 }
 
                 $normalized[$fieldName] = $errorHandlingConfigurator?->keepOriginalValue ? $originalValue : null;

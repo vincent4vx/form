@@ -231,7 +231,7 @@ class TestingTransformerWithDelegatedTransformer implements Quatrevieux\Form\Tra
         try {
             $transformed['foo'] = ($__transformer_80b8193e49fb60b95b7a65153fe6724c = new \Quatrevieux\Form\Transformer\Generator\DelegatedTransformerParameters(a: 'z'))->getTransformer($this->registry)->transformFromHttp($__transformer_80b8193e49fb60b95b7a65153fe6724c, $value['foo'] ?? null);
         } catch (\Exception $e) {
-            $errors['foo'] = new FieldError($e->getMessage());
+            $errors['foo'] = new FieldError($e->getMessage(), [], 'ec3b18d7-cb0a-5af9-b1cd-6f0b8fb00ffd');
             $transformed['foo'] = null;
         }
 
@@ -291,7 +291,7 @@ class TestingTransformerWithDelegatedTransformerAndGenerator implements Quatrevi
         try {
             $transformed['foo'] = ('z' . ($value['foo'] ?? null) . 'z');
         } catch (\Exception $e) {
-            $errors['foo'] = new FieldError($e->getMessage());
+            $errors['foo'] = new FieldError($e->getMessage(), [], 'ec3b18d7-cb0a-5af9-b1cd-6f0b8fb00ffd');
             $transformed['foo'] = null;
         }
 
@@ -407,7 +407,7 @@ class TestingTransformerWithUnsafeTransformers implements Quatrevieux\Form\Trans
         try {
             $transformed['foo'] = (new \Quatrevieux\Form\Transformer\Generator\FailingTransformer())->transformFromHttp($value['foo'] ?? null);
         } catch (\Exception $e) {
-            $errors['foo'] = new FieldError($e->getMessage());
+            $errors['foo'] = new FieldError($e->getMessage(), [], 'ec3b18d7-cb0a-5af9-b1cd-6f0b8fb00ffd');
             $transformed['foo'] = null;
         }
 
@@ -434,9 +434,9 @@ PHP
         $transformer = new \TestingTransformerWithUnsafeTransformers(new NullFieldTransformerRegistry());
 
         $this->assertSame(['bar' => null, 'foo' => null], $transformer->transformFromHttp([])->values);
-        $this->assertEquals(['foo' => new FieldError('my error')], $transformer->transformFromHttp([])->errors);
+        $this->assertEquals(['foo' => new FieldError('my error', code: TransformationError::CODE)], $transformer->transformFromHttp([])->errors);
         $this->assertSame(['bar' => 456, 'foo' => null], $transformer->transformFromHttp(['foo' => 123, 'bar' => 456])->values);
-        $this->assertEquals(['foo' => new FieldError('my error')], $transformer->transformFromHttp([])->errors);
+        $this->assertEquals(['foo' => new FieldError('my error', code: TransformationError::CODE)], $transformer->transformFromHttp([])->errors);
 
         $this->assertSame(['foo' => null, 'bar' => null], $transformer->transformToHttp([]));
         $this->assertSame(['foo' => 123, 'bar' => 456], $transformer->transformToHttp(['foo' => 123, 'bar' => 456]));
@@ -454,7 +454,7 @@ PHP
             ],
             [],
             [
-                'foo' => new TransformationError(message: 'my custom error'),
+                'foo' => new TransformationError(message: 'my custom error', code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6'),
                 'bar' => new TransformationError(ignore: true, keepOriginalValue: true)
             ]
         ));
@@ -476,7 +476,7 @@ class TestingTransformerWithCustomTransformationError implements Quatrevieux\For
         try {
             $transformed['foo'] = (new \Quatrevieux\Form\Transformer\Generator\FailingTransformer())->transformFromHttp($value['foo'] ?? null);
         } catch (\Exception $e) {
-            $errors['foo'] = new FieldError('my custom error');
+            $errors['foo'] = new FieldError('my custom error', [], 'd2e95635-fdb6-4752-acb4-aa8f76f64de6');
             $transformed['foo'] = null;
         }
 
@@ -510,9 +510,9 @@ PHP
         $transformer = new \TestingTransformerWithCustomTransformationError(new NullFieldTransformerRegistry());
 
         $this->assertSame(['foo' => null, 'bar' => null], $transformer->transformFromHttp([])->values);
-        $this->assertEquals(['foo' => new FieldError('my custom error')], $transformer->transformFromHttp([])->errors);
+        $this->assertEquals(['foo' => new FieldError('my custom error', code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6')], $transformer->transformFromHttp([])->errors);
         $this->assertSame(['foo' => null, 'bar' => 456], $transformer->transformFromHttp(['foo' => 123, 'bar' => 456])->values);
-        $this->assertEquals(['foo' => new FieldError('my custom error')], $transformer->transformFromHttp([])->errors);
+        $this->assertEquals(['foo' => new FieldError('my custom error', code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6')], $transformer->transformFromHttp([])->errors);
 
         $this->assertSame(['foo' => null, 'bar' => null], $transformer->transformToHttp([]));
         $this->assertSame(['foo' => 123, 'bar' => 456], $transformer->transformToHttp(['foo' => 123, 'bar' => 456]));

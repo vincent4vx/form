@@ -65,7 +65,7 @@ class RuntimeFormTransformerTest extends FormTestCase
             []
         );
 
-        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my transformation error')]), $transformer->transformFromHttp(['foo' => 'bar']));
+        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my transformation error', code: TransformationError::CODE)]), $transformer->transformFromHttp(['foo' => 'bar']));
     }
 
     public function test_with_transformation_error_custom_message()
@@ -81,7 +81,23 @@ class RuntimeFormTransformerTest extends FormTestCase
             ]
         );
 
-        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my custom error')]), $transformer->transformFromHttp(['foo' => 'bar']));
+        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my custom error', code: TransformationError::CODE)]), $transformer->transformFromHttp(['foo' => 'bar']));
+    }
+
+    public function test_with_transformation_error_custom_code()
+    {
+        $transformer = new RuntimeFormTransformer(
+            new NullFieldTransformerRegistry(),
+            [
+                'foo' => [new FailingTransformer()],
+            ],
+            [],
+            [
+                'foo' => new TransformationError(code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6'),
+            ]
+        );
+
+        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my transformation error', code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6')]), $transformer->transformFromHttp(['foo' => 'bar']));
     }
 
     public function test_with_transformation_error_ignored()
@@ -113,7 +129,7 @@ class RuntimeFormTransformerTest extends FormTestCase
             ]
         );
 
-        $this->assertEquals(new TransformationResult(['foo' => 'bar'], ['foo' => new FieldError('my transformation error')]), $transformer->transformFromHttp(['foo' => 'bar']));
+        $this->assertEquals(new TransformationResult(['foo' => 'bar'], ['foo' => new FieldError('my transformation error', code: TransformationError::CODE)]), $transformer->transformFromHttp(['foo' => 'bar']));
     }
 
     public function test_with_transformation_error_ignored_and_keep_original_value()

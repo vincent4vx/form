@@ -2,7 +2,13 @@
 
 namespace Quatrevieux\Form\Validator;
 
-final class FieldError
+use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
+
+/**
+ * Store error for a field
+ * This class can be serialized to JSON
+ */
+final class FieldError implements \JsonSerializable
 {
     public function __construct(
         /**
@@ -20,7 +26,31 @@ final class FieldError
          * @var array<string, mixed>
          */
         public readonly array $parameters = [],
+
+        /**
+         * Error code used to identify the error ignoring localized or parameterized messages
+         */
+        public readonly string $code = ConstraintInterface::CODE,
     ) {
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array{code: string, message: string, parameters?: array<string, mixed>}
+     */
+    public function jsonSerialize(): array
+    {
+        $json = [
+            'code' => $this->code,
+            'message' => (string) $this,
+        ];
+
+        if ($this->parameters) {
+            $json['parameters'] = $this->parameters;
+        }
+
+        return $json;
     }
 
     /**

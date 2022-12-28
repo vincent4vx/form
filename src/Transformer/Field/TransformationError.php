@@ -14,6 +14,8 @@ use Quatrevieux\Form\Transformer\TransformationResult;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class TransformationError
 {
+    public const CODE = 'ec3b18d7-cb0a-5af9-b1cd-6f0b8fb00ffd';
+
     public function __construct(
         /**
          * Define a custom error message
@@ -31,6 +33,14 @@ final class TransformationError
          * Be careful, the value may cause a type error
          */
         public readonly bool $keepOriginalValue = false,
+
+        /**
+         * Configure the error code to use when transformation error occur
+         * This error should be a UUID
+         *
+         * @var string
+         */
+        public readonly string $code = self::CODE,
     ) {
     }
 }

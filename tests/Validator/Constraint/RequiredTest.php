@@ -27,6 +27,7 @@ class RequiredTest extends FormTestCase
         $this->assertFalse($form->submit([])->valid());
         $this->assertFalse($form->submit(['value' => ''])->valid());
         $this->assertFalse($form->submit(['value' => []])->valid());
+        $this->assertEquals(['value' => new FieldError('my error', [], Required::CODE)], $form->submit(['value' => []])->errors());
 
         $this->assertTrue($form->submit(['value' => ' '])->valid());
         $this->assertTrue($form->submit(['value' => 'a'])->valid());
@@ -41,10 +42,10 @@ class RequiredTest extends FormTestCase
     {
         $generator = new ValidatorGenerator(new NullConstraintValidatorRegistry());
         $defaultMessage = new Required();
-        $this->assertEquals('($data->field ?? null) === null || ($data->field ?? null) === \'\' || ($data->field ?? null) === [] ? new FieldError(\'This value is required\') : null', $defaultMessage->generate($defaultMessage, '($data->field ?? null)', $generator));
+        $this->assertEquals('($data->field ?? null) === null || ($data->field ?? null) === \'\' || ($data->field ?? null) === [] ? new FieldError(\'This value is required\', [], \'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5\') : null', $defaultMessage->generate($defaultMessage, '($data->field ?? null)', $generator));
 
         $customMessage = new Required('my error');
-        $this->assertEquals('($data->field ?? null) === null || ($data->field ?? null) === \'\' || ($data->field ?? null) === [] ? new FieldError(\'my error\') : null', $customMessage->generate($customMessage, '($data->field ?? null)', $generator));
+        $this->assertEquals('($data->field ?? null) === null || ($data->field ?? null) === \'\' || ($data->field ?? null) === [] ? new FieldError(\'my error\', [], \'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5\') : null', $customMessage->generate($customMessage, '($data->field ?? null)', $generator));
     }
 }
 

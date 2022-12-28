@@ -77,6 +77,8 @@ use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class ValidationMethod extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface
 {
+    public const CODE = '1b50e942-6acd-5b06-a581-d0819e7f1657';
+
     public function __construct(
         /**
          * Method name to call
@@ -108,6 +110,14 @@ final class ValidationMethod extends SelfValidatedConstraint implements Constrai
          * @var string
          */
         public string $message = 'Invalid value',
+
+        /**
+         * Error code to use if the method returns false or a message as string
+         * Should be a UUID
+         *
+         * @var string
+         */
+        public string $code = self::CODE,
     ) {
     }
 
@@ -129,7 +139,7 @@ final class ValidationMethod extends SelfValidatedConstraint implements Constrai
             $expression = "\\{$className}::{$methodName}({$parameters})";
         }
 
-        return '\\' . self::class . '::toFieldError(' . $expression . ', ' . Code::value($constraint->message) . ')';
+        return '\\' . self::class . '::toFieldError(' . $expression . ', ' . Code::value($constraint->message) . ', ' . Code::value($constraint->code) . ')';
     }
 
     /**
@@ -142,7 +152,7 @@ final class ValidationMethod extends SelfValidatedConstraint implements Constrai
             : $constraint->class::{$constraint->method}($value, $data, ...$constraint->parameters)
         ;
 
-        return self::toFieldError($result, $constraint->message);
+        return self::toFieldError($result, $constraint->message, $constraint->code);
     }
 
     /**
@@ -150,25 +160,26 @@ final class ValidationMethod extends SelfValidatedConstraint implements Constrai
      *
      * @param string|null|bool|FieldError $result Result of the method call
      * @param string $message Error message to use if the method returns false
+     * @param string $code Error code to use if the method returns false or a message as string
      *
      * @return FieldError|null
      *
      * @internal This method should only be called by generated code or by the validate() method
      */
-    public static function toFieldError(mixed $result, string $message): ?FieldError
+    public static function toFieldError(mixed $result, string $message, string $code): ?FieldError
     {
         if ($result === null || $result === true) {
             return null;
         }
 
         if ($result === false) {
-            return new FieldError($message);
+            return new FieldError($message, code: $code);
         }
 
         if ($result instanceof FieldError) {
             return $result;
         }
 
-        return new FieldError($result);
+        return new FieldError($result, code: $code);
     }
 }

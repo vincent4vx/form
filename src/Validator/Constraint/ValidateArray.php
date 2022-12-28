@@ -26,6 +26,8 @@ use Quatrevieux\Form\Validator\FieldError;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 final class ValidateArray implements ConstraintInterface
 {
+    public const CODE = '1bfd08ad-82cf-57d0-a114-e9921e80986a';
+
     public function __construct(
         /**
          * List of constraints to apply to each element of the array

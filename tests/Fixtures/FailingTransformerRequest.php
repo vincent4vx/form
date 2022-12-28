@@ -12,7 +12,7 @@ class FailingTransformerRequest
     public object $foo;
 
     #[UnsafeBase64]
-    #[TransformationError(message: 'invalid data', keepOriginalValue: true)]
+    #[TransformationError(message: 'invalid data', keepOriginalValue: true, code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6')]
     public ?string $customTransformerErrorHandling;
 
     #[UnsafeBase64]

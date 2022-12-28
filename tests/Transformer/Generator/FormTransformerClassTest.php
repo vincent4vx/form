@@ -162,7 +162,7 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         try {
             $transformed['foo'] = base64_decode((string) ($value['foo'] ?? null));
         } catch (\Exception $e) {
-            $errors['foo'] = new FieldError($e->getMessage());
+            $errors['foo'] = new FieldError($e->getMessage(), [], 'ec3b18d7-cb0a-5af9-b1cd-6f0b8fb00ffd');
             $transformed['foo'] = null;
         }
 
@@ -189,7 +189,7 @@ PHP
     {
         $class = new FormTransformerClass('ClassName');
 
-        $class->declareField('foo', 'foo', new TransformationError(message: 'my transformation error', keepOriginalValue: true));
+        $class->declareField('foo', 'foo', new TransformationError(message: 'my transformation error', keepOriginalValue: true, code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6'));
         $class->declareField('bar', 'bar', new TransformationError(ignore: true));
 
         $class->addFieldTransformationExpression('foo', fn ($v) => "(string) ($v)", fn ($v) => "$v", true);
@@ -215,7 +215,7 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         try {
             $transformed['foo'] = (string) ($value['foo'] ?? null);
         } catch (\Exception $e) {
-            $errors['foo'] = new FieldError('my transformation error');
+            $errors['foo'] = new FieldError('my transformation error', [], 'd2e95635-fdb6-4752-acb4-aa8f76f64de6');
             $transformed['foo'] = $value['foo'] ?? null;
         }
 

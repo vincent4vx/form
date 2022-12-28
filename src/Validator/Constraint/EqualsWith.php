@@ -26,6 +26,8 @@ use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class EqualsWith extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface
 {
+    public const CODE = '35ef0ca6-ee68-5f99-a87d-b2f635ea4a4a';
+
     public function __construct(
         /**
          * The other field name
@@ -55,7 +57,7 @@ final class EqualsWith extends SelfValidatedConstraint implements ConstraintVali
         $other = $data->{$field} ?? null;
 
         if ($constraint->strict ? $value !== $other : $value != $other) {
-            return new FieldError($this->message, ['field' => $field]);
+            return new FieldError($this->message, ['field' => $field], self::CODE);
         }
 
         return null;
@@ -69,7 +71,7 @@ final class EqualsWith extends SelfValidatedConstraint implements ConstraintVali
     public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
     {
         $otherAccessor = '($data->' . $constraint->field . ' ?? null)';
-        $error = 'new FieldError(' . Code::value($constraint->message) . ', ' . Code::value(['field' => $constraint->field]) . ')';
+        $error = 'new FieldError(' . Code::value($constraint->message) . ', ' . Code::value(['field' => $constraint->field]) . ', ' . Code::value(self::CODE) . ')';
 
         if ($constraint->strict) {
             return "$fieldAccessor !== $otherAccessor ? $error : null";

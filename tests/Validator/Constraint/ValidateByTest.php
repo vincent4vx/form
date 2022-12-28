@@ -18,7 +18,7 @@ class ValidateByTest extends FormTestCase
 
         $submitted = $form->submit(['foo' => 'bar']);
         $this->assertFalse($submitted->valid());
-        $this->assertEquals(['foo' => 'Invalid checksum'], $submitted->errors());
+        $this->assertEquals(['foo' => new FieldError('Invalid checksum', [], '99e51862-6756-4a02-89b0-01c81a571d3a')], $submitted->errors());
 
         $submitted = $form->submit(['foo' => 'ear']);
         $this->assertTrue($submitted->valid());
@@ -39,7 +39,7 @@ class TestingValidator implements ConstraintValidatorInterface
         $checksum = crc32($value) % 32;
 
         if ($checksum !== $constraint->options['checksum']) {
-            return new FieldError('Invalid checksum');
+            return new FieldError('Invalid checksum', code: '99e51862-6756-4a02-89b0-01c81a571d3a');
         }
 
         return null;

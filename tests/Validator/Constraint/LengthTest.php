@@ -48,8 +48,8 @@ class LengthTest extends FormTestCase
 
         $this->assertFalse($result->valid());
         $this->assertEquals([
-            'onlyMin' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3]),
-            'both' => new FieldError('my error', ['min' => 3, 'max' => 6]),
+            'onlyMin' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE),
+            'both' => new FieldError('my error', ['min' => 3, 'max' => 6], Length::CODE),
         ], $result->errors());
 
         $result = $form->submit(['onlyMin' => 'aaaa', 'onlyMax' => 'aaaa', 'both' => 'aaaaa']);
@@ -68,8 +68,8 @@ class LengthTest extends FormTestCase
 
         $this->assertFalse($result->valid());
         $this->assertEquals([
-            'both' => new FieldError('my error', ['min' => 3, 'max' => 6]),
-            'onlyMax' => new FieldError('The value is too long. It should have {{ max }} characters or less.', ['max' => 6]),
+            'both' => new FieldError('my error', ['min' => 3, 'max' => 6], Length::CODE),
+            'onlyMax' => new FieldError('The value is too long. It should have {{ max }} characters or less.', ['max' => 6], Length::CODE),
         ], $result->errors());
 
         $result = $form->submit(['onlyMin' => 'aaaa', 'onlyMax' => 'aaaa', 'both' => 'aaaaa']);
@@ -80,13 +80,13 @@ class LengthTest extends FormTestCase
     {
         $generator = new ValidatorGenerator(new NullConstraintValidatorRegistry());
         $onlyMin = new Length(min: 3, message: 'my error');
-        $this->assertEquals('is_scalar(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) < 3) ? new FieldError(\'my error\', [\'min\' => 3]) : null', $onlyMin->generate($onlyMin, '($data->field ?? null)', $generator));
+        $this->assertEquals('is_scalar(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) < 3) ? new FieldError(\'my error\', [\'min\' => 3], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null', $onlyMin->generate($onlyMin, '($data->field ?? null)', $generator));
 
         $onlyMax = new Length(max: 3, message: 'my error');
-        $this->assertEquals('is_scalar(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) > 3) ? new FieldError(\'my error\', [\'max\' => 3]) : null', $onlyMax->generate($onlyMax, '($data->field ?? null)', $generator));
+        $this->assertEquals('is_scalar(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) > 3) ? new FieldError(\'my error\', [\'max\' => 3], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null', $onlyMax->generate($onlyMax, '($data->field ?? null)', $generator));
 
         $both = new Length(min: 3, max: 6, message: 'my error');
-        $this->assertEquals('is_scalar(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) < 3 || $__len_1444ef036f9b3842b62162dc7f14342b > 6) ? new FieldError(\'my error\', [\'min\' => 3, \'max\' => 6]) : null', $both->generate($both, '($data->field ?? null)', $generator));
+        $this->assertEquals('is_scalar(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) < 3 || $__len_1444ef036f9b3842b62162dc7f14342b > 6) ? new FieldError(\'my error\', [\'min\' => 3, \'max\' => 6], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null', $both->generate($both, '($data->field ?? null)', $generator));
     }
 }
 

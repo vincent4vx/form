@@ -88,7 +88,7 @@ class RuntimeFormTransformerFactoryTest extends FormTestCase
             'ignoreError' => [new UnsafeBase64(), new Cast(CastType::String)],
         ], $transformer->getFieldsTransformers());
         $this->assertEquals([
-            'customTransformerErrorHandling' => new TransformationError(message: 'invalid data', keepOriginalValue: true),
+            'customTransformerErrorHandling' => new TransformationError(message: 'invalid data', keepOriginalValue: true, code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6'),
             'ignoreError' => new TransformationError(ignore: true),
         ], $transformer->getFieldsTransformationErrors());
     }

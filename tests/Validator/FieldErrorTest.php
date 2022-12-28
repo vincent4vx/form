@@ -21,4 +21,10 @@ class FieldErrorTest extends TestCase
 
         $this->assertEquals('bar baz', (string) $error);
     }
+
+    public function test_json()
+    {
+        $this->assertEquals('{"code":"d2e95635-fdb6-4752-acb4-aa8f76f64de6","message":"bar baz","parameters":{"foo":"baz"}}', json_encode(new FieldError('bar {{ foo }}', ['foo' => 'baz'], 'd2e95635-fdb6-4752-acb4-aa8f76f64de6')));
+        $this->assertEquals('{"code":"d2e95635-fdb6-4752-acb4-aa8f76f64de6","message":"bar"}', json_encode(new FieldError('bar', [], 'd2e95635-fdb6-4752-acb4-aa8f76f64de6')));
+    }
 }
