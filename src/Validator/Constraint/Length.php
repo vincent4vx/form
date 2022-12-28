@@ -93,7 +93,6 @@ final class Length extends SelfValidatedConstraint implements ConstraintValidato
         $lenVarName = Code::varName($fieldAccessor, 'len');
         $lenVarNameInit = "$lenVarName = strlen($fieldAccessor)";
         $expression = '';
-        $errorMessage = Code::value($constraint->message());
         $errorParams = [];
 
         if ($constraint->min !== null) {
@@ -111,10 +110,9 @@ final class Length extends SelfValidatedConstraint implements ConstraintValidato
             }
         }
 
-        $errorParams = Code::value($errorParams);
-        $code = Code::value(self::CODE);
+        $error = Code::new('FieldError', [$constraint->message(), $errorParams, self::CODE]);
 
-        return "is_scalar($fieldAccessor) && ($expression) ? new FieldError($errorMessage, $errorParams, $code) : null";
+        return "is_scalar($fieldAccessor) && ($expression) ? $error : null";
     }
 
     /**

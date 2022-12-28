@@ -60,9 +60,8 @@ final class Required extends SelfValidatedConstraint implements ConstraintValida
      */
     public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
     {
-        $errorMessage = Code::value($constraint->message);
-        $code = Code::value(self::CODE);
+        $error = Code::new('FieldError', [$constraint->message, [], self::CODE]);
 
-        return "$fieldAccessor === null || $fieldAccessor === '' || $fieldAccessor === [] ? new FieldError($errorMessage, [], $code) : null";
+        return "$fieldAccessor === null || $fieldAccessor === '' || $fieldAccessor === [] ? $error : null";
     }
 }

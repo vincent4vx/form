@@ -20,7 +20,7 @@ final class GenericValidatorGenerator implements ConstraintValidatorGeneratorInt
      */
     public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
     {
-        $newConstraintExpression = Code::newExpression($constraint);
+        $newConstraintExpression = Code::instantiate($constraint);
         $constraintVarName = Code::varName($newConstraintExpression, 'constraint');
 
         // Optimisation of SelfValidatedConstraint

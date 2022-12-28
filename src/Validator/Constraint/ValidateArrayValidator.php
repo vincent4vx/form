@@ -102,11 +102,11 @@ final class ValidateArrayValidator implements ConstraintValidatorInterface, Cons
             return '$errors';
         }
 
-        $message = Code::value($constraint->message);
-        $code = Code::value(ValidateArray::CODE);
-        $parameters = '[\'item_errors\' => $errors]';
-
-        return "new FieldError($message, $parameters, $code)";
+        return Code::new('FieldError', [
+            $constraint->message,
+            ['item_errors' => Code::raw('$errors')],
+            ValidateArray::CODE
+        ]);
     }
 
     private function generateItemErrorExpression(ValidateArray $constraint): string

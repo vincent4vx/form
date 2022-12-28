@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Validator\Constraint;
 
 use Attribute;
+use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
@@ -128,18 +129,15 @@ final class ValidationMethod extends SelfValidatedConstraint implements Constrai
     {
         $className = $constraint->class;
         $methodName = $constraint->method;
-        $extraParameters = array_map(fn (mixed $parameter) => Code::value($parameter), $constraint->parameters);
 
-        $parameters = [$fieldAccessor, '$data', ...$extraParameters];
-        $parameters = implode(', ', $parameters);
+        $parameters = [Code::raw($fieldAccessor), Code::raw('$data'), ...$constraint->parameters];
 
-        if ($className === null) {
-            $expression = "\$data->{$methodName}({$parameters})";
-        } else {
-            $expression = "\\{$className}::{$methodName}({$parameters})";
-        }
+        $expression = $className === null
+            ? Code::callMethod('$data', $methodName, $parameters)
+            : Code::callStatic($className, $methodName, $parameters)
+        ;
 
-        return '\\' . self::class . '::toFieldError(' . $expression . ', ' . Code::value($constraint->message) . ', ' . Code::value($constraint->code) . ')';
+        return Call::static(self::class)->toFieldError(Code::raw($expression), $constraint->message, $constraint->code);
     }
 
     /**

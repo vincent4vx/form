@@ -3,3 +3,5 @@ parameters:
     paths:
         - src
     checkGenericClassInNonGenericObjectType: false
+    ignoreErrors:
+        - '#Call to an undefined( static)? method Quatrevieux\\Form\\Util\\Call#'

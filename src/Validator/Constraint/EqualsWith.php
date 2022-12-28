@@ -71,7 +71,7 @@ final class EqualsWith extends SelfValidatedConstraint implements ConstraintVali
     public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
     {
         $otherAccessor = '($data->' . $constraint->field . ' ?? null)';
-        $error = 'new FieldError(' . Code::value($constraint->message) . ', ' . Code::value(['field' => $constraint->field]) . ', ' . Code::value(self::CODE) . ')';
+        $error = Code::new('FieldError', [$constraint->message, ['field' => $constraint->field], self::CODE]);
 
         if ($constraint->strict) {
             return "$fieldAccessor !== $otherAccessor ? $error : null";

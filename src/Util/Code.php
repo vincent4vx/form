@@ -7,10 +7,13 @@ use ReflectionClass;
 use stdClass;
 use UnitEnum;
 
+use function array_is_list;
 use function array_map;
+use function class_exists;
 use function get_class;
 use function implode;
 use function is_array;
+use function is_int;
 use function is_object;
 use function is_string;
 use function md5;
@@ -46,6 +49,7 @@ final class Code
     public static function value(mixed $value): string
     {
         return match (true) {
+            $value instanceof PhpExpressionInterface => (string) $value,
             // Replace LF by PHP_EOL constant to ensure that the generated string will be written on a single line
             is_string($value) => str_replace(PHP_EOL, '\' . PHP_EOL . \'', var_export($value, true)),
             is_object($value) => self::dumpObject($value),
@@ -62,8 +66,10 @@ final class Code
      * @param object $o
      *
      * @return string
+     *
+     * @see Code::new() for a more generic way to instantiate an object, by passing arguments manually
      */
-    public static function newExpression(object $o): string
+    public static function instantiate(object $o): string
     {
         $reflection = new ReflectionClass($o);
 
@@ -71,11 +77,11 @@ final class Code
 
         foreach ($reflection->getProperties() as $property) {
             if ($property->isPromoted()) {
-                $properties[] = $property->name . ': ' . self::value($property->getValue($o));
+                $properties[$property->name] = $property->getValue($o);
             }
         }
 
-        return 'new \\' . get_class($o) . '(' . implode(', ', $properties) . ')';
+        return self::new(get_class($o), $properties);
     }
 
     /**
@@ -104,6 +110,129 @@ final class Code
     }
 
     /**
+     * Generate a function or method call expression
+     *
+     * Example:
+     * - `Code::call('Foo::bar', ['arg1', 'arg2'])` will generate `Foo::bar('arg1', 'arg2')`
+     * - `Code::call('substr', ['azerty', 'length' => 3])` will generate `substr('azerty', length: 3)`
+     *
+     * @param string $function Function name or method call expression
+     * @param array<string|int, mixed> $arguments Arguments to pass to the function.
+     *     All arguments will be converted to PHP expression using `Code::value()`.
+     *     If an associative array is given, the keys will be used as named argument.
+     *     Use {@see Code::raw()} to ignore the conversion.
+     *
+     * @return string
+     *
+     * @see Code::callStatic() For generate a static method call expression
+     * @see Code::callMethod() For generate a method call expression
+     * @see Code::new() For generate a `new` expression
+     */
+    public static function call(string $function, array $arguments = []): string
+    {
+        $indexedArguments = [];
+        $namedArguments = [];
+
+        foreach ($arguments as $key => $value) {
+            if (is_int($key)) {
+                $indexedArguments[] = self::value($value);
+            } else {
+                $namedArguments[] = $key . ': ' . self::value($value);
+            }
+        }
+
+        return $function . '(' . implode(', ', [...$indexedArguments, ...$namedArguments]) . ')';
+    }
+
+    /**
+     * Generate a static method call expression
+     *
+     * Example:
+     * - `Code::staticCall('Foo', 'bar', ['arg1', 'arg2'])` will generate `Foo::bar('arg1', 'arg2')`
+     *
+     * @param string $class Class name. If a FQCN is given, it will be prefixed with a backslash to ensure that the class will be resolved from the global namespace.
+     * @param string $method The method name
+     * @param array<string|int, mixed> $arguments Arguments to pass to the function.
+     *     All arguments will be converted to PHP expression using `Code::value()`.
+     *     If an associative array is given, the keys will be used as named argument.
+     *     Use {@see Code::raw()} to ignore the conversion.
+     *
+     * @return string
+     */
+    public static function callStatic(string $class, string $method, array $arguments = []): string
+    {
+        // Prefix the class name with a backslash to ensure that the class will be resolved from the global namespace
+        if ($class[0] !== '\\' && class_exists($class)) {
+            $class = '\\' . $class;
+        }
+
+        return self::call($class . '::' . $method, $arguments);
+    }
+
+    /**
+     * Generate an object method call expression
+     *
+     * Example:
+     * - `Code::callMethod('$foo', 'bar', ['arg1', 'arg2'])` will generate `$foo->bar('arg1', 'arg2')`
+     *
+     * @param string $object The object accessor expression
+     * @param string $method The method name
+     * @param array<string|int, mixed> $arguments Arguments to pass to the function.
+     *     All arguments will be converted to PHP expression using `Code::value()`.
+     *     If an associative array is given, the keys will be used as named argument.
+     *     Use {@see Code::raw()} to ignore the conversion.
+     *
+     * @return string
+     */
+    public static function callMethod(string $object, string $method, array $arguments = []): string
+    {
+        return self::call($object . '->' . $method, $arguments);
+    }
+
+    /**
+     * Generate a call to class constructor
+     *
+     * @param string $class Class name. Can be a fully qualified class name.
+     * @param array<string|int, mixed> $arguments Arguments to pass to the constructor.
+     *     All arguments will be converted to PHP expression using `Code::value()`.
+     *     If an associative array is given, the keys will be used as named argument.
+     *     Use {@see Code::raw()} to ignore the conversion.
+     *
+     * @return string The `new XXX()` PHP expression
+     *
+     * @see Code::instantiate() To generate a `new XXX()` expression for instantiate an existing object
+     */
+    public static function new(string $class, array $arguments = []): string
+    {
+        if ($class[0] !== '\\' && class_exists($class)) {
+            $class = '\\' . $class;
+        }
+
+        return self::call('new ' . $class, $arguments);
+    }
+
+    /**
+     * Wrap a PHP expression into to ensure that it will not be converted to a string expression by `Code::value()`
+     *
+     * @param string $code PHP code to wrap
+     *
+     * @return PhpExpressionInterface
+     */
+    public static function raw(string $code): PhpExpressionInterface
+    {
+        return new class ($code) implements PhpExpressionInterface {
+            public function __construct(private readonly string $code)
+            {
+            }
+
+            public function __toString(): string
+            {
+                return $this->code;
+            }
+        };
+    }
+
+    /**
      * Generate the PHP expression of the given object
      *
      * Handle the following cases:
@@ -124,7 +253,7 @@ final class Code
             return '\\' . get_class($value) . '::' . $value->name;
         }
 
-        return self::newExpression($value);
+        return self::instantiate($value);
     }
 
     /**

@@ -25,7 +25,7 @@ final class DelegatedFieldTransformerGenerator implements FieldTransformerGenera
      */
     public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $newTransformerExpression = Code::newExpression($transformer);
+        $newTransformerExpression = Code::instantiate($transformer);
         $tmpVarName = Code::varName($newTransformerExpression, 'transformer');
 
         return "($tmpVarName = $newTransformerExpression)->getTransformer(\$this->registry)->transformFromHttp($tmpVarName, $previousExpression)";
@@ -36,7 +36,7 @@ final class DelegatedFieldTransformerGenerator implements FieldTransformerGenera
      */
     public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $newTransformerExpression = Code::newExpression($transformer);
+        $newTransformerExpression = Code::instantiate($transformer);
         $tmpVarName = Code::varName($newTransformerExpression, 'transformer');
 
         return "($tmpVarName = $newTransformerExpression)->getTransformer(\$this->registry)->transformToHttp($tmpVarName, $previousExpression)";

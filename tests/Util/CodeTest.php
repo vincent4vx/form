@@ -33,11 +33,12 @@ class CodeTest extends TestCase
         $this->assertSame("new \Quatrevieux\Form\Transformer\Field\Csv(separator: ';', enclosure: '')", Code::value(new Csv(separator: ';')));
         $this->assertSame("\Quatrevieux\Form\Transformer\Field\CastType::Int", Code::value(CastType::Int));
         $this->assertSame("[new \Quatrevieux\Form\Transformer\Field\Csv(separator: ';', enclosure: ''), new \Quatrevieux\Form\Transformer\Field\ArrayCast(elementType: \Quatrevieux\Form\Transformer\Field\CastType::Int, preserveKeys: true)]", Code::value([new Csv(separator: ';'), new ArrayCast(CastType::Int)]));
+        $this->assertSame('$foo', Code::value(Code::raw('$foo')));
     }
 
-    public function test_newExpression()
+    public function test_instantiate()
     {
-        $this->assertSame("new \Quatrevieux\Form\Util\NewExprTestObject(pub: 'foo', prot: 123, priv: false)", Code::newExpression(new NewExprTestObject('foo', 123, false)));
+        $this->assertSame("new \Quatrevieux\Form\Util\NewExprTestObject(pub: 'foo', prot: 123, priv: false)", Code::instantiate(new NewExprTestObject('foo', 123, false)));
     }
 
     public function test_inlineStrtr()
@@ -47,6 +48,33 @@ class CodeTest extends TestCase
         $this->assertSame("'Hello ' . \$firstName . ' ' . \$lastName . ' !'", Code::inlineStrtr('Hello {{ firstName }} {{ lastName }} !', ['{{ firstName }}' => '$firstName', '{{ lastName }}' => '$lastName']));
         $this->assertSame("'Hello ' . \$firstName . \$lastName . ' !'", Code::inlineStrtr('Hello {{ firstName }}{{ lastName }} !', ['{{ firstName }}' => '$firstName', '{{ lastName }}' => '$lastName']));
         $this->assertSame("'Hello ' . \$firstName . \$lastName", Code::inlineStrtr('Hello {{ firstName }}{{ lastName }}', ['{{ firstName }}' => '$firstName', '{{ lastName }}' => '$lastName']));
+    }
+
+    public function test_call()
+    {
+        $this->assertSame("substr('azerty', 1, 3)", Code::call('substr', ['azerty', 1, 3]));
+        $this->assertSame("substr('azerty', length: 3)", Code::call('substr', ['azerty', 'length' => 3]));
+        $this->assertSame("Foo::bar('arg1', 'arg2')", Code::call('Foo::bar', ['arg1', 'arg2']));
+        $this->assertSame("Foo::bar(\$foo, '\$bar')", Code::call('Foo::bar', [Code::raw('$foo'), '$bar']));
+    }
+
+    public function test_callStatic()
+    {
+        $this->assertSame("Foo::bar('arg1', 'arg2')", Code::callStatic('Foo', 'bar', ['arg1', 'arg2']));
+        $this->assertSame("Foo::bar(\$foo, '\$bar')", Code::callStatic('Foo', 'bar', [Code::raw('$foo'), '$bar']));
+        $this->assertSame("\Quatrevieux\Form\Util\CodeTest::bar(123)", Code::callStatic(self::class, 'bar', [123]));
+    }
+
+    public function test_callMethod()
+    {
+        $this->assertSame("\$foo->bar('arg1', 'arg2')", Code::callMethod('$foo', 'bar', ['arg1', 'arg2']));
+        $this->assertSame("\$foo->bar(\$foo, '\$bar')", Code::callMethod('$foo', 'bar', [Code::raw('$foo'), '$bar']));
+    }
+
+    public function test_new()
+    {
+        $this->assertSame("new \Quatrevieux\Form\Transformer\Field\Csv(';')", Code::new(Csv::class, [';']));
+        $this->assertSame("new Csv(';')", Code::new('Csv', [';']));
     }
 }
 

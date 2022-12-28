@@ -5,6 +5,7 @@ namespace Quatrevieux\Form\Transformer\Field;
 use Attribute;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
+use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 
 /**
@@ -61,8 +62,6 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
 
     /**
      * {@inheritdoc}
-     *
-     * @param Csv $transformer
      */
     public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
@@ -75,19 +74,15 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
 
     /**
      * {@inheritdoc}
-     *
-     * @param Csv $transformer
      */
     public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $expressionVarName = Code::varName($previousExpression);
-        $separator = Code::value($transformer->separator);
 
         if ($transformer->enclosure) {
-            $enclosure = Code::value($transformer->enclosure);
-            $expression = '\\' . self::class . '::toCsv(' . $expressionVarName . ', ' . $separator . ', ' . $enclosure . ')';
+            $expression = Call::static(self::class)->toCsv(Code::raw($expressionVarName), $transformer->separator, $transformer->enclosure);
         } else {
-            $expression = "implode($separator, $expressionVarName)";
+            $expression = Call::implode($transformer->separator, Code::raw($expressionVarName));
         }
 
         return "(is_array($expressionVarName = $previousExpression) ? $expression : null)";
