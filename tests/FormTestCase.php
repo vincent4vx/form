@@ -9,8 +9,10 @@ use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
 use Quatrevieux\Form\Transformer\GeneratedFormTransformerFactory;
 use Quatrevieux\Form\Transformer\RuntimeFormTransformerFactory;
 use Quatrevieux\Form\Util\Functions;
+use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
+use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 use Quatrevieux\Form\Validator\RuntimeValidatorFactory;
 use RecursiveDirectoryIterator;
@@ -143,6 +145,17 @@ class FormTestCase extends TestCase
         }
 
         $this->assertEquals($normalizedExpected, $normalizedActual);
+    }
+
+    public function assertGeneratedValidator(string $expected, ConstraintInterface $constraint)
+    {
+        $registry = new ContainerRegistry($this->container);
+
+        if ($constraint instanceof ConstraintValidatorGeneratorInterface) {
+            $this->assertEquals($expected, $constraint->generate($constraint, new ValidatorGenerator($registry))->generate('($data->foo ?? null)'));
+        } else {
+            $this->assertEquals($expected, $constraint->getValidator($registry)->generate($constraint, new ValidatorGenerator($registry))->generate('($data->foo ?? null)'));
+        }
     }
 
     public function eval(string $code): void

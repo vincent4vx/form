@@ -51,12 +51,11 @@ class EqualsWithTest extends FormTestCase
 
     public function test_generated_code()
     {
-        $generator = new ValidatorGenerator(new NullConstraintValidatorRegistry());
-        $strict = new EqualsWith('foo', 'my error', true);
-        $notStrict = new EqualsWith('foo', 'my error', false);
+        $strict = new EqualsWith('bar', 'my error', true);
+        $notStrict = new EqualsWith('bar', 'my error', false);
 
-        $this->assertSame('($data->bar ?? null) !== ($data->foo ?? null) ? new FieldError(\'my error\', [\'field\' => \'foo\'], \'35ef0ca6-ee68-5f99-a87d-b2f635ea4a4a\') : null', $strict->generate($strict, '($data->bar ?? null)', $generator));
-        $this->assertSame('($data->bar ?? null) != ($data->foo ?? null) ? new FieldError(\'my error\', [\'field\' => \'foo\'], \'35ef0ca6-ee68-5f99-a87d-b2f635ea4a4a\') : null', $notStrict->generate($notStrict, '($data->bar ?? null)', $generator));
+        $this->assertGeneratedValidator('($data->foo ?? null) !== ($data->bar ?? null) ? new FieldError(\'my error\', [\'field\' => \'bar\'], \'35ef0ca6-ee68-5f99-a87d-b2f635ea4a4a\') : null', $strict);
+        $this->assertGeneratedValidator('($data->foo ?? null) != ($data->bar ?? null) ? new FieldError(\'my error\', [\'field\' => \'bar\'], \'35ef0ca6-ee68-5f99-a87d-b2f635ea4a4a\') : null', $notStrict);
     }
 }
 

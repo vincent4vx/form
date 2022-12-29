@@ -18,16 +18,16 @@ final class GenericValidatorGenerator implements ConstraintValidatorGeneratorInt
     /**
      * {@inheritdoc}
      */
-    public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
+    public function generate(ConstraintInterface $constraint, ValidatorGenerator $generator): FieldErrorExpressionInterface
     {
         $newConstraintExpression = Code::instantiate($constraint);
         $constraintVarName = Code::varName($newConstraintExpression, 'constraint');
 
         // Optimisation of SelfValidatedConstraint
         if ($constraint instanceof ConstraintValidatorInterface) {
-            return "($constraintVarName = $newConstraintExpression)->validate($constraintVarName, $fieldAccessor, \$data)";
+            return FieldErrorExpression::undefined(fn (string $fieldAccessor) => "($constraintVarName = $newConstraintExpression)->validate($constraintVarName, $fieldAccessor, \$data)");
         } else {
-            return "($constraintVarName = $newConstraintExpression)->getValidator(\$this->validatorRegistry)->validate($constraintVarName, $fieldAccessor, \$data)";
+            return FieldErrorExpression::undefined(fn (string $fieldAccessor) => "($constraintVarName = $newConstraintExpression)->getValidator(\$this->validatorRegistry)->validate($constraintVarName, $fieldAccessor, \$data)");
         }
     }
 }

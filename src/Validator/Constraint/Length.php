@@ -7,6 +7,8 @@ use LogicException;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
+use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
+use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 /**
@@ -88,31 +90,33 @@ final class Length extends SelfValidatedConstraint implements ConstraintValidato
      *
      * @param Length $constraint
      */
-    public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
+    public function generate(ConstraintInterface $constraint, ValidatorGenerator $generator): FieldErrorExpressionInterface
     {
-        $lenVarName = Code::varName($fieldAccessor, 'len');
-        $lenVarNameInit = "$lenVarName = strlen($fieldAccessor)";
-        $expression = '';
-        $errorParams = [];
+        return FieldErrorExpression::single(function (string $fieldAccessor) use ($constraint) {
+            $lenVarName = Code::varName($fieldAccessor, 'len');
+            $lenVarNameInit = "$lenVarName = strlen($fieldAccessor)";
+            $expression = '';
+            $errorParams = [];
 
-        if ($constraint->min !== null) {
-            $errorParams['min'] = $constraint->min;
-            $expression .= "({$lenVarNameInit}) < {$constraint->min}";
-        }
-
-        if ($constraint->max !== null) {
-            $errorParams['max'] = $constraint->max;
-
-            if ($expression) {
-                $expression .= " || {$lenVarName} > {$constraint->max}";
-            } else {
-                $expression .= "({$lenVarNameInit}) > {$constraint->max}";
+            if ($constraint->min !== null) {
+                $errorParams['min'] = $constraint->min;
+                $expression .= "({$lenVarNameInit}) < {$constraint->min}";
             }
-        }
 
-        $error = Code::new('FieldError', [$constraint->message(), $errorParams, self::CODE]);
+            if ($constraint->max !== null) {
+                $errorParams['max'] = $constraint->max;
 
-        return "is_scalar($fieldAccessor) && ($expression) ? $error : null";
+                if ($expression) {
+                    $expression .= " || {$lenVarName} > {$constraint->max}";
+                } else {
+                    $expression .= "({$lenVarNameInit}) > {$constraint->max}";
+                }
+            }
+
+            $error = Code::new('FieldError', [$constraint->message(), $errorParams, self::CODE]);
+
+            return "is_scalar($fieldAccessor) && ($expression) ? $error : null";
+        });
     }
 
     /**

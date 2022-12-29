@@ -6,6 +6,8 @@ use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
+use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
+use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 use function array_map;
@@ -78,23 +80,32 @@ final class ValidateArrayValidator implements ConstraintValidatorInterface, Cons
     /**
      * {@inheritdoc}
      */
-    public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
+    public function generate(ConstraintInterface $constraint, ValidatorGenerator $generator): FieldErrorExpressionInterface
     {
-        $varName = Code::varName($fieldAccessor);
-        $itemErrorExpression = $this->generateItemErrorExpression($constraint);
-        $fieldErrorExpression = $this->generateFieldErrorExpression($constraint);
+        $constraints = [];
+        $returnType = 0;
 
-        $constraints = array_map(
-            fn (ConstraintInterface $constraint) => $generator->validator($constraint, '$item'),
-            $constraint->constraints
-        );
+        foreach ($constraint->constraints as $itemConstraint) {
+            $expression = $generator->validator($itemConstraint);
+            $constraints[] = $expression->generate('$item');
+            $returnType |= $expression->returnType();
+        }
+
+        $fieldErrorExpression = $this->generateFieldErrorExpression($constraint);
         $constraints = implode(' ?? ', $constraints);
+        $itemErrorExpression = $this->generateItemErrorExpression($constraint, $returnType);
 
         $initErrorsExpression = $constraint->aggregateErrors ? '$valid = true; $errors = \'\';' : '$valid = true; $errors = [];';
         $expression = "if (\$error = $constraints) { \$valid = false; {$itemErrorExpression} }";
         $expression = "foreach (\$value as \$key => \$item) { $expression }";
 
-        return "!\is_array({$varName} = {$fieldAccessor}) ? null : (function (\$value) use(\$data, \$translator) { {$initErrorsExpression} {$expression} return \$valid ? null : {$fieldErrorExpression}; })({$varName})";
+        return new FieldErrorExpression(
+            function (string $fieldAccessor) use ($fieldErrorExpression, $expression, $initErrorsExpression) {
+                $varName = Code::varName($fieldAccessor);
+                return "!\is_array({$varName} = {$fieldAccessor}) ? null : (function (\$value) use(\$data, \$translator) { {$initErrorsExpression} {$expression} return \$valid ? null : {$fieldErrorExpression}; })({$varName})";
+            },
+            $constraint->aggregateErrors ? FieldErrorExpression::RETURN_TYPE_SINGLE : FieldErrorExpression::RETURN_TYPE_AGGREGATE,
+        );
     }
 
     private function generateFieldErrorExpression(ValidateArray $constraint): string
@@ -110,16 +121,25 @@ final class ValidateArrayValidator implements ConstraintValidatorInterface, Cons
         ]);
     }
 
-    private function generateItemErrorExpression(ValidateArray $constraint): string
+    private function generateItemErrorExpression(ValidateArray $constraint, int $returnType): string
     {
         if ($constraint->aggregateErrors) {
+            $errorExpression = match ($returnType) {
+                FieldErrorExpressionInterface::RETURN_TYPE_SINGLE => '$error->withTranslator($translator)',
+                FieldErrorExpressionInterface::RETURN_TYPE_AGGREGATE => "''",
+                default => '(\is_array($error) ? \'\' : $error->withTranslator($translator))'
+            };
+
             return '$errors .= ' . Call::object('$translator')->trans($constraint->itemMessage, [
                 '{{ key }}' => Code::raw('$key'),
-                '{{ error }}' => Code::raw('(\is_array($error) ? \'\' : $error->withTranslator($translator))'),
+                '{{ error }}' => Code::raw($errorExpression),
             ]) . ';';
         }
 
-        // @todo skip is_array check
-        return '$errors[$key] = \is_array($error) ? $error : $error->withTranslator($translator);';
+        return match ($returnType) {
+            FieldErrorExpressionInterface::RETURN_TYPE_SINGLE => '$errors[$key] = $error->withTranslator($translator);',
+            FieldErrorExpressionInterface::RETURN_TYPE_AGGREGATE => '$errors[$key] = $error;',
+            default => '$errors[$key] = \is_array($error) ? $error : $error->withTranslator($translator);'
+        };
     }
 }

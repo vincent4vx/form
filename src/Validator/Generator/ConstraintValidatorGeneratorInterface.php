@@ -23,10 +23,9 @@ interface ConstraintValidatorGeneratorInterface
      * '!is_string($data->foo ?? null) || !ctype_alpha($data->foo ?? null) ? new FieldError("my error message") : null'
      *
      * @param C $constraint Constraint instance
-     * @param string $fieldAccessor PHP expression use to access to the field value. Ex: '($data->foo ?? null)'
      * @param ValidatorGenerator $generator Code generator instance
      *
-     * @return string PHP expression
+     * @return FieldErrorExpressionInterface PHP expression
      */
-    public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string;
+    public function generate(ConstraintInterface $constraint, ValidatorGenerator $generator): FieldErrorExpressionInterface;
 }

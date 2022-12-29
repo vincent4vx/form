@@ -23,7 +23,7 @@ final class ValidatorClass
     public readonly Method $validateMethod;
 
     /**
-     * @var array<string, list<string>>
+     * @var array<string, list<FieldErrorExpressionInterface>>
      */
     private array $fieldsConstraintsExpressions = [];
 
@@ -54,11 +54,9 @@ final class ValidatorClass
      * All constraints will be applied successively, on validation will be stopped on first error
      *
      * @param string $fieldName Name of the field to validate
-     * @param string $errorExpression Validation expression in PHP. This expression must return a FieldError object on error, or null on success
-     *
-     * @todo use closure instead of string for expression
+     * @param FieldErrorExpressionInterface $errorExpression Validation expression in PHP. This expression must return a FieldError object on error, or null on success
      */
-    public function addConstraintCode(string $fieldName, string $errorExpression): void
+    public function addConstraintCode(string $fieldName, FieldErrorExpressionInterface $errorExpression): void
     {
         $this->fieldsConstraintsExpressions[$fieldName][] = $errorExpression;
     }
@@ -69,19 +67,30 @@ final class ValidatorClass
     public function generate(): void
     {
         // @todo optimize empty validator
-        // @todo optimize to skip is_array check
         $this->validateMethod->addBody('$errors = $previousErrors;');
         $this->validateMethod->addBody('$translator = $this->validatorRegistry->getTranslator();');
 
         foreach ($this->fieldsConstraintsExpressions as $fieldName => $expressions) {
-            $expressions = array_map(fn (string $expression) => "($expression)", $expressions);
-            $expressions = implode(' ?? ', $expressions);
+            $expressionCode = [];
+            $returnType = 0;
+
+            foreach ($expressions as $expression) {
+                $returnType |= $expression->returnType();
+                $expressionCode[] = '(' . $expression->generate('($data->' . $fieldName . ' ?? null)') . ')';
+            }
+
+            $expressionCode = implode(' ?? ', $expressionCode);
             $fieldNameString = Code::value($fieldName);
+            $errorWithTranslator = match ($returnType) {
+                FieldErrorExpressionInterface::RETURN_TYPE_SINGLE => '$__error_' . $fieldName . '->withTranslator($translator)',
+                FieldErrorExpressionInterface::RETURN_TYPE_AGGREGATE => '$__error_' . $fieldName,
+                default => "is_array(\$__error_{$fieldName}) ? \$__error_{$fieldName} : \$__error_{$fieldName}->withTranslator(\$translator)",
+            };
 
             $this->validateMethod->addBody(
                 <<<PHP
-            if (!isset(\$previousErrors[{$fieldNameString}]) && \$__error_{$fieldName} = {$expressions}) {
-                \$errors[{$fieldNameString}] = is_array(\$__error_{$fieldName}) ? \$__error_{$fieldName} : \$__error_{$fieldName}->withTranslator(\$translator);
+            if (!isset(\$previousErrors[{$fieldNameString}]) && \$__error_{$fieldName} = {$expressionCode}) {
+                \$errors[{$fieldNameString}] = {$errorWithTranslator};
             }
 
             PHP

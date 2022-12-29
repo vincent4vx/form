@@ -7,6 +7,8 @@ use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
+use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
+use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 /**
@@ -125,19 +127,21 @@ final class ValidationMethod extends SelfValidatedConstraint implements Constrai
     /**
      * {@inheritdoc}
      */
-    public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
+    public function generate(ConstraintInterface $constraint, ValidatorGenerator $generator): FieldErrorExpressionInterface
     {
-        $className = $constraint->class;
-        $methodName = $constraint->method;
+        return FieldErrorExpression::undefined(function (string $fieldAccessor) use ($constraint) {
+            $className = $constraint->class;
+            $methodName = $constraint->method;
 
-        $parameters = [Code::raw($fieldAccessor), Code::raw('$data'), ...$constraint->parameters];
+            $parameters = [Code::raw($fieldAccessor), Code::raw('$data'), ...$constraint->parameters];
 
-        $expression = $className === null
-            ? Code::callMethod('$data', $methodName, $parameters)
-            : Code::callStatic($className, $methodName, $parameters)
-        ;
+            $expression = $className === null
+                ? Code::callMethod('$data', $methodName, $parameters)
+                : Code::callStatic($className, $methodName, $parameters)
+            ;
 
-        return Call::static(self::class)->toFieldError(Code::raw($expression), $constraint->message, $constraint->code);
+            return Call::static(self::class)->toFieldError(Code::raw($expression), $constraint->message, $constraint->code);
+        });
     }
 
     /**

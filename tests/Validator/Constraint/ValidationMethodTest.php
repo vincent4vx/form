@@ -43,12 +43,11 @@ class ValidationMethodTest extends FormTestCase
 
     public function test_generate()
     {
-        $generator = new ValidatorGenerator(new NullConstraintValidatorRegistry());
-        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo($data->foo ?? null, $data), \'Invalid value\', \'1b50e942-6acd-5b06-a581-d0819e7f1657\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo'), '$data->foo ?? null', $generator));
-        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo($data->foo ?? null, $data), \'other message\', \'1b50e942-6acd-5b06-a581-d0819e7f1657\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo', message: 'other message'), '$data->foo ?? null', $generator));
-        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError(\Quatrevieux\Form\Validator\Constraint\UtilityClass::foo($data->foo ?? null, $data), \'Invalid value\', \'1b50e942-6acd-5b06-a581-d0819e7f1657\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo', class: UtilityClass::class), '$data->foo ?? null', $generator));
-        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo($data->foo ?? null, $data, 123, \'foo\', false), \'Invalid value\', \'1b50e942-6acd-5b06-a581-d0819e7f1657\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo', parameters: [123, 'foo', false]), '$data->foo ?? null', $generator));
-        $this->assertEquals('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo($data->foo ?? null, $data), \'Invalid value\', \'2418f5e6-15b9-4b4a-ab32-28acd993d945\')', (new ValidationMethod('foo'))->generate(new ValidationMethod('foo', code: '2418f5e6-15b9-4b4a-ab32-28acd993d945'), '$data->foo ?? null', $generator));
+        $this->assertGeneratedValidator('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo(($data->foo ?? null), $data), \'Invalid value\', \'1b50e942-6acd-5b06-a581-d0819e7f1657\')', new ValidationMethod('foo'));
+        $this->assertGeneratedValidator('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo(($data->foo ?? null), $data), \'other message\', \'1b50e942-6acd-5b06-a581-d0819e7f1657\')', new ValidationMethod('foo', message: 'other message'));
+        $this->assertGeneratedValidator('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError(\Quatrevieux\Form\Validator\Constraint\UtilityClass::foo(($data->foo ?? null), $data), \'Invalid value\', \'1b50e942-6acd-5b06-a581-d0819e7f1657\')', new ValidationMethod('foo', class: UtilityClass::class));
+        $this->assertGeneratedValidator('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo(($data->foo ?? null), $data, 123, \'foo\', false), \'Invalid value\', \'1b50e942-6acd-5b06-a581-d0819e7f1657\')', new ValidationMethod('foo', parameters: [123, 'foo', false]));
+        $this->assertGeneratedValidator('\Quatrevieux\Form\Validator\Constraint\ValidationMethod::toFieldError($data->foo(($data->foo ?? null), $data), \'Invalid value\', \'2418f5e6-15b9-4b4a-ab32-28acd993d945\')', new ValidationMethod('foo', code: '2418f5e6-15b9-4b4a-ab32-28acd993d945'));
     }
 }
 

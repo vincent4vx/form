@@ -32,7 +32,7 @@ final class ValidatorGenerator
 
         foreach ($validator->getFieldsConstraints() as $field => $constraints) {
             foreach ($constraints as $constraint) {
-                $classHelper->addConstraintCode($field, $this->validator($constraint, '($data->' . $field . ' ?? null)'));
+                $classHelper->addConstraintCode($field, $this->validator($constraint));
             }
         }
 
@@ -45,11 +45,10 @@ final class ValidatorGenerator
      * Generate PHP validation expression for given constraint
      *
      * @param ConstraintInterface $constraint Constraint instance
-     * @param string $fieldAccessor Accessor expression to the field value. Ex: '($data->foo ?? null)'
      *
-     * @return string PHP expression
+     * @return FieldErrorExpressionInterface PHP expression
      */
-    public function validator(ConstraintInterface $constraint, string $fieldAccessor): string
+    public function validator(ConstraintInterface $constraint): FieldErrorExpressionInterface
     {
         $generator = $constraint->getValidator($this->validatorRegistry);
 
@@ -57,6 +56,6 @@ final class ValidatorGenerator
             $generator = $this->genericValidatorGenerator;
         }
 
-        return $generator->generate($constraint, $fieldAccessor, $this);
+        return $generator->generate($constraint, $this);
     }
 }

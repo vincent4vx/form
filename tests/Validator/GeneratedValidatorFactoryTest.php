@@ -84,11 +84,11 @@ class Quatrevieux_Form_Fixtures_RequiredParametersRequestValidatorGeneratorTest 
         $errors = $previousErrors;
         $translator = $this->validatorRegistry->getTranslator();
         if (!isset($previousErrors['foo']) && $__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required', [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5') : null)) {
-            $errors['foo'] = is_array($__error_foo) ? $__error_foo : $__error_foo->withTranslator($translator);
+            $errors['foo'] = $__error_foo->withTranslator($translator);
         }
 
         if (!isset($previousErrors['bar']) && $__error_bar = (($data->bar ?? null) === null || ($data->bar ?? null) === '' || ($data->bar ?? null) === [] ? new FieldError('bar must be set', [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5') : null) ?? (is_scalar(($data->bar ?? null)) && (($__len_722af90ac1a42c8c3ad647bfd63cd459 = strlen(($data->bar ?? null))) < 3) ? new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], 'ecdd71f6-fa22-5564-bfc7-7e836dce3378') : null)) {
-            $errors['bar'] = is_array($__error_bar) ? $__error_bar : $__error_bar->withTranslator($translator);
+            $errors['bar'] = $__error_bar->withTranslator($translator);
         }
 
         return $errors;

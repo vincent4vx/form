@@ -80,13 +80,13 @@ class LengthTest extends FormTestCase
     {
         $generator = new ValidatorGenerator(new NullConstraintValidatorRegistry());
         $onlyMin = new Length(min: 3, message: 'my error');
-        $this->assertEquals('is_scalar(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) < 3) ? new FieldError(\'my error\', [\'min\' => 3], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null', $onlyMin->generate($onlyMin, '($data->field ?? null)', $generator));
+        $this->assertGeneratedValidator('is_scalar(($data->foo ?? null)) && (($__len_a3aa3c8caea059c99a14cd36eaceca72 = strlen(($data->foo ?? null))) < 3) ? new FieldError(\'my error\', [\'min\' => 3], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null', $onlyMin);
 
         $onlyMax = new Length(max: 3, message: 'my error');
-        $this->assertEquals('is_scalar(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) > 3) ? new FieldError(\'my error\', [\'max\' => 3], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null', $onlyMax->generate($onlyMax, '($data->field ?? null)', $generator));
+        $this->assertGeneratedValidator('is_scalar(($data->foo ?? null)) && (($__len_a3aa3c8caea059c99a14cd36eaceca72 = strlen(($data->foo ?? null))) > 3) ? new FieldError(\'my error\', [\'max\' => 3], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null', $onlyMax);
 
         $both = new Length(min: 3, max: 6, message: 'my error');
-        $this->assertEquals('is_scalar(($data->field ?? null)) && (($__len_1444ef036f9b3842b62162dc7f14342b = strlen(($data->field ?? null))) < 3 || $__len_1444ef036f9b3842b62162dc7f14342b > 6) ? new FieldError(\'my error\', [\'min\' => 3, \'max\' => 6], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null', $both->generate($both, '($data->field ?? null)', $generator));
+        $this->assertGeneratedValidator('is_scalar(($data->foo ?? null)) && (($__len_a3aa3c8caea059c99a14cd36eaceca72 = strlen(($data->foo ?? null))) < 3 || $__len_a3aa3c8caea059c99a14cd36eaceca72 > 6) ? new FieldError(\'my error\', [\'min\' => 3, \'max\' => 6], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null', $both);
     }
 }
 

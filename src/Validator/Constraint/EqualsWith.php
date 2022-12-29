@@ -6,6 +6,8 @@ use Attribute;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
+use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
+use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 /**
@@ -68,15 +70,15 @@ final class EqualsWith extends SelfValidatedConstraint implements ConstraintVali
      *
      * @param EqualsWith $constraint
      */
-    public function generate(ConstraintInterface $constraint, string $fieldAccessor, ValidatorGenerator $generator): string
+    public function generate(ConstraintInterface $constraint, ValidatorGenerator $generator): FieldErrorExpressionInterface
     {
         $otherAccessor = '($data->' . $constraint->field . ' ?? null)';
         $error = Code::new('FieldError', [$constraint->message, ['field' => $constraint->field], self::CODE]);
 
         if ($constraint->strict) {
-            return "$fieldAccessor !== $otherAccessor ? $error : null";
+            return FieldErrorExpression::single(fn (string $fieldAccessor) => "$fieldAccessor !== $otherAccessor ? $error : null");
         } else {
-            return "$fieldAccessor != $otherAccessor ? $error : null";
+            return FieldErrorExpression::single(fn (string $fieldAccessor) => "$fieldAccessor != $otherAccessor ? $error : null");
         }
     }
 }
