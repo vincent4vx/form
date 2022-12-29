@@ -47,7 +47,7 @@ final class FieldErrorExpression implements FieldErrorExpressionInterface
      * Returns a FieldErrorExpression that always returns a single FieldError
      *
      * @param Closure(string): string $generator Code generator
-     * @return FieldErrorExpressionInterface
+     * @return FieldErrorExpression
      *
      * @see FieldErrorExpressionInterface::RETURN_TYPE_SINGLE
      */
@@ -60,7 +60,7 @@ final class FieldErrorExpression implements FieldErrorExpressionInterface
      * Returns a FieldErrorExpression that always returns an array of FieldError
      *
      * @param Closure(string): string $generator Code generator
-     * @return FieldErrorExpressionInterface
+     * @return FieldErrorExpression
      *
      * @see FieldErrorExpressionInterface::RETURN_TYPE_AGGREGATE
      */
@@ -73,7 +73,7 @@ final class FieldErrorExpression implements FieldErrorExpressionInterface
      * Returns a FieldErrorExpression that can return a single FieldError or an array of FieldError (or undefined)
      *
      * @param Closure(string): string $generator Code generator
-     * @return FieldErrorExpressionInterface
+     * @return FieldErrorExpression
      *
      * @see FieldErrorExpressionInterface::RETURN_TYPE_BOTH
      */
