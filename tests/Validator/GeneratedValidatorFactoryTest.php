@@ -21,7 +21,7 @@ class GeneratedValidatorFactoryTest extends FormTestCase
     public function test_create_without_constraints()
     {
         $factory = new GeneratedValidatorFactory(
-            factory: new RuntimeValidatorFactory($registry = new NullConstraintValidatorRegistry()),
+            factory: new RuntimeValidatorFactory($registry = new NullConstraintValidatorRegistry(), null),
             generator: new ValidatorGenerator($registry),
             validatorRegistry: $registry,
             savePathResolver: Functions::savePathResolver(self::GENERATED_DIR),
@@ -41,6 +41,7 @@ class Quatrevieux_Form_Fixtures_SimpleRequestValidatorGeneratorTest implements Q
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
+        $translator = $this->validatorRegistry->getTranslator();
         return $errors;
     }
 
@@ -55,13 +56,13 @@ PHP
         $validator = $factory->create(SimpleRequest::class);
 
         $this->assertEmpty($validator->validate(new SimpleRequest()));
-        $this->assertEquals(['foo' => new FieldError('my transformer error')], $validator->validate(new SimpleRequest(), ['foo' => new FieldError('my transformer error')]));
+        $this->assertErrors(['foo' => new FieldError('my transformer error')], $validator->validate(new SimpleRequest(), ['foo' => new FieldError('my transformer error')]));
     }
 
     public function test_create_with_constraints()
     {
         $factory = new GeneratedValidatorFactory(
-            factory: new RuntimeValidatorFactory($registry = new NullConstraintValidatorRegistry()),
+            factory: new RuntimeValidatorFactory($registry = new NullConstraintValidatorRegistry(), null),
             generator: new ValidatorGenerator($registry),
             validatorRegistry: $registry,
             savePathResolver: Functions::savePathResolver(self::GENERATED_DIR),
@@ -81,12 +82,13 @@ class Quatrevieux_Form_Fixtures_RequiredParametersRequestValidatorGeneratorTest 
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
+        $translator = $this->validatorRegistry->getTranslator();
         if (!isset($previousErrors['foo']) && $__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required', [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5') : null)) {
-            $errors['foo'] = $__error_foo;
+            $errors['foo'] = is_array($__error_foo) ? $__error_foo : $__error_foo->withTranslator($translator);
         }
 
         if (!isset($previousErrors['bar']) && $__error_bar = (($data->bar ?? null) === null || ($data->bar ?? null) === '' || ($data->bar ?? null) === [] ? new FieldError('bar must be set', [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5') : null) ?? (is_scalar(($data->bar ?? null)) && (($__len_722af90ac1a42c8c3ad647bfd63cd459 = strlen(($data->bar ?? null))) < 3) ? new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], 'ecdd71f6-fa22-5564-bfc7-7e836dce3378') : null)) {
-            $errors['bar'] = $__error_bar;
+            $errors['bar'] = is_array($__error_bar) ? $__error_bar : $__error_bar->withTranslator($translator);
         }
 
         return $errors;
@@ -102,7 +104,7 @@ PHP
 
         $validator = $factory->create(RequiredParametersRequest::class);
 
-        $this->assertEquals([
+        $this->assertErrors([
             'foo' => new FieldError('This value is required', code: Required::CODE),
             'bar' => new FieldError('bar must be set', code: Required::CODE),
         ], $validator->validate(new RequiredParametersRequest()));
@@ -111,11 +113,11 @@ PHP
         $o->foo = 1;
         $o->bar = 'b';
 
-        $this->assertEquals([
+        $this->assertErrors([
             'bar' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE),
         ], $validator->validate($o));
         
-        $this->assertEquals([
+        $this->assertErrors([
             'foo' => new FieldError('transformer error', code: TransformationError::CODE),
             'bar' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE),
         ], $validator->validate($o, ['foo' => new FieldError('transformer error', code: TransformationError::CODE)]));
@@ -129,7 +131,7 @@ PHP
         $this->container->set(ConfiguredLengthValidator::class, new ConfiguredLengthValidator(new TestConfig(['foo.length' => 3])));
 
         $factory = new GeneratedValidatorFactory(
-            factory: new RuntimeValidatorFactory($registry = new ContainerRegistry($this->container)),
+            factory: new RuntimeValidatorFactory($registry = new ContainerRegistry($this->container), null),
             generator: new ValidatorGenerator($registry),
             validatorRegistry: $registry,
             savePathResolver: Functions::savePathResolver(self::GENERATED_DIR),
@@ -149,8 +151,9 @@ class Quatrevieux_Form_Fixtures_WithExternalDependencyConstraintRequestValidator
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
+        $translator = $this->validatorRegistry->getTranslator();
         if (!isset($previousErrors['foo']) && $__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required', [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5') : null) ?? (($__constraint_eead8f4bada4cb985586965f0b2d57c9 = new \Quatrevieux\Form\Fixtures\ConfiguredLength(key: 'foo.length'))->getValidator($this->validatorRegistry)->validate($__constraint_eead8f4bada4cb985586965f0b2d57c9, ($data->foo ?? null), $data))) {
-            $errors['foo'] = $__error_foo;
+            $errors['foo'] = is_array($__error_foo) ? $__error_foo : $__error_foo->withTranslator($translator);
         }
 
         return $errors;
@@ -169,7 +172,7 @@ PHP
         $o = new WithExternalDependencyConstraintRequest();
         $o->foo = 'aaaaaaaaa';
 
-        $this->assertEquals([
+        $this->assertErrors([
             'foo' => new FieldError('Invalid length'),
         ], $validator->validate($o));
 

@@ -33,7 +33,7 @@ class ValidationMethodTest extends FormTestCase
             'returnBool' => 'a',
         ]);
         $this->assertFalse($submitted->valid());
-        $this->assertEquals([
+        $this->assertErrors([
             'validateWithInstanceMethod' => new FieldError('my error', code: '213dee40-8d06-4274-a3aa-5b21c34ab108'),
             'validateWithStaticMethod' => new FieldError('my error', code: '213dee40-8d06-4274-a3aa-5b21c34ab108'),
             'returnString' => new FieldError('my error', code: 'f90e7e91-71dd-4cca-b288-3cb74e0cb387'),

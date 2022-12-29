@@ -24,6 +24,7 @@ class TestingEmptyValidatorClass implements Quatrevieux\Form\Validator\Validator
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
+        $translator = $this->validatorRegistry->getTranslator();
         return $errors;
     }
 
@@ -56,8 +57,9 @@ class TestingWithConstraintCodeValidatorClass implements Quatrevieux\Form\Valida
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
+        $translator = $this->validatorRegistry->getTranslator();
         if (!isset($previousErrors['test']) && $__error_test = (($data->test ?? null) === 123 ? new FieldError("error") : null)) {
-            $errors['test'] = $__error_test;
+            $errors['test'] = is_array($__error_test) ? $__error_test : $__error_test->withTranslator($translator);
         }
 
         return $errors;
@@ -74,6 +76,6 @@ PHP
 
         $this->assertGeneratedClass($class->code(), 'TestingWithConstraintCodeValidatorClass', ValidatorInterface::class);
         $this->assertEmpty((new \TestingWithConstraintCodeValidatorClass(new NullConstraintValidatorRegistry()))->validate((object) ['test' => 42]));
-        $this->assertEquals(['test' => new FieldError('error')], (new \TestingWithConstraintCodeValidatorClass(new NullConstraintValidatorRegistry()))->validate((object) ['test' => 123]));
+        $this->assertErrors(['test' => new FieldError('error')], (new \TestingWithConstraintCodeValidatorClass(new NullConstraintValidatorRegistry()))->validate((object) ['test' => 123]));
     }
 }

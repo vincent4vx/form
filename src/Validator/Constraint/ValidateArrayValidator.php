@@ -2,7 +2,7 @@
 
 namespace Quatrevieux\Form\Validator\Constraint;
 
-use LogicException;
+use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
@@ -40,13 +40,14 @@ final class ValidateArrayValidator implements ConstraintValidatorInterface, Cons
         $errors = [];
         $constraints = $constraint->constraints;
         $registry = $this->registry;
+        $translator = $registry->getTranslator();
 
         foreach ($value as $key => $item) {
             foreach ($constraints as $itemConstraint) {
                 $error = $itemConstraint->getValidator($registry)->validate($itemConstraint, $item, $data);
 
                 if ($error !== null) {
-                    $errors[$key] = $error;
+                    $errors[$key] = is_array($error) ? $error : $error->withTranslator($translator);
                     break;
                 }
             }
@@ -65,7 +66,7 @@ final class ValidateArrayValidator implements ConstraintValidatorInterface, Cons
         $itemErrors = '';
 
         foreach ($errors as $key => $error) {
-            $itemErrors .= strtr($itemMessage, [
+            $itemErrors .= $translator->trans($itemMessage, [
                 '{{ key }}' => (string) $key,
                 '{{ error }}' => is_array($error) ? '' : (string) $error,
             ]);
@@ -93,7 +94,7 @@ final class ValidateArrayValidator implements ConstraintValidatorInterface, Cons
         $expression = "if (\$error = $constraints) { \$valid = false; {$itemErrorExpression} }";
         $expression = "foreach (\$value as \$key => \$item) { $expression }";
 
-        return "!\is_array({$varName} = {$fieldAccessor}) ? null : (function (\$value) use(\$data) { {$initErrorsExpression} {$expression} return \$valid ? null : {$fieldErrorExpression}; })({$varName})";
+        return "!\is_array({$varName} = {$fieldAccessor}) ? null : (function (\$value) use(\$data, \$translator) { {$initErrorsExpression} {$expression} return \$valid ? null : {$fieldErrorExpression}; })({$varName})";
     }
 
     private function generateFieldErrorExpression(ValidateArray $constraint): string
@@ -112,12 +113,13 @@ final class ValidateArrayValidator implements ConstraintValidatorInterface, Cons
     private function generateItemErrorExpression(ValidateArray $constraint): string
     {
         if ($constraint->aggregateErrors) {
-            return '$errors .= ' . Code::inlineStrtr($constraint->itemMessage, [
-                '{{ key }}' => '$key',
-                '{{ error }}' => '(\is_array($error) ? \'\' : $error)',
+            return '$errors .= ' . Call::object('$translator')->trans($constraint->itemMessage, [
+                '{{ key }}' => Code::raw('$key'),
+                '{{ error }}' => Code::raw('(\is_array($error) ? \'\' : $error->withTranslator($translator))'),
             ]) . ';';
         }
 
-        return '$errors[$key] = $error;';
+        // @todo skip is_array check
+        return '$errors[$key] = \is_array($error) ? $error : $error->withTranslator($translator);';
     }
 }

@@ -49,6 +49,7 @@ final class RuntimeFormTransformer implements FormTransformerInterface
      */
     public function transformFromHttp(array $value): TransformationResult
     {
+        // @todo translate error messages (may need refactor of registry)
         $normalized = [];
         $errors = [];
 

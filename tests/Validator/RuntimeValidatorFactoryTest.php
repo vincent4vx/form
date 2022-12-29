@@ -13,7 +13,7 @@ class RuntimeValidatorFactoryTest extends TestCase
 {
     public function test_create_without_constraints()
     {
-        $factory = new RuntimeValidatorFactory(new NullConstraintValidatorRegistry());
+        $factory = new RuntimeValidatorFactory(new NullConstraintValidatorRegistry(), null);
 
         $this->assertInstanceOf(RuntimeValidator::class, $factory->create(SimpleRequest::class));
         $this->assertEmpty($factory->create(SimpleRequest::class)->getFieldsConstraints());
@@ -21,7 +21,7 @@ class RuntimeValidatorFactoryTest extends TestCase
 
     public function test_create_with_constraints()
     {
-        $factory = new RuntimeValidatorFactory(new NullConstraintValidatorRegistry());
+        $factory = new RuntimeValidatorFactory(new NullConstraintValidatorRegistry(), null);
 
         $this->assertEquals([
             'foo' => [new Required()],

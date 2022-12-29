@@ -47,7 +47,7 @@ class LengthTest extends FormTestCase
         $result = $form->submit(['onlyMin' => 'a', 'onlyMax' => 'a', 'both' => 'a']);
 
         $this->assertFalse($result->valid());
-        $this->assertEquals([
+        $this->assertErrors([
             'onlyMin' => new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE),
             'both' => new FieldError('my error', ['min' => 3, 'max' => 6], Length::CODE),
         ], $result->errors());
@@ -67,7 +67,7 @@ class LengthTest extends FormTestCase
         $result = $form->submit(['onlyMin' => 'aaaaaaaaaaaaaa', 'onlyMax' => 'aaaaaaaaaaaaaa', 'both' => 'aaaaaaaaaaaaaaa']);
 
         $this->assertFalse($result->valid());
-        $this->assertEquals([
+        $this->assertErrors([
             'both' => new FieldError('my error', ['min' => 3, 'max' => 6], Length::CODE),
             'onlyMax' => new FieldError('The value is too long. It should have {{ max }} characters or less.', ['max' => 6], Length::CODE),
         ], $result->errors());

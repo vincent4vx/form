@@ -68,7 +68,10 @@ final class ValidatorClass
      */
     public function generate(): void
     {
+        // @todo optimize empty validator
+        // @todo optimize to skip is_array check
         $this->validateMethod->addBody('$errors = $previousErrors;');
+        $this->validateMethod->addBody('$translator = $this->validatorRegistry->getTranslator();');
 
         foreach ($this->fieldsConstraintsExpressions as $fieldName => $expressions) {
             $expressions = array_map(fn (string $expression) => "($expression)", $expressions);
@@ -78,7 +81,7 @@ final class ValidatorClass
             $this->validateMethod->addBody(
                 <<<PHP
             if (!isset(\$previousErrors[{$fieldNameString}]) && \$__error_{$fieldName} = {$expressions}) {
-                \$errors[{$fieldNameString}] = \$__error_{$fieldName};
+                \$errors[{$fieldNameString}] = is_array(\$__error_{$fieldName}) ? \$__error_{$fieldName} : \$__error_{$fieldName}->withTranslator(\$translator);
             }
 
             PHP

@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\Validator;
 
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Simple runtime implementation of form validator using associative array to map constraints on each field.
@@ -31,6 +32,7 @@ final class RuntimeValidator implements ValidatorInterface
     public function validate(object $data, array $previousErrors = []): array
     {
         $registry = $this->validatorRegistry;
+        $translator = $registry->getTranslator();
         $errors = $previousErrors;
 
         /**
@@ -48,7 +50,7 @@ final class RuntimeValidator implements ValidatorInterface
                 $error = $constraint->getValidator($registry)->validate($constraint, $fieldValue, $data);
 
                 if ($error) {
-                    $errors[$fieldName] = $error;
+                    $errors[$fieldName] = is_array($error) ? $error : $error->withTranslator($translator);
                     break;
                 }
             }

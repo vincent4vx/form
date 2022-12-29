@@ -18,7 +18,7 @@ class ValidateByTest extends FormTestCase
 
         $submitted = $form->submit(['foo' => 'bar']);
         $this->assertFalse($submitted->valid());
-        $this->assertEquals(['foo' => new FieldError('Invalid checksum', [], '99e51862-6756-4a02-89b0-01c81a571d3a')], $submitted->errors());
+        $this->assertErrors(['foo' => new FieldError('Invalid checksum', [], '99e51862-6756-4a02-89b0-01c81a571d3a')], $submitted->errors());
 
         $submitted = $form->submit(['foo' => 'ear']);
         $this->assertTrue($submitted->valid());

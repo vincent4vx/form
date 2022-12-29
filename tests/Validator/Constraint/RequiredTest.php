@@ -27,7 +27,7 @@ class RequiredTest extends FormTestCase
         $this->assertFalse($form->submit([])->valid());
         $this->assertFalse($form->submit(['value' => ''])->valid());
         $this->assertFalse($form->submit(['value' => []])->valid());
-        $this->assertEquals(['value' => new FieldError('my error', [], Required::CODE)], $form->submit(['value' => []])->errors());
+        $this->assertErrors(['value' => new FieldError('my error', [], Required::CODE)], $form->submit(['value' => []])->errors());
 
         $this->assertTrue($form->submit(['value' => ' '])->valid());
         $this->assertTrue($form->submit(['value' => 'a'])->valid());

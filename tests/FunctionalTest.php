@@ -55,6 +55,24 @@ class FunctionalTest extends FormTestCase
         ], $submitted->errors());
     }
 
+    public function test_submit_with_constraint_error_translated()
+    {
+        $this->configureTranslator('fr', [
+            'This value is required' => 'Ce champ est requis',
+            'The value is too short. It should have {{ min }} characters or more.' => 'La valeur est trop courte. Elle doit avoir au moins {{ min }} caractères.',
+        ]);
+
+        $form = $this->form(RequiredParametersRequest::class);
+
+        $submitted = $form->submit(['bar' => 'a']);
+
+        $this->assertFalse($submitted->valid());
+        $this->assertEquals([
+            'foo' => 'Ce champ est requis',
+            'bar' => 'La valeur est trop courte. Elle doit avoir au moins 3 caractères.',
+        ], $submitted->errors());
+    }
+
     public function test_submit_with_constraint_success()
     {
         $form = $this->form(RequiredParametersRequest::class);
@@ -185,7 +203,6 @@ class FunctionalTest extends FormTestCase
         $this->assertTrue($submitted->valid());
         $this->assertNull($submitted->value()->ignoreError);
         $this->assertEmpty($submitted->errors());
-
     }
 
     public function form(string $dataClass): FormInterface

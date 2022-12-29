@@ -18,7 +18,7 @@ use function array_unshift;
 final class RuntimeValidatorFactory implements ValidatorFactoryInterface
 {
     public function __construct(
-        private readonly ConstraintValidatorRegistryInterface $validatorRegistry
+        private readonly ConstraintValidatorRegistryInterface $validatorRegistry,
     ) {
     }
 

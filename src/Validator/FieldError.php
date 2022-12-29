@@ -2,14 +2,20 @@
 
 namespace Quatrevieux\Form\Validator;
 
+use JsonSerializable;
+use Quatrevieux\Form\DummyTranslator;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Store error for a field
  * This class can be serialized to JSON
  */
-final class FieldError implements \JsonSerializable
+final class FieldError implements JsonSerializable, TranslatableInterface
 {
+    private ?TranslatorInterface $translator = null;
+
     public function __construct(
         /**
          * Error message
@@ -35,6 +41,26 @@ final class FieldError implements \JsonSerializable
     }
 
     /**
+     * Set the translator instance
+     * This method is called by the validator
+     *
+     * @return self A new instance with the translator set
+     *
+     * @internal
+     */
+    public function withTranslator(?TranslatorInterface $translator): self
+    {
+        if ($this->translator === $translator) {
+            return $this;
+        }
+
+        $error = clone $this;
+        $error->translator = $translator;
+
+        return $error;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return array{code: string, message: string, parameters?: array<string, mixed>}
@@ -54,21 +80,42 @@ final class FieldError implements \JsonSerializable
     }
 
     /**
+     * Translates the error message to the given locale
+     */
+    public function trans(TranslatorInterface $translator, string $locale = null): string
+    {
+        // Normalize placeholders parameters
+        if ($parameters = $this->parameters) {
+            $normalized = [];
+
+            foreach ($parameters as $key => $value) {
+                $normalized['{{ ' . $key . ' }}'] = $value;
+            }
+
+            $parameters = $normalized;
+        }
+
+        return $translator->trans($this->message, $parameters, null, $locale);
+    }
+
+    /**
+     * Get the translated error message
+     * All placeholders will be replaced by their value
+     *
+     * @param string|null $locale Locale to translate the message to
+     * @return string Translated error message
+     */
+    public function localizedMessage(?string $locale = null): string
+    {
+        return $this->trans($this->translator ?? DummyTranslator::instance(), $locale);
+    }
+
+    /**
      * Get the translated error message
      * All placeholders will be replaced by their value
      */
     public function __toString(): string
     {
-        if (!$parameters = $this->parameters) {
-            return $this->message;
-        }
-
-        $replacements = [];
-
-        foreach ($parameters as $key => $value) {
-            $replacements["{{ {$key} }}"] = $value;
-        }
-
-        return strtr($this->message, $replacements);
+        return $this->localizedMessage();
     }
 }
