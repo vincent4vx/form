@@ -2,8 +2,8 @@
 
 namespace Quatrevieux\Form\Validator\Generator;
 
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
-use Quatrevieux\Form\Validator\Constraint\NullConstraintValidatorRegistry;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\ValidatorInterface;
 
@@ -24,11 +24,11 @@ class TestingEmptyValidatorClass implements Quatrevieux\Form\Validator\Validator
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
-        $translator = $this->validatorRegistry->getTranslator();
+        $translator = $this->registry->getTranslator();
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface $validatorRegistry)
+    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -38,7 +38,7 @@ PHP
 );
 
         $this->assertGeneratedClass($class->code(), 'TestingEmptyValidatorClass', ValidatorInterface::class);
-        $this->assertEmpty((new \TestingEmptyValidatorClass(new NullConstraintValidatorRegistry()))->validate(new \stdClass()));
+        $this->assertEmpty((new \TestingEmptyValidatorClass(new DefaultRegistry()))->validate(new \stdClass()));
     }
 
     public function test_addConstraintCode()
@@ -57,7 +57,7 @@ class TestingWithConstraintCodeValidatorClass implements Quatrevieux\Form\Valida
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
-        $translator = $this->validatorRegistry->getTranslator();
+        $translator = $this->registry->getTranslator();
         if (!isset($previousErrors['test']) && $__error_test = (($data->test ?? null) === 123 ? new FieldError("error") : null)) {
             $errors['test'] = is_array($__error_test) ? $__error_test : $__error_test->withTranslator($translator);
         }
@@ -65,7 +65,7 @@ class TestingWithConstraintCodeValidatorClass implements Quatrevieux\Form\Valida
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface $validatorRegistry)
+    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -75,8 +75,8 @@ PHP
         );
 
         $this->assertGeneratedClass($class->code(), 'TestingWithConstraintCodeValidatorClass', ValidatorInterface::class);
-        $this->assertEmpty((new \TestingWithConstraintCodeValidatorClass(new NullConstraintValidatorRegistry()))->validate((object) ['test' => 42]));
-        $this->assertErrors(['test' => new FieldError('error')], (new \TestingWithConstraintCodeValidatorClass(new NullConstraintValidatorRegistry()))->validate((object) ['test' => 123]));
+        $this->assertEmpty((new \TestingWithConstraintCodeValidatorClass(new DefaultRegistry()))->validate((object) ['test' => 42]));
+        $this->assertErrors(['test' => new FieldError('error')], (new \TestingWithConstraintCodeValidatorClass(new DefaultRegistry()))->validate((object) ['test' => 123]));
     }
 
     public function test_addConstraintCode_returnTypeSingle()
@@ -95,7 +95,7 @@ class TestingWithConstraintCodeValidatorClassReturnTypeSingle implements Quatrev
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
-        $translator = $this->validatorRegistry->getTranslator();
+        $translator = $this->registry->getTranslator();
         if (!isset($previousErrors['test']) && $__error_test = (($data->test ?? null) === 123 ? new FieldError("error") : null)) {
             $errors['test'] = $__error_test->withTranslator($translator);
         }
@@ -103,7 +103,7 @@ class TestingWithConstraintCodeValidatorClassReturnTypeSingle implements Quatrev
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface $validatorRegistry)
+    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -113,8 +113,8 @@ PHP
         );
 
         $this->assertGeneratedClass($class->code(), 'TestingWithConstraintCodeValidatorClassReturnTypeSingle', ValidatorInterface::class);
-        $this->assertEmpty((new \TestingWithConstraintCodeValidatorClassReturnTypeSingle(new NullConstraintValidatorRegistry()))->validate((object) ['test' => 42]));
-        $this->assertErrors(['test' => new FieldError('error')], (new \TestingWithConstraintCodeValidatorClassReturnTypeSingle(new NullConstraintValidatorRegistry()))->validate((object) ['test' => 123]));
+        $this->assertEmpty((new \TestingWithConstraintCodeValidatorClassReturnTypeSingle(new DefaultRegistry()))->validate((object) ['test' => 42]));
+        $this->assertErrors(['test' => new FieldError('error')], (new \TestingWithConstraintCodeValidatorClassReturnTypeSingle(new DefaultRegistry()))->validate((object) ['test' => 123]));
     }
 
     public function test_addConstraintCode_returnTypeAggregate()
@@ -133,7 +133,7 @@ class TestingWithConstraintCodeValidatorClassReturnTypeAggregate implements Quat
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
-        $translator = $this->validatorRegistry->getTranslator();
+        $translator = $this->registry->getTranslator();
         if (!isset($previousErrors['test']) && $__error_test = (($data->test ?? null) === 123 ? ["foo" => new FieldError("error")] : null)) {
             $errors['test'] = $__error_test;
         }
@@ -141,7 +141,7 @@ class TestingWithConstraintCodeValidatorClassReturnTypeAggregate implements Quat
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface $validatorRegistry)
+    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -151,7 +151,7 @@ PHP
         );
 
         $this->assertGeneratedClass($class->code(), 'TestingWithConstraintCodeValidatorClassReturnTypeAggregate', ValidatorInterface::class);
-        $this->assertEmpty((new \TestingWithConstraintCodeValidatorClassReturnTypeAggregate(new NullConstraintValidatorRegistry()))->validate((object) ['test' => 42]));
-        $this->assertErrors(['foo' => new FieldError('error')], (new \TestingWithConstraintCodeValidatorClassReturnTypeAggregate(new NullConstraintValidatorRegistry()))->validate((object) ['test' => 123])['test']);
+        $this->assertEmpty((new \TestingWithConstraintCodeValidatorClassReturnTypeAggregate(new DefaultRegistry()))->validate((object) ['test' => 42]));
+        $this->assertErrors(['foo' => new FieldError('error')], (new \TestingWithConstraintCodeValidatorClassReturnTypeAggregate(new DefaultRegistry()))->validate((object) ['test' => 123])['test']);
     }
 }

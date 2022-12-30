@@ -4,7 +4,6 @@ namespace Quatrevieux\Form\Validator\Constraint;
 
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\FieldError;
-use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 class ValidateArrayTest extends FormTestCase
 {

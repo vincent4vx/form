@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Transformer\Field;
 
 use Attribute;
+use Quatrevieux\Form\RegistryInterface;
 
 /**
  * Apply transformers on each element of an array
@@ -35,7 +36,7 @@ final class TransformEach implements DelegatedFieldTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function getTransformer(FieldTransformerRegistryInterface $registry): ConfigurableFieldTransformerInterface
+    public function getTransformer(RegistryInterface $registry): ConfigurableFieldTransformerInterface
     {
         return new TransformEachImpl($registry);
     }

@@ -4,15 +4,13 @@ namespace Quatrevieux\Form;
 
 use Psr\Container\ContainerInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
-use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
-use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Implementation of registries using PSR-11 container
+ * Implementation of registry using PSR-11 container
  */
-final class ContainerRegistry implements FieldTransformerRegistryInterface, ConstraintValidatorRegistryInterface
+final class ContainerRegistry implements RegistryInterface
 {
     public function __construct(
         private readonly ContainerInterface $container,

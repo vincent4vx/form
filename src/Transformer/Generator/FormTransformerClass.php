@@ -7,7 +7,7 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
-use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Transformer\TransformationResult;
@@ -70,7 +70,7 @@ final class FormTransformerClass
         $this->class->addMethod('__construct')
             ->addPromotedParameter('registry')
             ->setPrivate()
-            ->setType(FieldTransformerRegistryInterface::class)
+            ->setType(RegistryInterface::class)
         ;
     }
 

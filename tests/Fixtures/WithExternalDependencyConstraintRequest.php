@@ -3,9 +3,9 @@
 namespace Quatrevieux\Form\Fixtures;
 
 use Attribute;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
-use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
 use Quatrevieux\Form\Validator\FieldError;
 
 class WithExternalDependencyConstraintRequest
@@ -22,7 +22,7 @@ class ConfiguredLength implements ConstraintInterface
     ) {
     }
 
-    public function getValidator(ConstraintValidatorRegistryInterface $registry): ConstraintValidatorInterface
+    public function getValidator(RegistryInterface $registry): ConstraintValidatorInterface
     {
         return $registry->getValidator(ConfiguredLengthValidator::class);
     }

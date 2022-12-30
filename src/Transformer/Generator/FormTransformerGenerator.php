@@ -2,11 +2,9 @@
 
 namespace Quatrevieux\Form\Transformer\Generator;
 
-use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
-use Quatrevieux\Form\Instantiator\InstantiatorInterface;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
-use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Transformer\RuntimeFormTransformer;
 
@@ -16,7 +14,7 @@ use Quatrevieux\Form\Transformer\RuntimeFormTransformer;
 final class FormTransformerGenerator
 {
     public function __construct(
-        private readonly FieldTransformerRegistryInterface $registry,
+        private readonly RegistryInterface $registry,
 
         /**
          * Default code generator to use the field transformer do not implement {@see FieldTransformerGeneratorInterface}

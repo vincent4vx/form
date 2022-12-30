@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form\Validator\Constraint;
 
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
@@ -9,11 +10,8 @@ use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
-
-use function array_map;
 use function implode;
 use function is_array;
-use function strtr;
 
 /**
  * Validator for {@see ValidateArray}
@@ -26,7 +24,7 @@ use function strtr;
 final class ValidateArrayValidator implements ConstraintValidatorInterface, ConstraintValidatorGeneratorInterface
 {
     public function __construct(
-        private ConstraintValidatorRegistryInterface $registry
+        private RegistryInterface $registry
     ) {
     }
 

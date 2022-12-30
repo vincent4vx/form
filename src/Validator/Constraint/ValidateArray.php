@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Validator\Constraint;
 
 use Attribute;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Validator\FieldError;
 
 /**
@@ -72,7 +73,7 @@ final class ValidateArray implements ConstraintInterface
     /**
      * {@inheritdoc}
      */
-    public function getValidator(ConstraintValidatorRegistryInterface $registry): ConstraintValidatorInterface
+    public function getValidator(RegistryInterface $registry): ConstraintValidatorInterface
     {
         return new ValidateArrayValidator($registry);
     }

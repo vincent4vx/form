@@ -36,7 +36,7 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -82,7 +82,7 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -126,7 +126,7 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -176,7 +176,7 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -237,7 +237,7 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }

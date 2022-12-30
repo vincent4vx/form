@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Validator;
 
 use Quatrevieux\Form\ContainerRegistry;
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\Fixtures\ConfiguredLengthValidator;
 use Quatrevieux\Form\Fixtures\RequiredParametersRequest;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
@@ -21,9 +22,9 @@ class GeneratedValidatorFactoryTest extends FormTestCase
     public function test_create_without_constraints()
     {
         $factory = new GeneratedValidatorFactory(
-            factory: new RuntimeValidatorFactory($registry = new NullConstraintValidatorRegistry(), null),
+            factory: new RuntimeValidatorFactory($registry = new DefaultRegistry()),
             generator: new ValidatorGenerator($registry),
-            validatorRegistry: $registry,
+            registry: $registry,
             savePathResolver: Functions::savePathResolver(self::GENERATED_DIR),
             classNameResolver: fn (string $className): string => str_replace('\\', '_', $className) . 'ValidatorGeneratorTest',
         );
@@ -41,11 +42,11 @@ class Quatrevieux_Form_Fixtures_SimpleRequestValidatorGeneratorTest implements Q
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
-        $translator = $this->validatorRegistry->getTranslator();
+        $translator = $this->registry->getTranslator();
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface $validatorRegistry)
+    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -62,9 +63,9 @@ PHP
     public function test_create_with_constraints()
     {
         $factory = new GeneratedValidatorFactory(
-            factory: new RuntimeValidatorFactory($registry = new NullConstraintValidatorRegistry(), null),
+            factory: new RuntimeValidatorFactory($registry = new DefaultRegistry()),
             generator: new ValidatorGenerator($registry),
-            validatorRegistry: $registry,
+            registry: $registry,
             savePathResolver: Functions::savePathResolver(self::GENERATED_DIR),
             classNameResolver: fn (string $className): string => str_replace('\\', '_', $className) . 'ValidatorGeneratorTest',
         );
@@ -82,7 +83,7 @@ class Quatrevieux_Form_Fixtures_RequiredParametersRequestValidatorGeneratorTest 
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
-        $translator = $this->validatorRegistry->getTranslator();
+        $translator = $this->registry->getTranslator();
         if (!isset($previousErrors['foo']) && $__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required', [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5') : null)) {
             $errors['foo'] = $__error_foo->withTranslator($translator);
         }
@@ -94,7 +95,7 @@ class Quatrevieux_Form_Fixtures_RequiredParametersRequestValidatorGeneratorTest 
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface $validatorRegistry)
+    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -133,7 +134,7 @@ PHP
         $factory = new GeneratedValidatorFactory(
             factory: new RuntimeValidatorFactory($registry = new ContainerRegistry($this->container), null),
             generator: new ValidatorGenerator($registry),
-            validatorRegistry: $registry,
+            registry: $registry,
             savePathResolver: Functions::savePathResolver(self::GENERATED_DIR),
             classNameResolver: fn (string $className): string => str_replace('\\', '_', $className) . 'ValidatorGeneratorTest',
         );
@@ -151,15 +152,15 @@ class Quatrevieux_Form_Fixtures_WithExternalDependencyConstraintRequestValidator
     function validate(object $data, array $previousErrors = []): array
     {
         $errors = $previousErrors;
-        $translator = $this->validatorRegistry->getTranslator();
-        if (!isset($previousErrors['foo']) && $__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required', [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5') : null) ?? (($__constraint_eead8f4bada4cb985586965f0b2d57c9 = new \Quatrevieux\Form\Fixtures\ConfiguredLength(key: 'foo.length'))->getValidator($this->validatorRegistry)->validate($__constraint_eead8f4bada4cb985586965f0b2d57c9, ($data->foo ?? null), $data))) {
+        $translator = $this->registry->getTranslator();
+        if (!isset($previousErrors['foo']) && $__error_foo = (($data->foo ?? null) === null || ($data->foo ?? null) === '' || ($data->foo ?? null) === [] ? new FieldError('This value is required', [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5') : null) ?? (($__constraint_eead8f4bada4cb985586965f0b2d57c9 = new \Quatrevieux\Form\Fixtures\ConfiguredLength(key: 'foo.length'))->getValidator($this->registry)->validate($__constraint_eead8f4bada4cb985586965f0b2d57c9, ($data->foo ?? null), $data))) {
             $errors['foo'] = is_array($__error_foo) ? $__error_foo : $__error_foo->withTranslator($translator);
         }
 
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface $validatorRegistry)
+    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }

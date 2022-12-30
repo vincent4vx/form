@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form\Transformer\Field;
 
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Util\Code;
@@ -19,7 +20,7 @@ use function array_reverse;
 final class TransformEachImpl implements ConfigurableFieldTransformerInterface, FieldTransformerGeneratorInterface
 {
     public function __construct(
-        private FieldTransformerRegistryInterface $registry,
+        private RegistryInterface $registry,
     ) {
     }
 

@@ -3,15 +3,15 @@
 namespace Quatrevieux\Form\Transformer\Generator;
 
 use Quatrevieux\Form\ContainerRegistry;
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\Cast;
 use Quatrevieux\Form\Transformer\Field\CastType;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\Csv;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
-use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
-use Quatrevieux\Form\Transformer\Field\NullFieldTransformerRegistry;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Transformer\RuntimeFormTransformer;
@@ -22,10 +22,10 @@ class FormTransformerGeneratorTest extends FormTestCase
 {
     public function test_generate_without_transformers()
     {
-        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $generator = new FormTransformerGenerator(new DefaultRegistry());
 
         $code = $generator->generate('TestingTransformerWithoutFieldTransformers', new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [],
                 'bar' => [],
@@ -61,7 +61,7 @@ class TestingTransformerWithoutFieldTransformers implements Quatrevieux\Form\Tra
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -70,7 +70,7 @@ PHP
         , $code);
 
         $this->assertGeneratedClass($code, 'TestingTransformerWithoutFieldTransformers', FormTransformerInterface::class);
-        $transformer = new \TestingTransformerWithoutFieldTransformers(new NullFieldTransformerRegistry());
+        $transformer = new \TestingTransformerWithoutFieldTransformers(new DefaultRegistry());
 
         $this->assertSame(['foo' => null, 'bar' => null], $transformer->transformFromHttp([])->values);
         $this->assertEmpty($transformer->transformFromHttp([])->errors);
@@ -83,10 +83,10 @@ PHP
 
     public function test_generate_with_field_mapping()
     {
-        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $generator = new FormTransformerGenerator(new DefaultRegistry());
 
         $code = $generator->generate('TestingTransformerWithFieldMapping', new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [],
                 'bar' => [],
@@ -125,7 +125,7 @@ class TestingTransformerWithFieldMapping implements Quatrevieux\Form\Transformer
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -134,7 +134,7 @@ PHP
         , $code);
 
         $this->assertGeneratedClass($code, 'TestingTransformerWithFieldMapping', FormTransformerInterface::class);
-        $transformer = new \TestingTransformerWithFieldMapping(new NullFieldTransformerRegistry());
+        $transformer = new \TestingTransformerWithFieldMapping(new DefaultRegistry());
 
         $this->assertSame(['foo' => 123, 'bar' => 456], $transformer->transformFromHttp(['f_o_o' => 123, 'b_a_r' => 456])->values);
         $this->assertEmpty($transformer->transformFromHttp(['f_o_o' => 123, 'b_a_r' => 456])->errors);
@@ -143,10 +143,10 @@ PHP
 
     public function test_generate_with_transformers_and_field_mapping()
     {
-        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $generator = new FormTransformerGenerator(new DefaultRegistry());
 
         $code = $generator->generate('TestingTransformerWithTransformers', new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [new Csv(), new Cast(CastType::Array)],
                 'bar' => [new Cast(CastType::Int)],
@@ -185,7 +185,7 @@ class TestingTransformerWithTransformers implements Quatrevieux\Form\Transformer
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -194,7 +194,7 @@ PHP
         , $code);
 
         $this->assertGeneratedClass($code, 'TestingTransformerWithTransformers', FormTransformerInterface::class);
-        $transformer = new \TestingTransformerWithTransformers(new NullFieldTransformerRegistry());
+        $transformer = new \TestingTransformerWithTransformers(new DefaultRegistry());
 
         $this->assertSame(['foo' => ['12', '3'], 'bar' => 456], $transformer->transformFromHttp(['f_o_o' => '12,3', 'b_a_r' => '456'])->values);
         $this->assertEmpty($transformer->transformFromHttp(['f_o_o' => '12,3', 'b_a_r' => '456'])->errors);
@@ -245,7 +245,7 @@ class TestingTransformerWithDelegatedTransformer implements Quatrevieux\Form\Tra
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -305,7 +305,7 @@ class TestingTransformerWithDelegatedTransformerAndGenerator implements Quatrevi
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -323,7 +323,7 @@ PHP
 
     public function test_generate_with_generic_transformer_generator()
     {
-        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $generator = new FormTransformerGenerator(new DefaultRegistry());
 
         $this->container->set(DelegatedTransformerImpl::class, new DelegatedTransformerImpl());
 
@@ -359,7 +359,7 @@ class TestingTransformerWithGenericTransformerGenerator implements Quatrevieux\F
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -377,10 +377,10 @@ PHP
 
     public function test_generate_with_unsafe_transformer()
     {
-        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $generator = new FormTransformerGenerator(new DefaultRegistry());
 
         $code = $generator->generate('TestingTransformerWithUnsafeTransformers', new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [new FailingTransformer()],
                 'bar' => [],
@@ -422,7 +422,7 @@ class TestingTransformerWithUnsafeTransformers implements Quatrevieux\Form\Trans
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -431,7 +431,7 @@ PHP
             , $code);
 
         $this->assertGeneratedClass($code, 'TestingTransformerWithUnsafeTransformers', FormTransformerInterface::class);
-        $transformer = new \TestingTransformerWithUnsafeTransformers(new NullFieldTransformerRegistry());
+        $transformer = new \TestingTransformerWithUnsafeTransformers(new DefaultRegistry());
 
         $this->assertSame(['bar' => null, 'foo' => null], $transformer->transformFromHttp([])->values);
         $this->assertEquals(['foo' => new FieldError('my error', code: TransformationError::CODE)], $transformer->transformFromHttp([])->errors);
@@ -444,10 +444,10 @@ PHP
 
     public function test_generate_with_unsafe_transformer_and_custom_error_handling()
     {
-        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $generator = new FormTransformerGenerator(new DefaultRegistry());
 
         $code = $generator->generate('TestingTransformerWithCustomTransformationError', new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [new FailingTransformer()],
                 'bar' => [new FailingTransformer()],
@@ -498,7 +498,7 @@ class TestingTransformerWithCustomTransformationError implements Quatrevieux\For
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -507,7 +507,7 @@ PHP
             , $code);
 
         $this->assertGeneratedClass($code, 'TestingTransformerWithCustomTransformationError', FormTransformerInterface::class);
-        $transformer = new \TestingTransformerWithCustomTransformationError(new NullFieldTransformerRegistry());
+        $transformer = new \TestingTransformerWithCustomTransformationError(new DefaultRegistry());
 
         $this->assertSame(['foo' => null, 'bar' => null], $transformer->transformFromHttp([])->values);
         $this->assertEquals(['foo' => new FieldError('my custom error', code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6')], $transformer->transformFromHttp([])->errors);
@@ -520,14 +520,14 @@ PHP
 
     public function test_generateFromHttp()
     {
-        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $generator = new FormTransformerGenerator(new DefaultRegistry());
 
         $this->assertSame('(is_string($__tmp_72c574c21812108f20992797675b2810 = $foo["bar"] ?? null) ? str_getcsv($__tmp_72c574c21812108f20992797675b2810, \',\', \'\', \'\') : null)', $generator->generateTransformFromHttp(new Csv(), '$foo["bar"] ?? null'));
     }
 
     public function test_generateToHttp()
     {
-        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $generator = new FormTransformerGenerator(new DefaultRegistry());
 
         $this->assertSame('(is_array($__tmp_72c574c21812108f20992797675b2810 = $foo["bar"] ?? null) ? implode(\',\', $__tmp_72c574c21812108f20992797675b2810) : null)', $generator->generateTransformToHttp(new Csv(), '$foo["bar"] ?? null'));
     }
@@ -540,7 +540,7 @@ class DelegatedTransformerParameters implements DelegatedFieldTransformerInterfa
     ) {
     }
 
-    public function getTransformer(FieldTransformerRegistryInterface $registry): ConfigurableFieldTransformerInterface
+    public function getTransformer(RegistryInterface $registry): ConfigurableFieldTransformerInterface
     {
         return $registry->getTransformer(DelegatedTransformerImpl::class);
     }

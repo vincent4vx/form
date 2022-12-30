@@ -2,8 +2,8 @@
 
 namespace Quatrevieux\Form\Validator;
 
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
-use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
 use Quatrevieux\Form\Validator\Constraint\Required;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -18,7 +18,7 @@ use function array_unshift;
 final class RuntimeValidatorFactory implements ValidatorFactoryInterface
 {
     public function __construct(
-        private readonly ConstraintValidatorRegistryInterface $validatorRegistry,
+        private readonly RegistryInterface $registry,
     ) {
     }
 
@@ -60,6 +60,6 @@ final class RuntimeValidatorFactory implements ValidatorFactoryInterface
         }
 
         /** @var RuntimeValidator<T> */
-        return new RuntimeValidator($this->validatorRegistry, $fieldsConstraints);
+        return new RuntimeValidator($this->registry, $fieldsConstraints);
     }
 }

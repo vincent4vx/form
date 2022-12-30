@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
 use Quatrevieux\Form\Transformer\GeneratedFormTransformerFactory;
-use Quatrevieux\Form\Transformer\RuntimeFormTransformerFactory;
 use Quatrevieux\Form\Util\Functions;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 use Quatrevieux\Form\Validator\FieldError;
@@ -36,7 +35,7 @@ class FormTestCase extends TestCase
         $this->container = new ArrayContainer();
         $registry = new ContainerRegistry($this->container);
 
-        $this->runtimeFormFactory = DefaultFormFactory::runtime($this->container);
+        $this->runtimeFormFactory = DefaultFormFactory::runtime($registry);
 
         $savePathResolver = Functions::savePathResolver(self::GENERATED_DIR);
 
@@ -45,7 +44,7 @@ class FormTestCase extends TestCase
             new GeneratedValidatorFactory(
                 factory: new RuntimeValidatorFactory($registry),
                 generator: new ValidatorGenerator($registry),
-                validatorRegistry: $registry,
+                registry: $registry,
                 savePathResolver: $savePathResolver,
             ),
             new GeneratedFormTransformerFactory(

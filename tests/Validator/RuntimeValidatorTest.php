@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form\Validator;
 
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\Constraint\EqualsWith;
 use Quatrevieux\Form\Validator\Constraint\Length;
@@ -11,7 +12,7 @@ class RuntimeValidatorTest extends FormTestCase
 {
     public function test_validate_no_constraints()
     {
-        $validator = new RuntimeValidator(new NullConstraintValidatorRegistry(), []);
+        $validator = new RuntimeValidator(new DefaultRegistry(), []);
         $o = (object) ['foo' => 'bar'];
 
         $this->assertSame([], $validator->validate($o));
@@ -20,7 +21,7 @@ class RuntimeValidatorTest extends FormTestCase
 
     public function test_validate_single_constraint()
     {
-        $validator = new RuntimeValidator(new NullConstraintValidatorRegistry(), [
+        $validator = new RuntimeValidator(new DefaultRegistry(), [
             'foo' => [new Length(min: 3)]
         ]);
 
@@ -31,7 +32,7 @@ class RuntimeValidatorTest extends FormTestCase
 
     public function test_validate_should_stop_at_first_field_violation()
     {
-        $validator = new RuntimeValidator(new NullConstraintValidatorRegistry(), [
+        $validator = new RuntimeValidator(new DefaultRegistry(), [
             'foo' => [new Length(min: 3), new Length(max: 5)],
             'bar' => [new EqualsWith('foo')],
         ]);
@@ -44,7 +45,7 @@ class RuntimeValidatorTest extends FormTestCase
 
     public function test_validate_success()
     {
-        $validator = new RuntimeValidator(new NullConstraintValidatorRegistry(), [
+        $validator = new RuntimeValidator(new DefaultRegistry(), [
             'foo' => [new Length(min: 3), new Length(max: 5)],
             'bar' => [new EqualsWith('foo')],
         ]);

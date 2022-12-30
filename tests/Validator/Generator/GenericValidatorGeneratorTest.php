@@ -3,13 +3,12 @@
 namespace Quatrevieux\Form\Validator\Generator;
 
 use Attribute;
-use PHPUnit\Framework\TestCase;
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
-use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
 use Quatrevieux\Form\Validator\Constraint\Length;
-use Quatrevieux\Form\Validator\Constraint\NullConstraintValidatorRegistry;
 use Quatrevieux\Form\Validator\Constraint\SelfValidatedConstraint;
 use Quatrevieux\Form\Validator\FieldError;
 
@@ -17,9 +16,9 @@ class GenericValidatorGeneratorTest extends FormTestCase
 {
     public function test_generate()
     {
-        $generator = new ValidatorGenerator(new NullConstraintValidatorRegistry());
+        $generator = new ValidatorGenerator(new DefaultRegistry());
         $this->assertSame("(\$__constraint_8e4856679a2fbb68dd545df21d00d9c7 = new \Quatrevieux\Form\Validator\Constraint\Length(min: 5, max: NULL, message: NULL))->validate(\$__constraint_8e4856679a2fbb68dd545df21d00d9c7, \$data->foo ?? null, \$data)", (new GenericValidatorGenerator())->generate(new Length(min: 5), $generator)->generate('$data->foo ?? null'));
-        $this->assertSame("(\$__constraint_63ba69d6fe3ff5f84a29bcaaaeae7448 = new \Quatrevieux\Form\Validator\Generator\MyCustomConstraint(foo: 5))->getValidator(\$this->validatorRegistry)->validate(\$__constraint_63ba69d6fe3ff5f84a29bcaaaeae7448, \$data->foo ?? null, \$data)", (new GenericValidatorGenerator())->generate(new MyCustomConstraint(foo: 5), $generator)->generate('$data->foo ?? null'));
+        $this->assertSame("(\$__constraint_63ba69d6fe3ff5f84a29bcaaaeae7448 = new \Quatrevieux\Form\Validator\Generator\MyCustomConstraint(foo: 5))->getValidator(\$this->registry)->validate(\$__constraint_63ba69d6fe3ff5f84a29bcaaaeae7448, \$data->foo ?? null, \$data)", (new GenericValidatorGenerator())->generate(new MyCustomConstraint(foo: 5), $generator)->generate('$data->foo ?? null'));
     }
 
     public function test_functional()
@@ -42,7 +41,7 @@ class MyCustomConstraint implements ConstraintInterface
     ) {
     }
 
-    public function getValidator(ConstraintValidatorRegistryInterface $registry): ConstraintValidatorInterface
+    public function getValidator(RegistryInterface $registry): ConstraintValidatorInterface
     {
         return $registry->getValidator(MyCustomConstraintValidator::class);
     }

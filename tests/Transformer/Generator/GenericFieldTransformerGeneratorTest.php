@@ -3,22 +3,15 @@
 namespace Quatrevieux\Form\Transformer\Generator;
 
 use Attribute;
-use PHPUnit\Framework\TestCase;
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
-use Quatrevieux\Form\Transformer\Field\NullFieldTransformerRegistry;
-use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
-use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
-use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
-use Quatrevieux\Form\Validator\Constraint\Length;
-use Quatrevieux\Form\Validator\Constraint\SelfValidatedConstraint;
-use Quatrevieux\Form\Validator\FieldError;
 
 class GenericFieldTransformerGeneratorTest extends FormTestCase
 {
     public function test_generate()
     {
-        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $generator = new FormTransformerGenerator(new DefaultRegistry());
         $this->assertSame('(new \Quatrevieux\Form\Transformer\Generator\MyCustomTransformer(foo: 5))->transformToHttp($data["foo"] ?? null)', (new GenericFieldTransformerGenerator())->generateTransformToHttp(new MyCustomTransformer(5), '$data["foo"] ?? null', $generator));
         $this->assertSame('(new \Quatrevieux\Form\Transformer\Generator\MyCustomTransformer(foo: 5))->transformFromHttp($data["foo"] ?? null)', (new GenericFieldTransformerGenerator())->generateTransformFromHttp(new MyCustomTransformer(5), '$data["foo"] ?? null', $generator));
     }

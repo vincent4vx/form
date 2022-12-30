@@ -48,7 +48,7 @@ class Quatrevieux_Form_Fixtures_SimpleRequestTransformerGeneratorTesting impleme
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }
@@ -115,7 +115,7 @@ class Quatrevieux_Form_Fixtures_WithTransformerRequestTransformerGeneratorTestin
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface $registry)
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
     {
     }
 }

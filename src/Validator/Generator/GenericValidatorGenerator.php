@@ -11,7 +11,7 @@ use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
  * This generator will simply inline constraint instantiation, and call `getValidator()->validate(...)`
  *
  * Generated code example:
- * '($__constraint_14ab54f6d = new MyConstraint(foo: "bar"))->getValidator($this->validatorRegistry)->validate($__constraint_14ab54f6d, ($data->foo ?? null), $data)'
+ * '($__constraint_14ab54f6d = new MyConstraint(foo: "bar"))->getValidator($this->registry)->validate($__constraint_14ab54f6d, ($data->foo ?? null), $data)'
  */
 final class GenericValidatorGenerator implements ConstraintValidatorGeneratorInterface
 {
@@ -27,7 +27,7 @@ final class GenericValidatorGenerator implements ConstraintValidatorGeneratorInt
         if ($constraint instanceof ConstraintValidatorInterface) {
             return FieldErrorExpression::undefined(fn (string $fieldAccessor) => "($constraintVarName = $newConstraintExpression)->validate($constraintVarName, $fieldAccessor, \$data)");
         } else {
-            return FieldErrorExpression::undefined(fn (string $fieldAccessor) => "($constraintVarName = $newConstraintExpression)->getValidator(\$this->validatorRegistry)->validate($constraintVarName, $fieldAccessor, \$data)");
+            return FieldErrorExpression::undefined(fn (string $fieldAccessor) => "($constraintVarName = $newConstraintExpression)->getValidator(\$this->registry)->validate($constraintVarName, $fieldAccessor, \$data)");
         }
     }
 }

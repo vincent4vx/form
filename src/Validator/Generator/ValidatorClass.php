@@ -3,13 +3,11 @@
 namespace Quatrevieux\Form\Validator\Generator;
 
 use Nette\PhpGenerator\ClassType;
-use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
-use Quatrevieux\Form\Instantiator\InstantiatorInterface;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Util\Code;
-use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\ValidatorInterface;
 
@@ -42,10 +40,10 @@ final class ValidatorClass
         $this->file->addUse(FieldError::class);
 
         $constructor = $this->class->addMethod('__construct');
-        $constructor->addPromotedParameter('validatorRegistry')
+        $constructor->addPromotedParameter('registry')
             ->setPrivate()
             ->setReadOnly()
-            ->setType(ConstraintValidatorRegistryInterface::class)
+            ->setType(RegistryInterface::class)
         ;
     }
 
@@ -68,7 +66,7 @@ final class ValidatorClass
     {
         // @todo optimize empty validator
         $this->validateMethod->addBody('$errors = $previousErrors;');
-        $this->validateMethod->addBody('$translator = $this->validatorRegistry->getTranslator();');
+        $this->validateMethod->addBody('$translator = $this->registry->getTranslator();');
 
         foreach ($this->fieldsConstraintsExpressions as $fieldName => $expressions) {
             $expressionCode = [];

@@ -4,12 +4,12 @@ namespace Bench;
 
 use FilesystemIterator;
 use Quatrevieux\Form\DefaultFormFactory;
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormFactoryInterface;
 use Quatrevieux\Form\FormInterface;
 use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
-use Quatrevieux\Form\Transformer\Field\NullFieldTransformerRegistry;
 use Quatrevieux\Form\Transformer\GeneratedFormTransformerFactory;
-use Quatrevieux\Form\Validator\Constraint\NullConstraintValidatorRegistry;
+use Quatrevieux\Form\Util\Functions;
 use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 use Quatrevieux\Form\Validator\RuntimeValidatorFactory;
@@ -32,7 +32,7 @@ class BenchUtils
     public function runtimeForm(string $dataClass): FormInterface
     {
         if (!$this->runtimeFactory) {
-            $this->runtimeFactory = new DefaultFormFactory();
+            $this->runtimeFactory = DefaultFormFactory::runtime();
         }
 
         return $this->runtimeFactory->create($dataClass);
@@ -41,18 +41,19 @@ class BenchUtils
     public function generatedForm(string $dataClass): FormInterface
     {
         if (!$this->generatedFactory) {
-            $savePathResolver = fn (string $class) => self::GENERATED_DIR . '/' . str_replace('\\', '_', $class) . '.php';
+            $savePathResolver = Functions::savePathResolver(self::GENERATED_DIR);
+            $registry = new DefaultRegistry();
 
             $this->generatedFactory = new DefaultFormFactory(
                 new GeneratedInstantiatorFactory(savePathResolver: $savePathResolver),
                 new GeneratedValidatorFactory(
-                    factory: new RuntimeValidatorFactory(new NullConstraintValidatorRegistry()),
-                    generator: new ValidatorGenerator(new NullConstraintValidatorRegistry()),
-                    validatorRegistry: new NullConstraintValidatorRegistry(),
+                    factory: new RuntimeValidatorFactory($registry),
+                    generator: new ValidatorGenerator($registry),
+                    registry: $registry,
                     savePathResolver: $savePathResolver,
                 ),
                 new GeneratedFormTransformerFactory(
-                    registry: new NullFieldTransformerRegistry(),
+                    registry: $registry,
                     savePathResolver: $savePathResolver
                 )
             );

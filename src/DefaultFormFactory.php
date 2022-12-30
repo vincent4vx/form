@@ -2,13 +2,10 @@
 
 namespace Quatrevieux\Form;
 
-use Psr\Container\ContainerInterface;
 use Quatrevieux\Form\Instantiator\InstantiatorFactoryInterface;
 use Quatrevieux\Form\Instantiator\RuntimeInstantiatorFactory;
-use Quatrevieux\Form\Transformer\Field\NullFieldTransformerRegistry;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Transformer\RuntimeFormTransformerFactory;
-use Quatrevieux\Form\Validator\Constraint\NullConstraintValidatorRegistry;
 use Quatrevieux\Form\Validator\RuntimeValidatorFactory;
 use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
 
@@ -20,9 +17,9 @@ use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
 final class DefaultFormFactory implements FormFactoryInterface
 {
     public function __construct(
-        private readonly InstantiatorFactoryInterface $instantiatorFactory = new RuntimeInstantiatorFactory(),
-        private readonly ValidatorFactoryInterface $validatorFactory = new RuntimeValidatorFactory(new NullConstraintValidatorRegistry()),
-        private readonly FormTransformerFactoryInterface $transformerFactory = new RuntimeFormTransformerFactory(new NullFieldTransformerRegistry()),
+        private readonly InstantiatorFactoryInterface $instantiatorFactory,
+        private readonly ValidatorFactoryInterface $validatorFactory,
+        private readonly FormTransformerFactoryInterface $transformerFactory,
     ) {
     }
 
@@ -39,15 +36,15 @@ final class DefaultFormFactory implements FormFactoryInterface
     }
 
     /**
-     * Create DefaultFormFactory using runtime factories and PSR-11 container for registries
+     * Create DefaultFormFactory using runtime factories
      *
-     * @param ContainerInterface $container PSR-11 container instance containing validators and transformers
+     * @param RegistryInterface|null $registry Registry instance. If null, a new DefaultRegistry will be created.
      *
      * @return DefaultFormFactory
      */
-    public static function runtime(ContainerInterface $container): DefaultFormFactory
+    public static function runtime(?RegistryInterface $registry = null): DefaultFormFactory
     {
-        $registry = new ContainerRegistry($container);
+        $registry ??= new DefaultRegistry();
 
         return new DefaultFormFactory(
             new RuntimeInstantiatorFactory(),

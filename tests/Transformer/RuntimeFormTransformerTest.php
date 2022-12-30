@@ -4,15 +4,15 @@ namespace Quatrevieux\Form\Transformer;
 
 use Exception;
 use Quatrevieux\Form\ContainerRegistry;
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\Cast;
 use Quatrevieux\Form\Transformer\Field\CastType;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\Csv;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
-use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
-use Quatrevieux\Form\Transformer\Field\NullFieldTransformerRegistry;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Validator\FieldError;
 
@@ -21,7 +21,7 @@ class RuntimeFormTransformerTest extends FormTestCase
     public function test_getters()
     {
         $transformer = new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             $transformers = [
                 'foo' => [new Csv(), new Cast(CastType::Array)],
                 'bar' => [new Cast(CastType::Int)],
@@ -42,7 +42,7 @@ class RuntimeFormTransformerTest extends FormTestCase
     public function test_without_transformers()
     {
         $transformer = new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [],
             ],
@@ -57,7 +57,7 @@ class RuntimeFormTransformerTest extends FormTestCase
     public function test_with_transformation_error()
     {
         $transformer = new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [new FailingTransformer()],
             ],
@@ -71,7 +71,7 @@ class RuntimeFormTransformerTest extends FormTestCase
     public function test_with_transformation_error_custom_message()
     {
         $transformer = new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [new FailingTransformer()],
             ],
@@ -87,7 +87,7 @@ class RuntimeFormTransformerTest extends FormTestCase
     public function test_with_transformation_error_custom_code()
     {
         $transformer = new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [new FailingTransformer()],
             ],
@@ -103,7 +103,7 @@ class RuntimeFormTransformerTest extends FormTestCase
     public function test_with_transformation_error_ignored()
     {
         $transformer = new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [new FailingTransformer()],
             ],
@@ -119,7 +119,7 @@ class RuntimeFormTransformerTest extends FormTestCase
     public function test_with_transformation_keep_original_value()
     {
         $transformer = new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [new FailingTransformer()],
             ],
@@ -135,7 +135,7 @@ class RuntimeFormTransformerTest extends FormTestCase
     public function test_with_transformation_error_ignored_and_keep_original_value()
     {
         $transformer = new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [new FailingTransformer()],
             ],
@@ -151,7 +151,7 @@ class RuntimeFormTransformerTest extends FormTestCase
     public function test_with_field_mapping()
     {
         $transformer = new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [],
             ],
@@ -168,7 +168,7 @@ class RuntimeFormTransformerTest extends FormTestCase
     public function test_with_transformers_and_mapping()
     {
         $transformer = new RuntimeFormTransformer(
-            new NullFieldTransformerRegistry(),
+            new DefaultRegistry(),
             [
                 'foo' => [new Csv(), new Cast(CastType::Array)],
                 'bar' => [new Cast(CastType::Int)],
@@ -203,7 +203,7 @@ class RuntimeFormTransformerTest extends FormTestCase
 
 class MyDelegatedTransformer implements DelegatedFieldTransformerInterface
 {
-    public function getTransformer(FieldTransformerRegistryInterface $registry): ConfigurableFieldTransformerInterface
+    public function getTransformer(RegistryInterface $registry): ConfigurableFieldTransformerInterface
     {
         return $registry->getTransformer(MyDelegatedTransformerImpl::class);
     }

@@ -3,9 +3,9 @@
 namespace Quatrevieux\Form\Transformer;
 
 use Exception;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
-use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Validator\FieldError;
 
@@ -20,7 +20,7 @@ use Quatrevieux\Form\Validator\FieldError;
 final class RuntimeFormTransformer implements FormTransformerInterface
 {
     public function __construct(
-        private readonly FieldTransformerRegistryInterface $registry,
+        private readonly RegistryInterface $registry,
         /**
          * Associate a field name with transformers to apply
          *

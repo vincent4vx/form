@@ -3,25 +3,17 @@
 namespace Quatrevieux\Form\Transformer\Generator;
 
 use Attribute;
-use PHPUnit\Framework\TestCase;
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
-use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
-use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
-use Quatrevieux\Form\Transformer\Field\NullFieldTransformerRegistry;
-use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
-use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
-use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
-use Quatrevieux\Form\Validator\Constraint\Length;
-use Quatrevieux\Form\Validator\Constraint\SelfValidatedConstraint;
-use Quatrevieux\Form\Validator\FieldError;
 
 class DelegatedFieldTransformerGeneratorTest extends FormTestCase
 {
     public function test_generate()
     {
-        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $generator = new FormTransformerGenerator(new DefaultRegistry());
         $this->assertSame('($__transformer_ff4a55a184baa579d830825fffb6cff2 = new \Quatrevieux\Form\Transformer\Generator\MyCustomDelegatedTransformer(foo: 5))->getTransformer($this->registry)->transformToHttp($__transformer_ff4a55a184baa579d830825fffb6cff2, $data["foo"] ?? null)', (new DelegatedFieldTransformerGenerator())->generateTransformToHttp(new MyCustomDelegatedTransformer(5), '$data["foo"] ?? null', $generator));
         $this->assertSame('($__transformer_ff4a55a184baa579d830825fffb6cff2 = new \Quatrevieux\Form\Transformer\Generator\MyCustomDelegatedTransformer(foo: 5))->getTransformer($this->registry)->transformFromHttp($__transformer_ff4a55a184baa579d830825fffb6cff2, $data["foo"] ?? null)', (new DelegatedFieldTransformerGenerator())->generateTransformFromHttp(new MyCustomDelegatedTransformer(5), '$data["foo"] ?? null', $generator));
     }
@@ -51,7 +43,7 @@ class MyCustomDelegatedTransformer implements DelegatedFieldTransformerInterface
     /**
      * @inheritDoc
      */
-    public function getTransformer(FieldTransformerRegistryInterface $registry): ConfigurableFieldTransformerInterface
+    public function getTransformer(RegistryInterface $registry): ConfigurableFieldTransformerInterface
     {
         return $registry->getTransformer(MyCustomDelegatedTransformerImpl::class);
     }

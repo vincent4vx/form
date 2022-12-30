@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form\Transformer\Field;
 
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
@@ -46,10 +47,10 @@ class TransformEachTest extends FormTestCase
             new Base64Transformer(),
             new JsonTransformer(),
         ]);
-        $generator = new FormTransformerGenerator(new NullFieldTransformerRegistry());
+        $generator = new FormTransformerGenerator(new DefaultRegistry());
 
-        $this->assertSame('($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) === null ? null : \array_map(fn ($item) => (new \Quatrevieux\Form\Transformer\Field\JsonTransformer())->transformFromHttp((($__tmp_0f8134fb6038ebcd7155f1de5f067c73 = ($item)) ? base64_decode($__tmp_0f8134fb6038ebcd7155f1de5f067c73) : null)), (array) $__tmp_cf8d20da9cb97be602abb1ce003a22b3)', $transformer->getTransformer(new NullFieldTransformerRegistry())->generateTransformFromHttp($transformer, '$data["foo"] ?? null', $generator));
-        $this->assertSame('($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) === null ? null : \array_map(fn ($item) => (($__tmp_05f1b0308b35161ae3bf8b9998e27763 = ((new \Quatrevieux\Form\Transformer\Field\JsonTransformer())->transformToHttp($item))) ? base64_encode($__tmp_05f1b0308b35161ae3bf8b9998e27763) : null), (array) $__tmp_cf8d20da9cb97be602abb1ce003a22b3)', $transformer->getTransformer(new NullFieldTransformerRegistry())->generateTransformToHttp($transformer, '$data["foo"] ?? null', $generator));
+        $this->assertSame('($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) === null ? null : \array_map(fn ($item) => (new \Quatrevieux\Form\Transformer\Field\JsonTransformer())->transformFromHttp((($__tmp_0f8134fb6038ebcd7155f1de5f067c73 = ($item)) ? base64_decode($__tmp_0f8134fb6038ebcd7155f1de5f067c73) : null)), (array) $__tmp_cf8d20da9cb97be602abb1ce003a22b3)', $transformer->getTransformer(new DefaultRegistry())->generateTransformFromHttp($transformer, '$data["foo"] ?? null', $generator));
+        $this->assertSame('($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) === null ? null : \array_map(fn ($item) => (($__tmp_05f1b0308b35161ae3bf8b9998e27763 = ((new \Quatrevieux\Form\Transformer\Field\JsonTransformer())->transformToHttp($item))) ? base64_encode($__tmp_05f1b0308b35161ae3bf8b9998e27763) : null), (array) $__tmp_cf8d20da9cb97be602abb1ce003a22b3)', $transformer->getTransformer(new DefaultRegistry())->generateTransformToHttp($transformer, '$data["foo"] ?? null', $generator));
     }
 }
 

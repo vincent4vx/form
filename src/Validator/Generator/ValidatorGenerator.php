@@ -2,8 +2,8 @@
 
 namespace Quatrevieux\Form\Validator\Generator;
 
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
-use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorRegistryInterface;
 use Quatrevieux\Form\Validator\RuntimeValidator;
 use Quatrevieux\Form\Validator\ValidatorInterface;
 
@@ -13,7 +13,7 @@ use Quatrevieux\Form\Validator\ValidatorInterface;
 final class ValidatorGenerator
 {
     public function __construct(
-        private readonly ConstraintValidatorRegistryInterface $validatorRegistry,
+        private readonly RegistryInterface $registry,
         private readonly ConstraintValidatorGeneratorInterface $genericValidatorGenerator = new GenericValidatorGenerator(),
     ) {
     }
@@ -50,7 +50,7 @@ final class ValidatorGenerator
      */
     public function validator(ConstraintInterface $constraint): FieldErrorExpressionInterface
     {
-        $generator = $constraint->getValidator($this->validatorRegistry);
+        $generator = $constraint->getValidator($this->registry);
 
         if (!$generator instanceof ConstraintValidatorGeneratorInterface) {
             $generator = $this->genericValidatorGenerator;

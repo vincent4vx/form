@@ -3,7 +3,7 @@
 namespace Quatrevieux\Form\Transformer;
 
 use Closure;
-use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Util\AbstractGeneratedFactory;
 use Quatrevieux\Form\Util\Functions;
@@ -28,7 +28,7 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
      * @var FormTransformerGenerator
      */
     private readonly FormTransformerGenerator $generator;
-    private readonly FieldTransformerRegistryInterface $registry;
+    private readonly RegistryInterface $registry;
 
     /**
      * @param (Closure(string):string)|null $savePathResolver Resolve instatiator class file path using instantiator class name as parameter. By default, save into `sys_get_temp_dir()`
@@ -36,7 +36,7 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
      * @param FormTransformerFactoryInterface|null $factory Fallback instantiator factory.
      * @param FormTransformerGenerator|null $generator Code generator instance.
      */
-    public function __construct(FieldTransformerRegistryInterface $registry, ?FormTransformerFactoryInterface $factory = null, ?FormTransformerGenerator $generator = null, ?Closure $savePathResolver = null, ?Closure $classNameResolver = null)
+    public function __construct(RegistryInterface $registry, ?FormTransformerFactoryInterface $factory = null, ?FormTransformerGenerator $generator = null, ?Closure $savePathResolver = null, ?Closure $classNameResolver = null)
     {
         parent::__construct(
             $savePathResolver ?? Functions::savePathResolver(),

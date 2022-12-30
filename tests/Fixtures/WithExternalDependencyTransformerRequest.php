@@ -2,9 +2,9 @@
 
 namespace Quatrevieux\Form\Fixtures;
 
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
-use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 
 class WithExternalDependencyTransformerRequest
 {
@@ -21,7 +21,7 @@ class FooTransformer implements DelegatedFieldTransformerInterface
 
     }
 
-    public function getTransformer(FieldTransformerRegistryInterface $registry): ConfigurableFieldTransformerInterface
+    public function getTransformer(RegistryInterface $registry): ConfigurableFieldTransformerInterface
     {
         return $registry->getTransformer(FooImplementation::class);
     }

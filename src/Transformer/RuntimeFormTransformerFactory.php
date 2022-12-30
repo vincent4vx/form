@@ -2,11 +2,11 @@
 
 namespace Quatrevieux\Form\Transformer;
 
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\Cast;
 use Quatrevieux\Form\Transformer\Field\CastType;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
-use Quatrevieux\Form\Transformer\Field\FieldTransformerRegistryInterface;
 use Quatrevieux\Form\Transformer\Field\HttpField;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 use ReflectionClass;
@@ -26,7 +26,7 @@ use function is_subclass_of;
 final class RuntimeFormTransformerFactory implements FormTransformerFactoryInterface
 {
     public function __construct(
-        private readonly FieldTransformerRegistryInterface $registry,
+        private readonly RegistryInterface $registry,
     ) {
     }
 

@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Validator\Constraint;
 
 use Attribute;
+use Quatrevieux\Form\RegistryInterface;
 
 /**
  * Generic constraint to validate a field value using a custom validator instance.
@@ -56,7 +57,7 @@ final class ValidateBy implements ConstraintInterface
     /**
      * {@inheritdoc}
      */
-    public function getValidator(ConstraintValidatorRegistryInterface $registry): ConstraintValidatorInterface
+    public function getValidator(RegistryInterface $registry): ConstraintValidatorInterface
     {
         return $registry->getValidator($this->validatorClass);
     }

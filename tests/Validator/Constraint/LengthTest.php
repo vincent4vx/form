@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form\Validator\Constraint;
 
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
@@ -78,7 +79,7 @@ class LengthTest extends FormTestCase
 
     public function test_generated_code()
     {
-        $generator = new ValidatorGenerator(new NullConstraintValidatorRegistry());
+        $generator = new ValidatorGenerator(new DefaultRegistry());
         $onlyMin = new Length(min: 3, message: 'my error');
         $this->assertGeneratedValidator('is_scalar(($data->foo ?? null)) && (($__len_a3aa3c8caea059c99a14cd36eaceca72 = strlen(($data->foo ?? null))) < 3) ? new FieldError(\'my error\', [\'min\' => 3], \'ecdd71f6-fa22-5564-bfc7-7e836dce3378\') : null', $onlyMin);
 
