@@ -14,8 +14,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class FieldError implements JsonSerializable, TranslatableInterface
 {
-    private ?TranslatorInterface $translator = null;
-
     public function __construct(
         /**
          * Error message
@@ -37,6 +35,12 @@ final class FieldError implements JsonSerializable, TranslatableInterface
          * Error code used to identify the error ignoring localized or parameterized messages
          */
         public readonly string $code = ConstraintInterface::CODE,
+
+        /**
+         * Translator to use to translate the message and replace placeholders
+         * If null, a DummyTranslator will be used
+         */
+        private ?TranslatorInterface $translator = null,
     ) {
     }
 

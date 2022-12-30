@@ -158,11 +158,12 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         $errors = [];
         $transformed = [
         ];
+        $translator = $this->registry->getTranslator();
 
         try {
             $transformed['foo'] = base64_decode((string) ($value['foo'] ?? null));
         } catch (\Exception $e) {
-            $errors['foo'] = new FieldError($e->getMessage(), [], 'ec3b18d7-cb0a-5af9-b1cd-6f0b8fb00ffd');
+            $errors['foo'] = new FieldError($e->getMessage(), [], 'ec3b18d7-cb0a-5af9-b1cd-6f0b8fb00ffd', $translator);
             $transformed['foo'] = null;
         }
 
@@ -211,11 +212,12 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         $errors = [];
         $transformed = [
         ];
+        $translator = $this->registry->getTranslator();
 
         try {
             $transformed['foo'] = (string) ($value['foo'] ?? null);
         } catch (\Exception $e) {
-            $errors['foo'] = new FieldError('my transformation error', [], 'd2e95635-fdb6-4752-acb4-aa8f76f64de6');
+            $errors['foo'] = new FieldError('my transformation error', [], 'd2e95635-fdb6-4752-acb4-aa8f76f64de6', $translator);
             $transformed['foo'] = $value['foo'] ?? null;
         }
 

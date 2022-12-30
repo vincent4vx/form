@@ -49,9 +49,9 @@ final class RuntimeFormTransformer implements FormTransformerInterface
      */
     public function transformFromHttp(array $value): TransformationResult
     {
-        // @todo translate error messages (may need refactor of registry)
         $normalized = [];
         $errors = [];
+        $translator = $this->registry->getTranslator();
 
         foreach ($this->fieldsTransformers as $fieldName => $transformers) {
             $httpFieldName = $this->fieldsNameMapping[$fieldName] ?? $fieldName;
@@ -67,6 +67,7 @@ final class RuntimeFormTransformer implements FormTransformerInterface
                     $errors[$fieldName] = new FieldError(
                         message: $errorHandlingConfigurator?->message ?? $e->getMessage(),
                         code: $errorHandlingConfigurator?->code ?? TransformationError::CODE,
+                        translator: $translator,
                     );
                 }
 

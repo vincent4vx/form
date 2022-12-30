@@ -177,12 +177,12 @@ class FunctionalTest extends FormTestCase
         $submitted = $form->submit(['foo' => 'foo']);
         $this->assertFalse($submitted->valid());
         $this->assertFalse(isset($submitted->value()->foo));
-        $this->assertEquals(['foo' => new FieldError('Syntax error', code: TransformationError::CODE)], $submitted->errors());
+        $this->assertErrors(['foo' => new FieldError('Syntax error', code: TransformationError::CODE)], $submitted->errors());
 
         $submitted = $form->submit(['foo' => '123']);
         $this->assertFalse($submitted->valid());
         $this->assertFalse(isset($submitted->value()->foo));
-        $this->assertEquals(['foo' => new FieldError('Invalid JSON object', code: TransformationError::CODE)], $submitted->errors());
+        $this->assertErrors(['foo' => new FieldError('Invalid JSON object', code: TransformationError::CODE)], $submitted->errors());
 
         $submitted = $form->submit(['foo' => '{"foo":"bar"}']);
         $this->assertTrue($submitted->valid());
@@ -192,7 +192,7 @@ class FunctionalTest extends FormTestCase
         $submitted = $form->submit(['foo' => '{"foo":"bar"}', 'customTransformerErrorHandling' => '____']);
         $this->assertFalse($submitted->valid());
         $this->assertSame('____', $submitted->value()->customTransformerErrorHandling);
-        $this->assertEquals(['customTransformerErrorHandling' => new FieldError('invalid data', code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6')], $submitted->errors());
+        $this->assertErrors(['customTransformerErrorHandling' => new FieldError('invalid data', code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6')], $submitted->errors());
 
         $submitted = $form->submit(['foo' => '{"foo":"bar"}', 'customTransformerErrorHandling' => base64_encode('foo')]);
         $this->assertTrue($submitted->valid());
@@ -203,6 +203,16 @@ class FunctionalTest extends FormTestCase
         $this->assertTrue($submitted->valid());
         $this->assertNull($submitted->value()->ignoreError);
         $this->assertEmpty($submitted->errors());
+
+        $this->configureTranslator('fr', [
+            'Syntax error' => 'Erreur de syntaxe',
+            'Invalid JSON object' => 'Objet JSON invalide',
+            'invalid data' => 'données invalides',
+        ]);
+
+        $this->assertErrors(['foo' => 'Erreur de syntaxe'], $form->submit(['foo' => 'foo'])->errors());
+        $this->assertErrors(['foo' => 'Objet JSON invalide'], $form->submit(['foo' => '123'])->errors());
+        $this->assertErrors(['customTransformerErrorHandling' => 'données invalides'], $form->submit(['foo' => '{"foo":"bar"}', 'customTransformerErrorHandling' => '____'])->errors());
     }
 
     public function form(string $dataClass): FormInterface

@@ -5,6 +5,7 @@ namespace Quatrevieux\Form\Transformer;
 use Exception;
 use Quatrevieux\Form\ContainerRegistry;
 use Quatrevieux\Form\DefaultRegistry;
+use Quatrevieux\Form\DummyTranslator;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\Cast;
@@ -65,7 +66,25 @@ class RuntimeFormTransformerTest extends FormTestCase
             []
         );
 
-        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my transformation error', code: TransformationError::CODE)]), $transformer->transformFromHttp(['foo' => 'bar']));
+        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my transformation error', code: TransformationError::CODE, translator: DummyTranslator::instance())]), $transformer->transformFromHttp(['foo' => 'bar']));
+    }
+
+    public function test_with_transformation_error_translated()
+    {
+        $this->configureTranslator('fr', [
+            'my transformation error' => 'mon erreur de transformation',
+        ]);
+
+        $transformer = new RuntimeFormTransformer(
+            new ContainerRegistry($this->container),
+            [
+                'foo' => [new FailingTransformer()],
+            ],
+            [],
+            []
+        );
+
+        $this->assertErrors(['foo' => 'mon erreur de transformation'], $transformer->transformFromHttp(['foo' => 'bar'])->errors);
     }
 
     public function test_with_transformation_error_custom_message()
@@ -81,7 +100,7 @@ class RuntimeFormTransformerTest extends FormTestCase
             ]
         );
 
-        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my custom error', code: TransformationError::CODE)]), $transformer->transformFromHttp(['foo' => 'bar']));
+        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my custom error', code: TransformationError::CODE, translator: DummyTranslator::instance())]), $transformer->transformFromHttp(['foo' => 'bar']));
     }
 
     public function test_with_transformation_error_custom_code()
@@ -97,7 +116,7 @@ class RuntimeFormTransformerTest extends FormTestCase
             ]
         );
 
-        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my transformation error', code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6')]), $transformer->transformFromHttp(['foo' => 'bar']));
+        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my transformation error', code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6', translator: DummyTranslator::instance())]), $transformer->transformFromHttp(['foo' => 'bar']));
     }
 
     public function test_with_transformation_error_ignored()
@@ -129,7 +148,7 @@ class RuntimeFormTransformerTest extends FormTestCase
             ]
         );
 
-        $this->assertEquals(new TransformationResult(['foo' => 'bar'], ['foo' => new FieldError('my transformation error', code: TransformationError::CODE)]), $transformer->transformFromHttp(['foo' => 'bar']));
+        $this->assertEquals(new TransformationResult(['foo' => 'bar'], ['foo' => new FieldError('my transformation error', code: TransformationError::CODE, translator: DummyTranslator::instance())]), $transformer->transformFromHttp(['foo' => 'bar']));
     }
 
     public function test_with_transformation_error_ignored_and_keep_original_value()

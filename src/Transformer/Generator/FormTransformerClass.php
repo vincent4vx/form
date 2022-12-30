@@ -197,6 +197,11 @@ final class FormTransformerClass
                 continue;
             }
 
+            // Get translator only if there is at least one unsafe field
+            if (!$code) {
+                $code = '$translator = $this->registry->getTranslator();' . PHP_EOL;
+            }
+
             $errorHandlingConfiguration = $this->fieldTransformersErrorHandling[$fieldName] ?? null;
 
             $fieldNameString = Code::value($fieldName);
@@ -209,7 +214,7 @@ final class FormTransformerClass
             $errorCode = Code::value($errorHandlingConfiguration?->code ?? TransformationError::CODE);
             $setErrorExpression = $errorHandlingConfiguration?->ignore
                 ? ''
-                : '$errors[' . $fieldNameString . '] = new FieldError(' . $errorMessage . ', [], ' . $errorCode . ');'
+                : '$errors[' . $fieldNameString . '] = new FieldError(' . $errorMessage . ', [], ' . $errorCode . ', $translator);'
             ;
 
             foreach ($expressions as $expression) {
