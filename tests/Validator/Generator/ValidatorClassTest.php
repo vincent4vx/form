@@ -23,9 +23,7 @@ class TestingEmptyValidatorClass implements Quatrevieux\Form\Validator\Validator
 {
     function validate(object $data, array $previousErrors = []): array
     {
-        $errors = $previousErrors;
-        $translator = $this->registry->getTranslator();
-        return $errors;
+        return $previousErrors;
     }
 
     public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)

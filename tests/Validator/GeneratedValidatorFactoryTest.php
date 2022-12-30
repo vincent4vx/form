@@ -41,9 +41,7 @@ class Quatrevieux_Form_Fixtures_SimpleRequestValidatorGeneratorTest implements Q
 {
     function validate(object $data, array $previousErrors = []): array
     {
-        $errors = $previousErrors;
-        $translator = $this->registry->getTranslator();
-        return $errors;
+        return $previousErrors;
     }
 
     public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)

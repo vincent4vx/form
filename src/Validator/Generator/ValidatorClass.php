@@ -64,7 +64,11 @@ final class ValidatorClass
      */
     public function generate(): void
     {
-        // @todo optimize empty validator
+        if (empty($this->fieldsConstraintsExpressions)) {
+            $this->validateMethod->addBody('return $previousErrors;');
+            return;
+        }
+
         $this->validateMethod->addBody('$errors = $previousErrors;');
         $this->validateMethod->addBody('$translator = $this->registry->getTranslator();');
 
