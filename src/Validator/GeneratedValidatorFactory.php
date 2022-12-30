@@ -17,6 +17,7 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
 {
     /**
      * Fallback instantiator factory
+     * Will be lazily instantiated to {@see RuntimeValidatorFactory} if not provided in constructor
      *
      * @var ValidatorFactoryInterface
      */
@@ -24,19 +25,21 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
 
     /**
      * Code generator
+     * Will be lazily instantiated if not provided in constructor
      *
      * @var ValidatorGenerator
      */
     private readonly ValidatorGenerator $generator;
-    private readonly RegistryInterface $validator;
+    private readonly RegistryInterface $registry;
 
     /**
-     * @param ValidatorFactoryInterface $factory Fallback instantiator factory.
-     * @param ValidatorGenerator $generator Code generator instance.
+     * @param RegistryInterface $registry Registry instance.
+     * @param ValidatorFactoryInterface|null $factory Fallback instantiator factory. If not provided, will be lazily instantiated to {@see RuntimeValidatorFactory}
+     * @param ValidatorGenerator|null $generator Code generator instance. If not provided, will be lazily instantiated.
      * @param (Closure(string):string)|null $savePathResolver Resolve instatiator class file path using instantiator class name as parameter. By default, save into `sys_get_temp_dir()`
      * @param (Closure(class-string):string)|null $classNameResolver Resolve instantiator class name using DTO class name as parameter. By default, replace namespace seprator by "_", and add "Instantiator" suffix
      */
-    public function __construct(ValidatorFactoryInterface $factory, ValidatorGenerator $generator, RegistryInterface $registry, ?Closure $savePathResolver = null, ?Closure $classNameResolver = null)
+    public function __construct(RegistryInterface $registry, ?ValidatorFactoryInterface $factory = null, ?ValidatorGenerator $generator = null, ?Closure $savePathResolver = null, ?Closure $classNameResolver = null)
     {
         parent::__construct(
             $savePathResolver ?? Functions::savePathResolver(),
@@ -44,9 +47,15 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
             ValidatorInterface::class
         );
 
-        $this->factory = $factory;
-        $this->generator = $generator;
-        $this->validator = $registry;
+        $this->registry = $registry;
+
+        if ($factory) {
+            $this->factory = $factory;
+        }
+
+        if ($generator) {
+            $this->generator = $generator;
+        }
     }
 
     /**
@@ -62,7 +71,7 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
      */
     protected function callConstructor(string $generatedClass): ValidatorInterface
     {
-        return new $generatedClass($this->validator);
+        return new $generatedClass($this->registry);
     }
 
     /**
@@ -70,7 +79,9 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
      */
     protected function createRuntime(string $dataClass): ValidatorInterface
     {
-        return $this->factory->create($dataClass);
+        // @phpstan-ignore-next-line
+        $factory = $this->factory ??= new RuntimeValidatorFactory($this->registry);
+        return $factory->create($dataClass);
     }
 
     /**
@@ -79,6 +90,12 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
     protected function generate(string $generatedClassName, object $runtime): ?string
     {
         // @todo handle other validator instances ?
-        return $runtime instanceof RuntimeValidator ? $this->generator->generate($generatedClassName, $runtime) : null;
+        if ($runtime instanceof RuntimeValidator) {
+            // @phpstan-ignore-next-line
+            $generator = $this->generator ??= new ValidatorGenerator($this->registry);
+            return $generator->generate($generatedClassName, $runtime);
+        }
+
+        return null;
     }
 }

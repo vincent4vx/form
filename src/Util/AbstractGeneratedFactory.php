@@ -111,8 +111,8 @@ abstract class AbstractGeneratedFactory
             file_put_contents($fileName, $code);
             require_once $fileName;
 
-            if ($instance = $this->instantiate($className)) {
-                return $instance;
+            if ($generated = $this->instantiate($className)) {
+                return $generated;
             }
         }
 

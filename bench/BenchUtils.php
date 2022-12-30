@@ -51,8 +51,6 @@ class BenchUtils
         return new DefaultFormFactory(
             new GeneratedInstantiatorFactory(savePathResolver: $savePathResolver),
             new GeneratedValidatorFactory(
-                factory: new RuntimeValidatorFactory($registry),
-                generator: new ValidatorGenerator($registry),
                 registry: $registry,
                 savePathResolver: $savePathResolver,
             ),

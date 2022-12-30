@@ -17,6 +17,7 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
 {
     /**
      * Fallback instantiator factory
+     * Will be lazily initialized to {@see RuntimeFormTransformerFactory} if not passed in constructor
      *
      * @var FormTransformerFactoryInterface
      */
@@ -24,6 +25,7 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
 
     /**
      * Code generator
+     * Will be lazily initialized if not passed in constructor
      *
      * @var FormTransformerGenerator
      */
@@ -44,9 +46,15 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
             FormTransformerInterface::class
         );
 
-        $this->factory = $factory ?? new RuntimeFormTransformerFactory($registry);
-        $this->generator = $generator ?? new FormTransformerGenerator($registry);
         $this->registry = $registry;
+
+        if ($factory) {
+            $this->factory = $factory;
+        }
+
+        if ($generator) {
+            $this->generator = $generator;
+        }
     }
 
     /**
@@ -70,7 +78,9 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
      */
     protected function createRuntime(string $dataClass): FormTransformerInterface
     {
-        return $this->factory->create($dataClass);
+        // @phpstan-ignore-next-line
+        $factory = $this->factory ??= new RuntimeFormTransformerFactory($this->registry);
+        return $factory->create($dataClass);
     }
 
     /**
@@ -78,6 +88,12 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
      */
     protected function generate(string $generatedClassName, object $runtime): ?string
     {
-        return $runtime instanceof RuntimeFormTransformer ? $this->generator->generate($generatedClassName, $runtime) : null;
+        if (!$runtime instanceof RuntimeFormTransformer) {
+            return null;
+        }
+
+        // @phpstan-ignore-next-line
+        $generator = $this->generator ??= new FormTransformerGenerator($this->registry);
+        return $generator->generate($generatedClassName, $runtime);
     }
 }
