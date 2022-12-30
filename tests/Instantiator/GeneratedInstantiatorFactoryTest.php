@@ -19,6 +19,10 @@ class GeneratedInstantiatorFactoryTest extends TestCase
 
     protected function tearDown(): void
     {
+        if (!is_dir(__DIR__.'/_tmp/')) {
+            return;
+        }
+
         foreach (scandir(__DIR__.'/_tmp/') as $file) {
             $file = __DIR__.'/_tmp/'.$file;
 
@@ -34,7 +38,8 @@ class GeneratedInstantiatorFactoryTest extends TestCase
     {
         $instantiator = $this->factory->create(SimpleRequest::class);
 
-        $this->assertInstanceOf(PublicPropertyInstantiator::class, $instantiator);
+        $this->assertInstanceOf(InstantiatorInterface::class, $instantiator);
+        $this->assertInstanceOf('TestSimpleRequestInstantiator', $instantiator);
         $this->assertFileExists(__DIR__.'/_tmp/TestSimpleRequestInstantiator.php');
         $this->assertEquals(<<<'PHP'
 <?php

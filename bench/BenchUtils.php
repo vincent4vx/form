@@ -29,34 +29,44 @@ class BenchUtils
     private ?FormFactoryInterface $generatedFactory = null;
     private ?SfFormFactory $symfonyFactory = null;
 
+    public function runtimeFormFactory(): FormFactoryInterface
+    {
+        return DefaultFormFactory::runtime();
+    }
+
     public function runtimeForm(string $dataClass): FormInterface
     {
         if (!$this->runtimeFactory) {
-            $this->runtimeFactory = DefaultFormFactory::runtime();
+            $this->runtimeFactory = $this->runtimeFormFactory();
         }
 
         return $this->runtimeFactory->create($dataClass);
     }
 
+    public function generatedFormFactory(): FormFactoryInterface
+    {
+        $savePathResolver = Functions::savePathResolver(self::GENERATED_DIR);
+        $registry = new DefaultRegistry();
+
+        return new DefaultFormFactory(
+            new GeneratedInstantiatorFactory(savePathResolver: $savePathResolver),
+            new GeneratedValidatorFactory(
+                factory: new RuntimeValidatorFactory($registry),
+                generator: new ValidatorGenerator($registry),
+                registry: $registry,
+                savePathResolver: $savePathResolver,
+            ),
+            new GeneratedFormTransformerFactory(
+                registry: $registry,
+                savePathResolver: $savePathResolver
+            )
+        );
+    }
+
     public function generatedForm(string $dataClass): FormInterface
     {
         if (!$this->generatedFactory) {
-            $savePathResolver = Functions::savePathResolver(self::GENERATED_DIR);
-            $registry = new DefaultRegistry();
-
-            $this->generatedFactory = new DefaultFormFactory(
-                new GeneratedInstantiatorFactory(savePathResolver: $savePathResolver),
-                new GeneratedValidatorFactory(
-                    factory: new RuntimeValidatorFactory($registry),
-                    generator: new ValidatorGenerator($registry),
-                    registry: $registry,
-                    savePathResolver: $savePathResolver,
-                ),
-                new GeneratedFormTransformerFactory(
-                    registry: $registry,
-                    savePathResolver: $savePathResolver
-                )
-            );
+            $this->generatedFactory = $this->generatedFormFactory();
         }
 
         return $this->generatedFactory->create($dataClass);

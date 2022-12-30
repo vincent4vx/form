@@ -38,5 +38,7 @@ class DefaultFormFactoryTest extends TestCase
 
         $this->assertInstanceOf(Form::class, $form);
         $this->assertInstanceOf(SimpleRequest::class, $form->submit([])->value());
+
+        $this->assertSame($form, $factory->create(SimpleRequest::class));
     }
 }

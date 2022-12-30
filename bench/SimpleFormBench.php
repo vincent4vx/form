@@ -2,6 +2,7 @@
 
 namespace Bench;
 
+use Bench\Fixtures\AggregatedForm;
 use Bench\Fixtures\SimpleForm;
 use Bench\Fixtures\SimpleFormSymfony;
 use Bench\Fixtures\SimpleFormVanilla;
@@ -30,10 +31,40 @@ class SimpleFormBench extends BenchUtils
         assert($submitted->value()->age === 42);
     }
 
+    #[Groups(['valid', 'runtime-no-cache'])]
+    public function benchRuntimeNoCacheValid()
+    {
+        $form = $this->runtimeFormFactory()->create(SimpleForm::class);
+        $submitted = $form->submit(['first_name' => 'John', 'last_name' => 'Doe', 'age' => '42']);
+
+        if (!$submitted->valid()) {
+            throw new \RuntimeException();
+        }
+
+        assert($submitted->value()->firstName === 'John');
+        assert($submitted->value()->lastName === 'Doe');
+        assert($submitted->value()->age === 42);
+    }
+
     #[Groups(['valid', 'generated'])]
     public function benchGeneratedValid()
     {
         $form = $this->generatedForm(SimpleForm::class);
+        $submitted = $form->submit(['first_name' => 'John', 'last_name' => 'Doe', 'age' => '42']);
+
+        if (!$submitted->valid()) {
+            throw new \RuntimeException();
+        }
+
+        assert($submitted->value()->firstName === 'John');
+        assert($submitted->value()->lastName === 'Doe');
+        assert($submitted->value()->age === 42);
+    }
+
+    #[Groups(['valid', 'generated-no-cache'])]
+    public function benchGeneratedNoCacheValid()
+    {
+        $form = $this->generatedFormFactory()->create(SimpleForm::class);
         $submitted = $form->submit(['first_name' => 'John', 'last_name' => 'Doe', 'age' => '42']);
 
         if (!$submitted->valid()) {
@@ -89,10 +120,34 @@ class SimpleFormBench extends BenchUtils
         assert(!isset($submitted->errors()['age']));
     }
 
+    #[Groups(['invalid', 'runtime-no-cache'])]
+    public function benchRuntimeNoCacheInvalid()
+    {
+        $form = $this->runtimeFormFactory()->create(SimpleForm::class);
+        $submitted = $form->submit(['first_name' => 'a', 'last_name' => 'b']);
+
+        assert(!$submitted->valid());
+        assert(isset($submitted->errors()['firstName']));
+        assert(isset($submitted->errors()['lastName']));
+        assert(!isset($submitted->errors()['age']));
+    }
+
     #[Groups(['invalid', 'generated'])]
     public function benchGeneratedInvalid()
     {
         $form = $this->generatedForm(SimpleForm::class);
+        $submitted = $form->submit(['first_name' => 'a', 'last_name' => 'b']);
+
+        assert(!$submitted->valid());
+        assert(isset($submitted->errors()['firstName']));
+        assert(isset($submitted->errors()['lastName']));
+        assert(!isset($submitted->errors()['age']));
+    }
+
+    #[Groups(['invalid', 'generated-no-cache'])]
+    public function benchGeneratedNoCacheInvalid()
+    {
+        $form = $this->generatedFormFactory()->create(SimpleForm::class);
         $submitted = $form->submit(['first_name' => 'a', 'last_name' => 'b']);
 
         assert(!$submitted->valid());

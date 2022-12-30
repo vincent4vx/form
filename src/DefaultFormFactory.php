@@ -16,6 +16,11 @@ use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
  */
 final class DefaultFormFactory implements FormFactoryInterface
 {
+    /**
+     * @var array<class-string, FormInterface>
+     */
+    private array $cache = [];
+
     public function __construct(
         private readonly InstantiatorFactoryInterface $instantiatorFactory,
         private readonly ValidatorFactoryInterface $validatorFactory,
@@ -28,7 +33,7 @@ final class DefaultFormFactory implements FormFactoryInterface
      */
     public function create(string $dataClass): FormInterface
     {
-        return new Form(
+        return $this->cache[$dataClass] ??= new Form(
             $this->transformerFactory->create($dataClass),
             $this->instantiatorFactory->create($dataClass),
             $this->validatorFactory->create($dataClass),
