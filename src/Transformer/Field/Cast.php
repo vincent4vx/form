@@ -5,7 +5,6 @@ namespace Quatrevieux\Form\Transformer\Field;
 use Attribute;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
-use Quatrevieux\Form\Util\Code;
 
 /**
  * Cast HTTP value to target type
@@ -15,7 +14,7 @@ use Quatrevieux\Form\Util\Code;
  * - if the value cannot be cast, `null` will be returned
  * - in case of numeric type, invalid string will return 0 (or 0.0 on float)
  *
- * Transformation to HTTP value will simply cast non-scalar types to array, and let untransformed any other values
+ * Transformation to HTTP value will simply assume the value is already a normalized value
  *
  * @see CastType List of available types
  *
@@ -39,20 +38,10 @@ final class Cast implements FieldTransformerInterface, FieldTransformerGenerator
 
     /**
      * {@inheritdoc}
-     *
-     * @return scalar|null|mixed[]
      */
-    public function transformToHttp(mixed $value): string|array|bool|int|null|float
+    public function transformToHttp(mixed $value): mixed
     {
-        if ($value === null) {
-            return null;
-        }
-
-        if (is_scalar($value)) {
-            return $value;
-        }
-
-        return (array) $value;
+        return $value;
     }
 
     /**
@@ -68,8 +57,7 @@ final class Cast implements FieldTransformerInterface, FieldTransformerGenerator
      */
     public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $expressionVarName = Code::varName($previousExpression);
-        return "(($expressionVarName = $previousExpression) === null || is_scalar($expressionVarName) ? $expressionVarName : (array) $expressionVarName)";
+        return $previousExpression;
     }
 
     /**

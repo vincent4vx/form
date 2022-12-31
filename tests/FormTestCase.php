@@ -28,30 +28,37 @@ class FormTestCase extends TestCase
     protected FormFactoryInterface $generatedFormFactory;
     protected ArrayContainer $container;
     protected ArrayTranslator $translator;
+    protected ContainerRegistry $registry;
 
     protected function setUp(): void
     {
         $this->translator = new ArrayTranslator();
         $this->container = new ArrayContainer();
-        $registry = new ContainerRegistry($this->container);
+        $this->registry = new ContainerRegistry($this->container);
 
-        $this->runtimeFormFactory = DefaultFormFactory::runtime($registry);
+        $this->runtimeFormFactory = DefaultFormFactory::runtime($this->registry);
 
         $savePathResolver = Functions::savePathResolver(self::GENERATED_DIR);
 
+        $generatedFormRegistry = new ContainerRegistry($this->container);
+
         $this->generatedFormFactory = new DefaultFormFactory(
-            new GeneratedInstantiatorFactory(savePathResolver: $savePathResolver),
-            new GeneratedValidatorFactory(
-                factory: new RuntimeValidatorFactory($registry),
-                generator: new ValidatorGenerator($registry),
-                registry: $registry,
+            $generatedInstantiatorFactory = new GeneratedInstantiatorFactory(savePathResolver: $savePathResolver),
+            $generatedValidatorFactory = new GeneratedValidatorFactory(
+                factory: new RuntimeValidatorFactory($generatedFormRegistry),
+                generator: new ValidatorGenerator($generatedFormRegistry),
+                registry: $generatedFormRegistry,
                 savePathResolver: $savePathResolver,
             ),
-            new GeneratedFormTransformerFactory(
-                registry: $registry,
+            $generatedFormTransformerFactory = new GeneratedFormTransformerFactory(
+                registry: $generatedFormRegistry,
                 savePathResolver: $savePathResolver
             )
         );
+
+        $generatedFormRegistry->setInstantiatorFactory($generatedInstantiatorFactory);
+        $generatedFormRegistry->setValidatorFactory($generatedValidatorFactory);
+        $generatedFormRegistry->setTransformerFactory($generatedFormTransformerFactory);
     }
 
     protected function tearDown(): void
@@ -126,6 +133,13 @@ class FormTestCase extends TestCase
 
     public function assertErrors(array $expected, array $actual)
     {
+        [$normalizedExpected, $normalizedActual] = $this->normalizeErrors($expected, $actual);
+
+        $this->assertEquals($normalizedExpected, $normalizedActual);
+    }
+
+    private function normalizeErrors(array $expected, array $actual): array
+    {
         $normalizedActual = $actual;
         $normalizedExpected = $expected;
 
@@ -138,22 +152,25 @@ class FormTestCase extends TestCase
 
             if (is_string($value)) {
                 $normalizedActual[$key] = (string) $actualValue;
+            } elseif (is_array($value)) {
+                [
+                    $normalizedExpected[$key],
+                    $normalizedActual[$key]
+                ] = $this->normalizeErrors($value, $actualValue);
             } else {
                 $normalizedExpected[$key] = $value->withTranslator((new \ReflectionProperty(FieldError::class, 'translator'))->getValue($actualValue));
             }
         }
 
-        $this->assertEquals($normalizedExpected, $normalizedActual);
+        return [$normalizedExpected, $normalizedActual];
     }
 
     public function assertGeneratedValidator(string $expected, ConstraintInterface $constraint)
     {
-        $registry = new ContainerRegistry($this->container);
-
         if ($constraint instanceof ConstraintValidatorGeneratorInterface) {
-            $this->assertEquals($expected, $constraint->generate($constraint, new ValidatorGenerator($registry))->generate('($data->foo ?? null)'));
+            $this->assertEquals($expected, $constraint->generate($constraint, new ValidatorGenerator($this->registry))->generate('($data->foo ?? null)'));
         } else {
-            $this->assertEquals($expected, $constraint->getValidator($registry)->generate($constraint, new ValidatorGenerator($registry))->generate('($data->foo ?? null)'));
+            $this->assertEquals($expected, $constraint->getValidator($this->registry)->generate($constraint, new ValidatorGenerator($this->registry))->generate('($data->foo ?? null)'));
         }
     }
 

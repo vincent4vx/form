@@ -180,8 +180,8 @@ class TestingTransformerWithTransformers implements Quatrevieux\Form\Transformer
     function transformToHttp(array $value): array
     {
         return [
-            'f_o_o' => (is_array($__tmp_b43d73a92f49a16c5c6761c9e0e4ee72 = (($__tmp_8f4ee22287b10f019cf66bcea64b29b1 = $value['foo'] ?? null) === null || is_scalar($__tmp_8f4ee22287b10f019cf66bcea64b29b1) ? $__tmp_8f4ee22287b10f019cf66bcea64b29b1 : (array) $__tmp_8f4ee22287b10f019cf66bcea64b29b1)) ? implode(',', $__tmp_b43d73a92f49a16c5c6761c9e0e4ee72) : null),
-            'b_a_r' => (($__tmp_18be4920f0fd7449d8f97cd9dcd226d5 = $value['bar'] ?? null) === null || is_scalar($__tmp_18be4920f0fd7449d8f97cd9dcd226d5) ? $__tmp_18be4920f0fd7449d8f97cd9dcd226d5 : (array) $__tmp_18be4920f0fd7449d8f97cd9dcd226d5),
+            'f_o_o' => (is_array($__tmp_8f4ee22287b10f019cf66bcea64b29b1 = $value['foo'] ?? null) ? implode(',', $__tmp_8f4ee22287b10f019cf66bcea64b29b1) : null),
+            'b_a_r' => $value['bar'] ?? null,
         ];
     }
 

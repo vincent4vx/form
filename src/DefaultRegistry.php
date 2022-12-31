@@ -16,6 +16,8 @@ use function sprintf;
  */
 final class DefaultRegistry implements RegistryInterface
 {
+    use RegistryTrait;
+
     /**
      * @var array<class-string<ConfigurableFieldTransformerInterface>, ConfigurableFieldTransformerInterface>
      */

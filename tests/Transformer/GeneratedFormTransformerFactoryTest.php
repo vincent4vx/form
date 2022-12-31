@@ -43,8 +43,8 @@ class Quatrevieux_Form_Fixtures_SimpleRequestTransformerGeneratorTesting impleme
     function transformToHttp(array $value): array
     {
         return [
-            'foo' => (($__tmp_8f4ee22287b10f019cf66bcea64b29b1 = $value['foo'] ?? null) === null || is_scalar($__tmp_8f4ee22287b10f019cf66bcea64b29b1) ? $__tmp_8f4ee22287b10f019cf66bcea64b29b1 : (array) $__tmp_8f4ee22287b10f019cf66bcea64b29b1),
-            'bar' => (($__tmp_18be4920f0fd7449d8f97cd9dcd226d5 = $value['bar'] ?? null) === null || is_scalar($__tmp_18be4920f0fd7449d8f97cd9dcd226d5) ? $__tmp_18be4920f0fd7449d8f97cd9dcd226d5 : (array) $__tmp_18be4920f0fd7449d8f97cd9dcd226d5),
+            'foo' => $value['foo'] ?? null,
+            'bar' => $value['bar'] ?? null,
         ];
     }
 
@@ -111,7 +111,7 @@ class Quatrevieux_Form_Fixtures_WithTransformerRequestTransformerGeneratorTestin
     function transformToHttp(array $value): array
     {
         return [
-            'list' => (is_array($__tmp_25470d413f79004c3b8f72ddfdad0ef3 = (($__tmp_ccc11a38b775e3f7281e431235032257 = $value['list'] ?? null) === null || is_scalar($__tmp_ccc11a38b775e3f7281e431235032257) ? $__tmp_ccc11a38b775e3f7281e431235032257 : (array) $__tmp_ccc11a38b775e3f7281e431235032257)) ? \Quatrevieux\Form\Transformer\Field\Csv::toCsv($__tmp_25470d413f79004c3b8f72ddfdad0ef3, ',', '"') : null),
+            'list' => (is_array($__tmp_ccc11a38b775e3f7281e431235032257 = $value['list'] ?? null) ? \Quatrevieux\Form\Transformer\Field\Csv::toCsv($__tmp_ccc11a38b775e3f7281e431235032257, ',', '"') : null),
         ];
     }
 

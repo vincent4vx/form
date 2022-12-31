@@ -2,8 +2,11 @@
 
 namespace Quatrevieux\Form;
 
+use Quatrevieux\Form\Instantiator\InstantiatorFactoryInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
+use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
+use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -41,4 +44,34 @@ interface RegistryInterface
      * @return TranslatorInterface
      */
     public function getTranslator(): TranslatorInterface;
+
+    /**
+     * @internal
+     */
+    public function getInstantiatorFactory(): InstantiatorFactoryInterface;
+
+    /**
+     * @internal
+     */
+    public function getTransformerFactory(): FormTransformerFactoryInterface;
+
+    /**
+     * @internal
+     */
+    public function getValidatorFactory(): ValidatorFactoryInterface;
+
+    /**
+     * @internal
+     */
+    public function setInstantiatorFactory(InstantiatorFactoryInterface $factory): void;
+
+    /**
+     * @internal
+     */
+    public function setTransformerFactory(FormTransformerFactoryInterface $factory): void;
+
+    /**
+     * @internal
+     */
+    public function setValidatorFactory(ValidatorFactoryInterface $factory): void;
 }

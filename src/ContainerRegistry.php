@@ -3,8 +3,11 @@
 namespace Quatrevieux\Form;
 
 use Psr\Container\ContainerInterface;
+use Quatrevieux\Form\Instantiator\InstantiatorFactoryInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
+use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
+use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -12,6 +15,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class ContainerRegistry implements RegistryInterface
 {
+    use RegistryTrait;
+
     public function __construct(
         private readonly ContainerInterface $container,
     ) {

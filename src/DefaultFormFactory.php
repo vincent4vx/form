@@ -51,10 +51,10 @@ final class DefaultFormFactory implements FormFactoryInterface
     {
         $registry ??= new DefaultRegistry();
 
-        return new DefaultFormFactory(
-            new RuntimeInstantiatorFactory(),
-            new RuntimeValidatorFactory($registry),
-            new RuntimeFormTransformerFactory($registry)
-        );
+        $registry->setInstantiatorFactory($instantiatorFactory = new RuntimeInstantiatorFactory());
+        $registry->setValidatorFactory($validatorFactory = new RuntimeValidatorFactory($registry));
+        $registry->setTransformerFactory($transformerFactory = new RuntimeFormTransformerFactory($registry));
+
+        return new DefaultFormFactory($instantiatorFactory, $validatorFactory, $transformerFactory);
     }
 }

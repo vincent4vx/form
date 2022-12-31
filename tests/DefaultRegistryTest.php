@@ -3,8 +3,12 @@
 namespace Quatrevieux\Form;
 
 use PHPUnit\Framework\TestCase;
+use Quatrevieux\Form\Instantiator\InstantiatorFactoryInterface;
+use Quatrevieux\Form\Instantiator\InstantiatorInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
+use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
+use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultRegistryTest extends TestCase
@@ -56,5 +60,22 @@ class DefaultRegistryTest extends TestCase
 
         $registry->registerValidator($validator = $this->createMock(ConstraintValidatorInterface::class), 'foo');
         $this->assertSame($validator, $registry->getValidator('foo'));
+    }
+
+    public function test_get_set_modules()
+    {
+        $registry = new DefaultRegistry();
+
+        $instantiatorFactory = $this->createMock(InstantiatorFactoryInterface::class);
+        $transformerFactory = $this->createMock(FormTransformerFactoryInterface::class);
+        $validatorFactory = $this->createMock(ValidatorFactoryInterface::class);
+
+        $registry->setInstantiatorFactory($instantiatorFactory);
+        $registry->setTransformerFactory($transformerFactory);
+        $registry->setValidatorFactory($validatorFactory);
+
+        $this->assertSame($instantiatorFactory, $registry->getInstantiatorFactory());
+        $this->assertSame($transformerFactory, $registry->getTransformerFactory());
+        $this->assertSame($validatorFactory, $registry->getValidatorFactory());
     }
 }

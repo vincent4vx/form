@@ -35,7 +35,7 @@ class CastTest extends FormTestCase
         $this->assertSame(42, $form->import(CastTestRequest::create(42))->httpValue()['value']);
         $this->assertSame('42', $form->import(CastTestRequest::create('42'))->httpValue()['value']);
         $this->assertSame(null, $form->import(CastTestRequest::create(null))->httpValue()['value']);
-        $this->assertSame(['foo' => 'bar'], $form->import(CastTestRequest::create((object) ['foo' => 'bar']))->httpValue()['value']);
+        $this->assertSame(['foo' => 'bar'], $form->import(CastTestRequest::create(['foo' => 'bar']))->httpValue()['value']);
     }
 
     public function test_generateTransformFromHttp()
@@ -47,7 +47,7 @@ class CastTest extends FormTestCase
     public function test_generateTransformToHttp()
     {
         $generator = new FormTransformerGenerator(new DefaultRegistry());
-        $this->assertSame('(($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) === null || is_scalar($__tmp_4e6c78d168de10f915401b0dad567ede) ? $__tmp_4e6c78d168de10f915401b0dad567ede : (array) $__tmp_4e6c78d168de10f915401b0dad567ede)', (new Cast(CastType::Int))->generateTransformToHttp(new Cast(CastType::Int), '$data["foo"]', $generator));
+        $this->assertSame('$data["foo"]', (new Cast(CastType::Int))->generateTransformToHttp(new Cast(CastType::Int), '$data["foo"]', $generator));
     }
 }
 
