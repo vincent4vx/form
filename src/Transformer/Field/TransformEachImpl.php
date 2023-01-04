@@ -2,10 +2,13 @@
 
 namespace Quatrevieux\Form\Transformer\Field;
 
+use Exception;
 use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
+use Quatrevieux\Form\Transformer\TransformerException;
 use Quatrevieux\Form\Util\Code;
+use Quatrevieux\Form\Validator\FieldError;
 
 use function array_reverse;
 
@@ -37,17 +40,31 @@ final class TransformEachImpl implements ConfigurableFieldTransformerInterface, 
         }
 
         $transformers = $configuration->transformers;
+        $handleElementErrors = $configuration->handleElementsErrors;
+        $errors = [];
         $transformed = [];
 
         foreach ((array) $value as $key => $item) {
-            foreach ($transformers as $transformer) {
-                $item = $transformer instanceof DelegatedFieldTransformerInterface
-                    ? $transformer->getTransformer($this->registry)->transformFromHttp($transformer, $item)
-                    : $transformer->transformFromHttp($item)
-                ;
+            if (!$handleElementErrors) {
+                $transformed[$key] = $this->callFromHttpTransformers($transformers, $item);
+                continue;
             }
 
-            $transformed[$key] = $item;
+            try {
+                $transformed[$key] = $this->callFromHttpTransformers($transformers, $item);
+            } catch (TransformerException $e) {
+                $errors[$key] = $e->errors;
+            } catch (Exception $e) {
+                $errors[$key] = new FieldError(
+                    message: $e->getMessage(),
+                    code: TransformationError::CODE,
+                    translator: $this->registry->getTranslator()
+                );
+            }
+        }
+
+        if ($errors) {
+            throw new TransformerException('Some elements of the array are invalid', $errors);
         }
 
         return $transformed;
@@ -90,11 +107,28 @@ final class TransformEachImpl implements ConfigurableFieldTransformerInterface, 
         $varName = Code::varName($previousExpression);
         $expression = '$item';
 
-        foreach ($transformer->transformers as $transformer) {
-            $expression = $generator->generateTransformFromHttp($transformer, $expression);
+        foreach ($transformer->transformers as $elementTransformer) {
+            $expression = $generator->generateTransformFromHttp($elementTransformer, $expression);
         }
 
-        return "({$varName} = {$previousExpression}) === null ? null : \array_map(fn (\$item) => {$expression}, (array) {$varName})";
+        if (!$transformer->handleElementsErrors) {
+            return "({$varName} = {$previousExpression}) === null ? null : \array_map(fn (\$item) => {$expression}, (array) {$varName})";
+        }
+
+        $transformerException = '\\' . TransformerException::class;
+        $fieldErrorFromException = Code::new('FieldError', [
+            Code::raw('$e->getMessage()'),
+            [],
+            TransformationError::CODE,
+            Code::raw('$translator'),
+        ]);
+        $throwError = 'if ($errors) { throw ' . Code::new($transformerException, ['Some elements of the array are invalid', Code::raw('$errors')]) . '; }';
+
+        $expression = "try { \$transformed[\$key] = {$expression}; } catch ({$transformerException} \$e) { \$errors[\$key] = \$e->errors; } catch (\\Exception \$e) { \$errors[\$key] = {$fieldErrorFromException}; }";
+        $expression = "foreach (\$values as \$key => \$item) { {$expression} }";
+        $expression = "(function (\$values) use (\$translator) { \$errors = []; \$transformed = []; {$expression} {$throwError} return \$transformed; })";
+
+        return "({$varName} = {$previousExpression}) === null ? null : {$expression}((array) {$varName})";
     }
 
     /**
@@ -110,5 +144,25 @@ final class TransformEachImpl implements ConfigurableFieldTransformerInterface, 
         }
 
         return "({$varName} = {$previousExpression}) === null ? null : \array_map(fn (\$item) => {$expression}, (array) {$varName})";
+    }
+
+    /**
+     * Call all transformers on the given value
+     *
+     * @param list<FieldTransformerInterface|DelegatedFieldTransformerInterface> $transformers
+     * @param mixed $value Base item value
+     *
+     * @return mixed Transformed value
+     */
+    private function callFromHttpTransformers(array $transformers, mixed $value): mixed
+    {
+        foreach ($transformers as $transformer) {
+            $value = $transformer instanceof DelegatedFieldTransformerInterface
+                ? $transformer->getTransformer($this->registry)->transformFromHttp($transformer, $value)
+                : $transformer->transformFromHttp($value)
+            ;
+        }
+
+        return $value;
     }
 }

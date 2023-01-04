@@ -9,8 +9,6 @@ use Quatrevieux\Form\RegistryInterface;
  * Apply transformers on each element of an array
  * If the input value is not and array, it will be transformed as an array before applying the transformers
  *
- * Note: sub-transformers errors are not handled by this transformer, so the error will be reported on the field
- *
  * Example:
  * <code>
  * class MyForm
@@ -29,7 +27,15 @@ final class TransformEach implements DelegatedFieldTransformerInterface
         /**
          * @var non-empty-list<FieldTransformerInterface|DelegatedFieldTransformerInterface>
          */
-        public readonly array $transformers
+        public readonly array $transformers,
+
+        /**
+         * If true, transformation process will continue even if a sub-transformer fails,
+         * and errors will be aggregated and reported on the field as array, for more precise error handling.
+         *
+         * @var bool
+         */
+        public readonly bool  $handleElementsErrors = false,
     ) {
     }
 

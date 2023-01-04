@@ -212,25 +212,42 @@ final class FormTransformerClass
             $errorValue = $errorHandlingConfiguration?->keepOriginalValue ? $fieldExpression : 'null';
             $errorMessage = $errorHandlingConfiguration?->message ? Code::value($errorHandlingConfiguration->message) : '$e->getMessage()';
             $errorCode = Code::value($errorHandlingConfiguration?->code ?? TransformationError::CODE);
-            $setErrorExpression = $errorHandlingConfiguration?->ignore
-                ? ''
-                : '$errors[' . $fieldNameString . '] = new FieldError(' . $errorMessage . ', [], ' . $errorCode . ', $translator);'
-            ;
 
             foreach ($expressions as $expression) {
                 $fieldExpression = $expression($fieldExpression);
             }
 
-            $code .= <<<PHP
-
+            $tryExpression = <<<PHP
             try {
                 \$transformed[{$fieldNameString}] = {$fieldExpression};
-            } catch (\Exception \$e) {
-                {$setErrorExpression}
-                \$transformed[{$fieldNameString}] = {$errorValue};
+            }
+            PHP;
+
+            if (!$errorHandlingConfiguration?->ignore && !$errorHandlingConfiguration?->hideSubErrors) {
+                $tryExpression .= <<<PHP
+                 catch (\Quatrevieux\Form\Transformer\TransformerException \$e) {
+                    \$errors[{$fieldNameString}] = \$e->errors;
+                    \$transformed[{$fieldNameString}] = {$errorValue};
+                }
+                PHP;
             }
 
-            PHP;
+            if ($errorHandlingConfiguration?->ignore) {
+                $tryExpression .= <<<PHP
+                 catch (\Exception \$e) {
+                    \$transformed[{$fieldNameString}] = {$errorValue};
+                }
+                PHP;
+            } else {
+                $tryExpression .= <<<PHP
+                 catch (\Exception \$e) {
+                    \$errors[{$fieldNameString}] = new FieldError({$errorMessage}, [], {$errorCode}, \$translator);
+                    \$transformed[{$fieldNameString}] = {$errorValue};
+                }
+                PHP;
+            }
+
+            $code .= PHP_EOL . $tryExpression . PHP_EOL;
         }
 
         return $code;

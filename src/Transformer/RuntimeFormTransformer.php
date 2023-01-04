@@ -51,7 +51,6 @@ final class RuntimeFormTransformer implements FormTransformerInterface
     {
         $normalized = [];
         $errors = [];
-        $translator = $this->registry->getTranslator();
 
         foreach ($this->fieldsTransformers as $fieldName => $transformers) {
             $httpFieldName = $this->fieldsNameMapping[$fieldName] ?? $fieldName;
@@ -64,11 +63,7 @@ final class RuntimeFormTransformer implements FormTransformerInterface
                 $errorHandlingConfigurator = $this->fieldsTransformationErrors[$fieldName] ?? null;
 
                 if (!$errorHandlingConfigurator?->ignore) {
-                    $errors[$fieldName] = new FieldError(
-                        message: $errorHandlingConfigurator?->message ?? $e->getMessage(),
-                        code: $errorHandlingConfigurator?->code ?? TransformationError::CODE,
-                        translator: $translator,
-                    );
+                    $errors[$fieldName] = $this->toFieldErrors($e, $errorHandlingConfigurator);
                 }
 
                 $normalized[$fieldName] = $errorHandlingConfigurator?->keepOriginalValue ? $originalValue : null;
@@ -150,5 +145,18 @@ final class RuntimeFormTransformer implements FormTransformerInterface
         }
 
         return $fieldValue;
+    }
+
+    private function toFieldErrors(Exception $exception, ?TransformationError $errorHandlingConfigurator): FieldError|array
+    {
+        if ($exception instanceof TransformerException && !$errorHandlingConfigurator?->hideSubErrors) {
+            return $exception->errors;
+        }
+
+        return new FieldError(
+            message: $errorHandlingConfigurator?->message ?? $exception->getMessage(),
+            code: $errorHandlingConfigurator?->code ?? TransformationError::CODE,
+            translator: $this->registry->getTranslator(),
+        );
     }
 }

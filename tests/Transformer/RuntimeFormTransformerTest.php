@@ -69,6 +69,36 @@ class RuntimeFormTransformerTest extends FormTestCase
         $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my transformation error', code: TransformationError::CODE, translator: DummyTranslator::instance())]), $transformer->transformFromHttp(['foo' => 'bar']));
     }
 
+    public function test_with_transformation_exception()
+    {
+        $transformer = new RuntimeFormTransformer(
+            new DefaultRegistry(),
+            [
+                'foo' => [new FailingTransformer(true)],
+            ],
+            [],
+            []
+        );
+
+        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => ['foo' => new FieldError('my sub error', code: '67f20e07-9dc2-4aa0-8521-f4fb08ad23ad')]]), $transformer->transformFromHttp(['foo' => 'bar']));
+    }
+
+    public function test_with_transformation_exception_hidden()
+    {
+        $transformer = new RuntimeFormTransformer(
+            new DefaultRegistry(),
+            [
+                'foo' => [new FailingTransformer(true)],
+            ],
+            [],
+            [
+                'foo' => new TransformationError(hideSubErrors: true),
+            ]
+        );
+
+        $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my sub error', code: TransformationError::CODE, translator: DummyTranslator::instance())]), $transformer->transformFromHttp(['foo' => 'bar']));
+    }
+
     public function test_with_transformation_error_translated()
     {
         $this->configureTranslator('fr', [
@@ -119,12 +149,16 @@ class RuntimeFormTransformerTest extends FormTestCase
         $this->assertEquals(new TransformationResult(['foo' => null], ['foo' => new FieldError('my transformation error', code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6', translator: DummyTranslator::instance())]), $transformer->transformFromHttp(['foo' => 'bar']));
     }
 
-    public function test_with_transformation_error_ignored()
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_with_transformation_error_ignored(bool $subErrors)
     {
         $transformer = new RuntimeFormTransformer(
             new DefaultRegistry(),
             [
-                'foo' => [new FailingTransformer()],
+                'foo' => [new FailingTransformer($subErrors)],
             ],
             [],
             [
@@ -151,12 +185,32 @@ class RuntimeFormTransformerTest extends FormTestCase
         $this->assertEquals(new TransformationResult(['foo' => 'bar'], ['foo' => new FieldError('my transformation error', code: TransformationError::CODE, translator: DummyTranslator::instance())]), $transformer->transformFromHttp(['foo' => 'bar']));
     }
 
-    public function test_with_transformation_error_ignored_and_keep_original_value()
+    public function test_with_transformation_exception_keep_original_value()
     {
         $transformer = new RuntimeFormTransformer(
             new DefaultRegistry(),
             [
-                'foo' => [new FailingTransformer()],
+                'foo' => [new FailingTransformer(true)],
+            ],
+            [],
+            [
+                'foo' => new TransformationError(keepOriginalValue: true),
+            ]
+        );
+
+        $this->assertEquals(new TransformationResult(['foo' => 'bar'], ['foo' => ['foo' => new FieldError('my sub error', code: '67f20e07-9dc2-4aa0-8521-f4fb08ad23ad')]]), $transformer->transformFromHttp(['foo' => 'bar']));
+    }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_with_transformation_error_ignored_and_keep_original_value(bool $subErrors)
+    {
+        $transformer = new RuntimeFormTransformer(
+            new DefaultRegistry(),
+            [
+                'foo' => [new FailingTransformer($subErrors)],
             ],
             [],
             [
@@ -243,9 +297,16 @@ class MyDelegatedTransformerImpl implements ConfigurableFieldTransformerInterfac
 
 class FailingTransformer implements FieldTransformerInterface
 {
+    public function __construct(public readonly bool $subError = false)
+    {
+    }
+
     public function transformFromHttp(mixed $value): mixed
     {
-        throw new Exception('my transformation error');
+        $this->subError
+            ? throw new TransformerException('my sub error', ['foo' => new FieldError('my sub error', code: '67f20e07-9dc2-4aa0-8521-f4fb08ad23ad')])
+            : throw new Exception('my transformation error')
+        ;
     }
 
     public function transformToHttp(mixed $value): mixed

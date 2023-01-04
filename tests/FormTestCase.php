@@ -153,10 +153,9 @@ class FormTestCase extends TestCase
             if (is_string($value)) {
                 $normalizedActual[$key] = (string) $actualValue;
             } elseif (is_array($value)) {
-                [
-                    $normalizedExpected[$key],
-                    $normalizedActual[$key]
-                ] = $this->normalizeErrors($value, $actualValue);
+                if (is_array($actualValue)) {
+                    [$normalizedExpected[$key], $normalizedActual[$key]] = $this->normalizeErrors($value, $actualValue);
+                }
             } else {
                 $normalizedExpected[$key] = $value->withTranslator((new \ReflectionProperty(FieldError::class, 'translator'))->getValue($actualValue));
             }

@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\Transformer\Field;
 
 use Attribute;
 use Quatrevieux\Form\Transformer\TransformationResult;
+use Quatrevieux\Form\Transformer\TransformerException;
 
 /**
  * Configure error handling of transformation error
@@ -41,6 +42,14 @@ final class TransformationError
          * @var string
          */
         public readonly string $code = self::CODE,
+
+        /**
+         * If true, transformation errors raised using {@see TransformerException} will be hidden,
+         * and a generic error will be displayed instead.
+         *
+         * @var bool
+         */
+        public readonly bool $hideSubErrors = false,
     ) {
     }
 }
