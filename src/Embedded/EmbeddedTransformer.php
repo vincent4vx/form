@@ -8,6 +8,7 @@ use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
+use Quatrevieux\Form\Transformer\TransformerException;
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 
@@ -42,7 +43,10 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
 
         $transformationResult = $transformer->transformFromHttp($value);
 
-        // @todo handle errors
+        if ($transformationResult->errors) {
+            throw new TransformerException('Embedded form has errors', $transformationResult->errors);
+        }
+
         return $instantiator->instantiate($transformationResult->values);
     }
 
@@ -71,9 +75,11 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
         $varName = Code::varName($previousExpression);
         $instantiator = Call::object('$this->registry->getInstantiatorFactory()')->create($transformer->class);
         $transformer = Call::object('$this->registry->getTransformerFactory()')->create($transformer->class);
+        $transformationResult = Call::object($transformer)->transformFromHttp(Code::raw($varName));
+        $transformationResultVarName = Code::varName($transformationResult);
+        $transformerException = Code::new(TransformerException::class, ['Embedded form has errors', Code::raw($transformationResultVarName . '->errors')]);
 
-        // @todo handle transformation errors
-        return "is_array({$varName} = {$previousExpression}) ? {$instantiator}->instantiate({$transformer}->transformFromHttp($varName)->values) : null";
+        return "is_array({$varName} = {$previousExpression}) ? {$instantiator}->instantiate(({$transformationResultVarName} = {$transformationResult})->errors ? throw {$transformerException} : {$transformationResultVarName}->values) : null";
     }
 
     /**

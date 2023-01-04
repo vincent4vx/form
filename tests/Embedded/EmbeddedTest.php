@@ -6,6 +6,8 @@ use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Transformer\Field\ArrayCast;
 use Quatrevieux\Form\Transformer\Field\CastType;
 use Quatrevieux\Form\Transformer\Field\Csv;
+use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
+use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Validator\Constraint\Length;
 
@@ -90,6 +92,52 @@ class EmbeddedTest extends FormTestCase
                 'bar' => '6,6,6',
             ],
         ], $form->import($data)->httpValue());
+    }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_functional_transformation_with_error(bool $generated)
+    {
+        $form = $generated ? $this->generatedForm(FormWithFailableEmbedded::class) : $this->runtimeForm(FormWithFailableEmbedded::class);
+
+        $submitted = $form->submit([
+            'name' => 'foo',
+            'embedded' => [
+                'data' => 'invalid',
+            ],
+            'hideErrors' => [
+                'data' => 'invalid',
+            ],
+        ]);
+
+        $this->assertFalse($submitted->valid());
+        $this->assertErrors([
+            'embedded' => ['data' => 'Syntax error'],
+            'hideErrors' => 'Embedded form has errors',
+        ], $submitted->errors());
+
+        $this->configureTranslator('fr', [
+            'Syntax error' => 'Erreur de syntaxe',
+            'Embedded form has errors' => 'Le formulaire embarqué contient des erreurs',
+        ]);
+
+        $submitted = $form->submit([
+            'name' => 'foo',
+            'embedded' => [
+                'data' => 'invalid',
+            ],
+            'hideErrors' => [
+                'data' => 'invalid',
+            ],
+        ]);
+
+        $this->assertFalse($submitted->valid());
+        $this->assertErrors([
+            'embedded' => ['data' => 'Erreur de syntaxe'],
+            'hideErrors' => 'Le formulaire embarqué contient des erreurs',
+        ], $submitted->errors());
     }
 
     /**
@@ -239,7 +287,7 @@ class EmbeddedTest extends FormTestCase
     public function test_generate_from_http()
     {
         $transformer = new Embedded(EmbeddedForm::class);
-        $this->assertSame('is_array($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? $this->registry->getInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->instantiate($this->registry->getTransformerFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->transformFromHttp($__tmp_4e6c78d168de10f915401b0dad567ede)->values) : null', $transformer->getTransformer($this->registry)->generateTransformFromHttp($transformer, '$data["foo"]', new FormTransformerGenerator($this->registry)));
+        $this->assertSame('is_array($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? $this->registry->getInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->instantiate(($__tmp_8e69f24495b190aeee9b13db3b08f883 = $this->registry->getTransformerFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->transformFromHttp($__tmp_4e6c78d168de10f915401b0dad567ede))->errors ? throw new \Quatrevieux\Form\Transformer\TransformerException(\'Embedded form has errors\', $__tmp_8e69f24495b190aeee9b13db3b08f883->errors) : $__tmp_8e69f24495b190aeee9b13db3b08f883->values) : null', $transformer->getTransformer($this->registry)->generateTransformFromHttp($transformer, '$data["foo"]', new FormTransformerGenerator($this->registry)));
     }
 
     public function test_generate_to_http()
@@ -276,4 +324,40 @@ class RecursiveForm
 
     #[Embedded(RecursiveForm::class)]
     public ?RecursiveForm $child;
+}
+
+class FormWithFailableEmbedded
+{
+    public string $name;
+    #[Embedded(FailableEmbedded::class)]
+    public FailableEmbedded $embedded;
+
+    #[TransformationError(hideSubErrors: true)]
+    #[Embedded(FailableEmbedded::class)]
+    public ?FailableEmbedded $hideErrors;
+}
+
+class FailableEmbedded
+{
+    #[JsonTransformer]
+    public $data;
+}
+
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
+class JsonTransformer implements FieldTransformerInterface
+{
+    public function transformFromHttp(mixed $value): mixed
+    {
+        return $value ? json_decode($value, true, flags: JSON_THROW_ON_ERROR) : null;
+    }
+
+    public function transformToHttp(mixed $value): mixed
+    {
+        return $value === null ? null : json_encode($value);
+    }
+
+    public function canThrowError(): bool
+    {
+        return true;
+    }
 }
