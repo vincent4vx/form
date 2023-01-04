@@ -147,6 +147,13 @@ final class RuntimeFormTransformer implements FormTransformerInterface
         return $fieldValue;
     }
 
+    /**
+     * Transform an exception into a FieldError or array of FieldError
+     *
+     * @param Exception $exception Caught exception
+     * @param TransformationError|null $errorHandlingConfigurator Error handling configuration
+     * @return FieldError|array<string, FieldError|mixed[]>
+     */
     private function toFieldErrors(Exception $exception, ?TransformationError $errorHandlingConfigurator): FieldError|array
     {
         if ($exception instanceof TransformerException && !$errorHandlingConfigurator?->hideSubErrors) {
