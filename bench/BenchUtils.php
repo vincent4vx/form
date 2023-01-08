@@ -47,17 +47,22 @@ class BenchUtils
     {
         $savePathResolver = Functions::savePathResolver(self::GENERATED_DIR);
         $registry = new DefaultRegistry();
+        $registry->setInstantiatorFactory($instantiatorFactory = new GeneratedInstantiatorFactory(
+            savePathResolver: $savePathResolver
+        ));
+        $registry->setTransformerFactory($formTransformerFactory = new GeneratedFormTransformerFactory(
+            registry: $registry,
+            savePathResolver: $savePathResolver,
+        ));
+        $registry->setValidatorFactory($validatorFactory = new GeneratedValidatorFactory(
+            registry: $registry,
+            savePathResolver: $savePathResolver,
+        ));
 
         return new DefaultFormFactory(
-            new GeneratedInstantiatorFactory(savePathResolver: $savePathResolver),
-            new GeneratedValidatorFactory(
-                registry: $registry,
-                savePathResolver: $savePathResolver,
-            ),
-            new GeneratedFormTransformerFactory(
-                registry: $registry,
-                savePathResolver: $savePathResolver
-            )
+            instantiatorFactory: $instantiatorFactory,
+            validatorFactory: $validatorFactory,
+            transformerFactory: $formTransformerFactory,
         );
     }
 
