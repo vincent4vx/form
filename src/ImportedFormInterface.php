@@ -2,6 +2,8 @@
 
 namespace Quatrevieux\Form;
 
+use Quatrevieux\Form\View\FormView;
+
 /**
  * @template T as object
  */
@@ -20,4 +22,6 @@ interface ImportedFormInterface
      * @return array<string, mixed>
      */
     public function httpValue(): array;
+
+    public function view(): FormView; // @todo extends FormInterface
 }

@@ -10,6 +10,8 @@ use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Validator\Constraint\Length;
+use Quatrevieux\Form\View\FieldView;
+use Quatrevieux\Form\View\FormView;
 
 class EmbeddedTest extends FormTestCase
 {
@@ -92,6 +94,142 @@ class EmbeddedTest extends FormTestCase
                 'bar' => '6,6,6',
             ],
         ], $form->import($data)->httpValue());
+    }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_functional_view(bool $generated)
+    {
+        $form = $generated ? $this->generatedForm(BaseForm::class) : $this->runtimeForm(BaseForm::class);
+
+        $view = $form->view();
+
+        $this->assertEquals([
+            'name' => new FieldView('name', null, null),
+            'value' => new FieldView('value', null, null),
+            'embedded' => new FormView([
+                'foo' => new FieldView('embedded[foo]', null, null),
+                'bar' => new FieldView('embedded[bar]', null, null),
+            ], []),
+            'optionalEmbedded' => new FormView([
+                'foo' => new FieldView('optionalEmbedded[foo]', null, null),
+                'bar' => new FieldView('optionalEmbedded[bar]', null, null),
+            ], []),
+        ], $view->fields);
+        $this->assertSame([], $view->value);
+
+        $view = $form->submit([
+            'name' => 'foo',
+            'value' => '42',
+            'embedded' => [
+                'foo' => 'azer',
+                'bar' => '4,2,6',
+            ],
+        ])->view();
+
+        $this->assertEquals([
+            'name' => new FieldView('name', 'foo', null),
+            'value' => new FieldView('value', '42', null),
+            'embedded' => new FormView([
+                'foo' => new FieldView('embedded[foo]', 'azer', null),
+                'bar' => new FieldView('embedded[bar]', '4,2,6', null),
+            ], [
+                'foo' => 'azer',
+                'bar' => '4,2,6',
+            ]),
+            'optionalEmbedded' => new FormView([
+                'foo' => new FieldView('optionalEmbedded[foo]', null, null),
+                'bar' => new FieldView('optionalEmbedded[bar]', null, null),
+            ], []),
+        ], $view->fields);
+        $this->assertSame([
+            'name' => 'foo',
+            'value' => '42',
+            'embedded' => [
+                'foo' => 'azer',
+                'bar' => '4,2,6',
+            ],
+        ], $view->value);
+
+        $view = $form->submit([
+            'name' => 'foo',
+            'value' => '42',
+            'embedded' => [
+                'foo' => 'azer',
+                'bar' => '4,2,6',
+            ],
+            'optionalEmbedded' => [
+                'foo' => 'aqw',
+                'bar' => '7,4,1',
+            ],
+        ])->view();
+
+        $this->assertEquals([
+            'name' => new FieldView('name', 'foo', null),
+            'value' => new FieldView('value', '42', null),
+            'embedded' => new FormView([
+                'foo' => new FieldView('embedded[foo]', 'azer', null),
+                'bar' => new FieldView('embedded[bar]', '4,2,6', null),
+            ], [
+                'foo' => 'azer',
+                'bar' => '4,2,6',
+            ]),
+            'optionalEmbedded' => new FormView([
+                'foo' => new FieldView('optionalEmbedded[foo]', 'aqw', null),
+                'bar' => new FieldView('optionalEmbedded[bar]', '7,4,1', null),
+            ], [
+                'foo' => 'aqw',
+                'bar' => '7,4,1',
+            ]),
+        ], $view->fields);
+        $this->assertSame([
+            'name' => 'foo',
+            'value' => '42',
+            'embedded' => [
+                'foo' => 'azer',
+                'bar' => '4,2,6',
+            ],
+            'optionalEmbedded' => [
+                'foo' => 'aqw',
+                'bar' => '7,4,1',
+            ],
+        ], $view->value);
+
+        $data = new BaseForm();
+        $data->name = 'bar';
+        $data->value = 666;
+        $data->embedded = new EmbeddedForm();
+        $data->embedded->foo = 'qwerty';
+        $data->embedded->bar = [1, 2, 3];
+
+        $view = $form->import($data)->view();
+
+        $this->assertEquals([
+            'name' => new FieldView('name', 'bar', null),
+            'value' => new FieldView('value', 666, null),
+            'embedded' => new FormView([
+                'foo' => new FieldView('embedded[foo]', 'qwerty', null),
+                'bar' => new FieldView('embedded[bar]', '1,2,3', null),
+            ], [
+                'foo' => 'qwerty',
+                'bar' => '1,2,3',
+            ]),
+            'optionalEmbedded' => new FormView([
+                'foo' => new FieldView('optionalEmbedded[foo]', null, null),
+                'bar' => new FieldView('optionalEmbedded[bar]', null, null),
+            ], []),
+        ], $view->fields);
+        $this->assertSame([
+            'name' => 'bar',
+            'value' => 666,
+            'embedded' => [
+                'foo' => 'qwerty',
+                'bar' => '1,2,3',
+            ],
+            'optionalEmbedded' => null,
+        ], $view->value);
     }
 
     /**

@@ -14,6 +14,7 @@ use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 use Quatrevieux\Form\Validator\RuntimeValidatorFactory;
+use Quatrevieux\Form\View\RuntimeFormViewInstantiatorFactory;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -53,12 +54,14 @@ class FormTestCase extends TestCase
             $generatedFormTransformerFactory = new GeneratedFormTransformerFactory(
                 registry: $generatedFormRegistry,
                 savePathResolver: $savePathResolver
-            )
+            ),
+            new RuntimeFormViewInstantiatorFactory($generatedFormRegistry),
         );
 
         $generatedFormRegistry->setInstantiatorFactory($generatedInstantiatorFactory);
         $generatedFormRegistry->setValidatorFactory($generatedValidatorFactory);
         $generatedFormRegistry->setTransformerFactory($generatedFormTransformerFactory);
+        $generatedFormRegistry->setFormViewInstantiatorFactory(new RuntimeFormViewInstantiatorFactory($generatedFormRegistry)); // @todo change this to generated
     }
 
     protected function tearDown(): void

@@ -8,6 +8,8 @@ use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Transformer\RuntimeFormTransformerFactory;
 use Quatrevieux\Form\Validator\RuntimeValidatorFactory;
 use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
+use Quatrevieux\Form\View\FormViewInstantiatorFactoryInterface;
+use Quatrevieux\Form\View\RuntimeFormViewInstantiatorFactory;
 
 /**
  * Default implementation of FormFactoryInterface
@@ -25,6 +27,7 @@ final class DefaultFormFactory implements FormFactoryInterface
         private readonly InstantiatorFactoryInterface $instantiatorFactory,
         private readonly ValidatorFactoryInterface $validatorFactory,
         private readonly FormTransformerFactoryInterface $transformerFactory,
+        private readonly FormViewInstantiatorFactoryInterface $formViewInstantiatorFactory,
     ) {
     }
 
@@ -37,6 +40,7 @@ final class DefaultFormFactory implements FormFactoryInterface
             $this->transformerFactory->create($dataClass),
             $this->instantiatorFactory->create($dataClass),
             $this->validatorFactory->create($dataClass),
+            $this->formViewInstantiatorFactory->create($dataClass),
         );
     }
 
@@ -54,7 +58,8 @@ final class DefaultFormFactory implements FormFactoryInterface
         $registry->setInstantiatorFactory($instantiatorFactory = new RuntimeInstantiatorFactory());
         $registry->setValidatorFactory($validatorFactory = new RuntimeValidatorFactory($registry));
         $registry->setTransformerFactory($transformerFactory = new RuntimeFormTransformerFactory($registry));
+        $registry->setFormViewInstantiatorFactory($viewInstantiatorFactory = new RuntimeFormViewInstantiatorFactory($registry));
 
-        return new DefaultFormFactory($instantiatorFactory, $validatorFactory, $transformerFactory);
+        return new DefaultFormFactory($instantiatorFactory, $validatorFactory, $transformerFactory, $viewInstantiatorFactory);
     }
 }

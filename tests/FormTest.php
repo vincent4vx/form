@@ -7,6 +7,7 @@ use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\Instantiator\PublicPropertyInstantiator;
 use Quatrevieux\Form\Transformer\RuntimeFormTransformer;
 use Quatrevieux\Form\Validator\RuntimeValidator;
+use Quatrevieux\Form\View\RuntimeFormViewInstantiator;
 
 class FormTest extends TestCase
 {
@@ -16,6 +17,7 @@ class FormTest extends TestCase
             new RuntimeFormTransformer(new DefaultRegistry(), ['foo' => [], 'bar' => []], [], []),
             new PublicPropertyInstantiator(SimpleRequest::class),
             new RuntimeValidator(new DefaultRegistry(), []),
+            new RuntimeFormViewInstantiator(new DefaultRegistry(), [], []),
         );
 
         $submitted = $form->submit(['foo' => 'aaa', 'bar' => 'bbb']);

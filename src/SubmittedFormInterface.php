@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form;
 
 use Quatrevieux\Form\Validator\FieldError;
+use Quatrevieux\Form\View\FormView;
 
 /**
  * @template T as object
@@ -32,4 +33,6 @@ interface SubmittedFormInterface
      * @return array<string, FieldError|mixed[]>
      */
     public function errors(): array;
+
+    public function view(): FormView; // @todo extends FormInterface
 }

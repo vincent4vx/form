@@ -5,6 +5,7 @@ namespace Quatrevieux\Form;
 use Quatrevieux\Form\Instantiator\InstantiatorFactoryInterface;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
+use Quatrevieux\Form\View\FormViewInstantiatorFactoryInterface;
 
 /**
  * Add default implementations for factories getters and setters
@@ -14,6 +15,7 @@ trait RegistryTrait
     private InstantiatorFactoryInterface $instantiatorFactory;
     private FormTransformerFactoryInterface $transformerFactory;
     private ValidatorFactoryInterface $validatorFactory;
+    private FormViewInstantiatorFactoryInterface $formViewInstantiatorFactory;
 
     /**
      * Implements {@see RegistryInterface::getInstantiatorFactory()}
@@ -61,5 +63,21 @@ trait RegistryTrait
     public function setValidatorFactory(ValidatorFactoryInterface $factory): void
     {
         $this->validatorFactory = $factory;
+    }
+
+    /**
+     * Implements {@see RegistryInterface::getFormViewInstantiatorFactory()}
+     */
+    public function getFormViewInstantiatorFactory(): FormViewInstantiatorFactoryInterface
+    {
+        return $this->formViewInstantiatorFactory;
+    }
+
+    /**
+     * Implements {@see RegistryInterface::setFormViewInstantiatorFactory()}
+     */
+    public function setFormViewInstantiatorFactory(FormViewInstantiatorFactoryInterface $factory): void
+    {
+        $this->formViewInstantiatorFactory = $factory;
     }
 }

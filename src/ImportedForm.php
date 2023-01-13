@@ -2,6 +2,9 @@
 
 namespace Quatrevieux\Form;
 
+use Quatrevieux\Form\View\FormView;
+use Quatrevieux\Form\View\FormViewInstantiatorInterface;
+
 /**
  * @template T as object
  * @implements ImportedFormInterface<T>
@@ -18,6 +21,8 @@ final class ImportedForm implements ImportedFormInterface
          * @var mixed[]
          */
         private readonly array $httpValue,
+
+        private readonly FormViewInstantiatorInterface $viewInstantiator,
     ) {
     }
 
@@ -35,5 +40,13 @@ final class ImportedForm implements ImportedFormInterface
     public function httpValue(): array
     {
         return $this->httpValue;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function view(): FormView
+    {
+        return $this->viewInstantiator->submitted($this->httpValue, []);
     }
 }

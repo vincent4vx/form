@@ -3,6 +3,8 @@
 namespace Quatrevieux\Form;
 
 use Quatrevieux\Form\Validator\FieldError;
+use Quatrevieux\Form\View\FormView;
+use Quatrevieux\Form\View\FormViewInstantiatorInterface;
 
 /**
  * @template T as object
@@ -13,6 +15,13 @@ final class SubmittedForm implements SubmittedFormInterface
 {
     public function __construct(
         /**
+         * Raw submitted HTTP data
+         *
+         * @var array<string, mixed>
+         */
+        private readonly array $httpValue,
+
+        /**
          * @var T
          */
         private readonly object $data,
@@ -20,7 +29,9 @@ final class SubmittedForm implements SubmittedFormInterface
         /**
          * @var array<string, FieldError|mixed[]>
          */
-        private readonly array $errors
+        private readonly array $errors,
+
+        private readonly FormViewInstantiatorInterface $viewInstantiator,
     ) {
     }
 
@@ -46,5 +57,13 @@ final class SubmittedForm implements SubmittedFormInterface
     public function errors(): array
     {
         return $this->errors;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function view(): FormView
+    {
+        return $this->viewInstantiator->submitted($this->httpValue, $this->errors);
     }
 }

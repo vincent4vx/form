@@ -9,6 +9,7 @@ use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
 use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
+use Quatrevieux\Form\View\FormViewInstantiatorFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultRegistryTest extends TestCase
@@ -69,13 +70,16 @@ class DefaultRegistryTest extends TestCase
         $instantiatorFactory = $this->createMock(InstantiatorFactoryInterface::class);
         $transformerFactory = $this->createMock(FormTransformerFactoryInterface::class);
         $validatorFactory = $this->createMock(ValidatorFactoryInterface::class);
+        $viewInstantiatorFactory = $this->createMock(FormViewInstantiatorFactoryInterface::class);
 
         $registry->setInstantiatorFactory($instantiatorFactory);
         $registry->setTransformerFactory($transformerFactory);
         $registry->setValidatorFactory($validatorFactory);
+        $registry->setFormViewInstantiatorFactory($viewInstantiatorFactory);
 
         $this->assertSame($instantiatorFactory, $registry->getInstantiatorFactory());
         $this->assertSame($transformerFactory, $registry->getTransformerFactory());
         $this->assertSame($validatorFactory, $registry->getValidatorFactory());
+        $this->assertSame($viewInstantiatorFactory, $registry->getFormViewInstantiatorFactory());
     }
 }

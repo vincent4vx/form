@@ -13,7 +13,10 @@ use Quatrevieux\Form\Fixtures\WithExternalDependencyTransformerRequest;
 use Quatrevieux\Form\Fixtures\WithFieldNameMapping;
 use Quatrevieux\Form\Fixtures\WithTransformerRequest;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
+use Quatrevieux\Form\Validator\Constraint\Length;
+use Quatrevieux\Form\Validator\Constraint\Required;
 use Quatrevieux\Form\Validator\FieldError;
+use Quatrevieux\Form\View\FieldView;
 
 class FunctionalTest extends FormTestCase
 {
@@ -213,6 +216,82 @@ class FunctionalTest extends FormTestCase
         $this->assertErrors(['foo' => 'Erreur de syntaxe'], $form->submit(['foo' => 'foo'])->errors());
         $this->assertErrors(['foo' => 'Objet JSON invalide'], $form->submit(['foo' => '123'])->errors());
         $this->assertErrors(['customTransformerErrorHandling' => 'données invalides'], $form->submit(['foo' => '{"foo":"bar"}', 'customTransformerErrorHandling' => '____'])->errors());
+    }
+
+    public function test_view_simple_form()
+    {
+        $form = $this->form(SimpleRequest::class);
+        $view = $form->view();
+
+        $this->assertEquals([
+            'foo' => new FieldView('foo', null, null, []),
+            'bar' => new FieldView('bar', null, null, []),
+        ], $view->fields);
+        $this->assertSame([], $view->value);
+
+        $view = $form->submit(['foo' => 'aaa', 'bar' => 'bbb'])->view();
+
+        $this->assertEquals([
+            'foo' => new FieldView('foo', 'aaa', null, []),
+            'bar' => new FieldView('bar', 'bbb', null, []),
+        ], $view->fields);
+        $this->assertSame(['foo' => 'aaa', 'bar' => 'bbb'], $view->value);
+
+        $request = new SimpleRequest();
+        $request->foo = 'ccc';
+        $request->bar = 'ddd';
+
+        $view = $form->import($request)->view();
+
+        $this->assertEquals([
+            'foo' => new FieldView('foo', 'ccc', null, []),
+            'bar' => new FieldView('bar', 'ddd', null, []),
+        ], $view->fields);
+        $this->assertSame(['foo' => 'ccc', 'bar' => 'ddd'], $view->value);
+    }
+
+    public function test_http_field_mapping_view()
+    {
+        $form = $this->form(WithFieldNameMapping::class);
+
+        $view = $form->view();
+        $this->assertEquals([
+            'myComplexName' => new FieldView('my_complex_name', null, null, []),
+            'otherField' => new FieldView('other', null, null, []),
+        ], $view->fields);
+        $this->assertSame([], $view->value);
+
+        $view = $form->submit(['my_complex_name' => 'foo', 'other' => 123])->view();
+
+        $this->assertEquals([
+            'myComplexName' => new FieldView('my_complex_name', 'foo', null, []),
+            'otherField' => new FieldView('other', 123, null, []),
+        ], $view->fields);
+        $this->assertSame(['my_complex_name' => 'foo', 'other' => 123], $view->value);
+
+        $obj = new WithFieldNameMapping();
+        $obj->myComplexName = 'bar';
+        $obj->otherField = 456;
+
+        $view = $form->import($obj)->view();
+        $this->assertEquals([
+            'myComplexName' => new FieldView('my_complex_name', 'bar', null, []),
+            'otherField' => new FieldView('other', 456, null, []),
+        ], $view->fields);
+        $this->assertSame(['my_complex_name' => 'bar', 'other' => 456], $view->value);
+    }
+
+    public function test_view_with_constraint_error()
+    {
+        $form = $this->form(RequiredParametersRequest::class);
+
+        $view = $form->submit(['bar' => 'a'])->view();
+
+        $this->assertEquals([
+            'foo' => new FieldView('foo', null, new FieldError('This value is required', [], Required::CODE, DummyTranslator::instance()), []),
+            'bar' => new FieldView('bar', 'a', new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE, DummyTranslator::instance())),
+        ], $view->fields);
+        $this->assertSame(['bar' => 'a'], $view->value);
     }
 
     public function form(string $dataClass): FormInterface

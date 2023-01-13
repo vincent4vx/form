@@ -7,6 +7,7 @@ use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
 use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
+use Quatrevieux\Form\View\FormViewInstantiatorFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -16,6 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 interface RegistryInterface
 {
     /**
+     * @todo rename
      * Get transformer implementation for a {@see DelegatedFieldTransformerInterface}
      *
      * @param class-string<T> $className Class name of the implementation
@@ -26,6 +28,7 @@ interface RegistryInterface
     public function getTransformer(string $className): ConfigurableFieldTransformerInterface;
 
     /**
+     * @todo rename
      * Get a validator instance
      *
      * @param class-string<V> $className Validator class name
@@ -63,6 +66,11 @@ interface RegistryInterface
     /**
      * @internal
      */
+    public function getFormViewInstantiatorFactory(): FormViewInstantiatorFactoryInterface;
+
+    /**
+     * @internal
+     */
     public function setInstantiatorFactory(InstantiatorFactoryInterface $factory): void;
 
     /**
@@ -74,4 +82,9 @@ interface RegistryInterface
      * @internal
      */
     public function setValidatorFactory(ValidatorFactoryInterface $factory): void;
+
+    /**
+     * @internal
+     */
+    public function setFormViewInstantiatorFactory(FormViewInstantiatorFactoryInterface $factory): void;
 }

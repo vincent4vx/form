@@ -5,6 +5,8 @@ namespace Quatrevieux\Form;
 use Quatrevieux\Form\Instantiator\InstantiatorInterface;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Validator\ValidatorInterface;
+use Quatrevieux\Form\View\FormView;
+use Quatrevieux\Form\View\FormViewInstantiatorInterface;
 
 /**
  * Base form implementation
@@ -29,6 +31,11 @@ final class Form implements FormInterface
          * @var ValidatorInterface<T>
          */
         private readonly ValidatorInterface $validator,
+
+        /**
+         * @var FormViewInstantiatorInterface
+         */
+        private readonly FormViewInstantiatorInterface $viewInstantiator, // @todo allow null to disable view system
     ) {
     }
 
@@ -41,7 +48,7 @@ final class Form implements FormInterface
         $dto = $this->instantiator->instantiate($transformation->values);
         $errors = $this->validator->validate($dto, $transformation->errors);
 
-        return new SubmittedForm($dto, $errors);
+        return new SubmittedForm($data, $dto, $errors, $this->viewInstantiator);
     }
 
     /**
@@ -51,7 +58,16 @@ final class Form implements FormInterface
     {
         return new ImportedForm(
             $data,
-            $this->transformer->transformToHttp($this->instantiator->export($data))
+            $this->transformer->transformToHttp($this->instantiator->export($data)),
+            $this->viewInstantiator,
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function view(): FormView
+    {
+        return $this->viewInstantiator->default();
     }
 }

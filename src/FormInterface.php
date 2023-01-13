@@ -2,6 +2,8 @@
 
 namespace Quatrevieux\Form;
 
+use Quatrevieux\Form\View\FormView;
+
 /**
  * @template T as object
  */
@@ -24,4 +26,6 @@ interface FormInterface
      * @return ImportedFormInterface<T>
      */
     public function import(object $data): ImportedFormInterface;
+
+    public function view(): FormView;
 }
