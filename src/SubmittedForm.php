@@ -30,7 +30,6 @@ final class SubmittedForm implements SubmittedFormInterface
          * @var array<string, FieldError|mixed[]>
          */
         private readonly array $errors,
-
         private readonly FormViewInstantiatorInterface $viewInstantiator,
     ) {
     }

@@ -21,7 +21,6 @@ final class ImportedForm implements ImportedFormInterface
          * @var mixed[]
          */
         private readonly array $httpValue,
-
         private readonly FormViewInstantiatorInterface $viewInstantiator,
     ) {
     }
