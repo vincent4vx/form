@@ -10,6 +10,7 @@ use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
+use Quatrevieux\Form\View\Provider\FieldViewAttributesProviderInterface;
 
 /**
  * Validate the length of a string field
@@ -18,7 +19,7 @@ use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
  * @implements ConstraintValidatorGeneratorInterface<static>
  */
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
-final class Length extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface
+final class Length extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface, FieldViewAttributesProviderInterface
 {
     public const CODE = 'ecdd71f6-fa22-5564-bfc7-7e836dce3378';
 
@@ -117,6 +118,24 @@ final class Length extends SelfValidatedConstraint implements ConstraintValidato
 
             return "is_scalar($fieldAccessor) && ($expression) ? $error : null";
         });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttributes(): array
+    {
+        $attributes = [];
+
+        if ($this->min !== null) {
+            $attributes['minlength'] = $this->min;
+        }
+
+        if ($this->max !== null) {
+            $attributes['maxlength'] = $this->max;
+        }
+
+        return $attributes;
     }
 
     /**

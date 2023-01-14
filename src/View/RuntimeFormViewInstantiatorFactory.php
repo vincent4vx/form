@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\View;
 
 use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\HttpField;
+use Quatrevieux\Form\View\Provider\FieldViewAttributesProviderInterface;
 use Quatrevieux\Form\View\Provider\FieldViewConfiguration;
 use Quatrevieux\Form\View\Provider\FieldViewProviderConfigurationInterface;
 use ReflectionAttribute;
@@ -27,26 +28,84 @@ final class RuntimeFormViewInstantiatorFactory implements FormViewInstantiatorFa
     {
         $fieldsNameMapping = [];
         $providerConfigurations = [];
+        $attributesByField = [];
 
         foreach ((new ReflectionClass($dataClassName))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            $providerConfiguration = null;
             $fieldName = $property->getName();
 
-            foreach ($property->getAttributes(HttpField::class) as $httpFieldAttribute) {
-                $fieldsNameMapping[$fieldName] = $httpFieldAttribute->newInstance()->name;
+            $providerConfigurations[$fieldName] = $this->providerConfiguration($property);
+
+            if ($httpFieldName = $this->fieldNameMapping($property)) {
+                $fieldsNameMapping[$fieldName] = $httpFieldName;
             }
 
-            foreach ($property->getAttributes(FieldViewProviderConfigurationInterface::class, ReflectionAttribute::IS_INSTANCEOF) as $fieldViewProviderConfigurationAttribute) {
-                $providerConfiguration = $fieldViewProviderConfigurationAttribute->newInstance();
+            if ($attributes = $this->attributes($property)) {
+                $attributesByField[$fieldName] = $attributes;
             }
-
-            $providerConfigurations[$fieldName] = $providerConfiguration ?? new FieldViewConfiguration();
         }
 
         return new RuntimeFormViewInstantiator(
             $this->registry,
             $providerConfigurations,
             $fieldsNameMapping,
+            $attributesByField,
         );
+    }
+
+    /**
+     * Get the HTTP field name for the given property
+     *
+     * @param ReflectionProperty $property
+     *
+     * @return string|null The HTTP field name, or null if the property name should be used
+     */
+    private function fieldNameMapping(ReflectionProperty $property): ?string
+    {
+        foreach ($property->getAttributes(HttpField::class) as $httpFieldAttribute) {
+            return $httpFieldAttribute->newInstance()->name;
+        }
+
+        return null;
+    }
+
+    /**
+     * Load the view provider configuration for the given property
+     * If no configuration is found, an empty {@see FieldViewConfiguration} will be used.
+     *
+     * @param ReflectionProperty $property
+     *
+     * @return FieldViewProviderConfigurationInterface
+     */
+    private function providerConfiguration(ReflectionProperty $property): FieldViewProviderConfigurationInterface
+    {
+        foreach ($property->getAttributes(FieldViewProviderConfigurationInterface::class, ReflectionAttribute::IS_INSTANCEOF) as $fieldViewProviderConfigurationAttribute) {
+            return $fieldViewProviderConfigurationAttribute->newInstance();
+        }
+
+        // @todo keep instance
+        return new FieldViewConfiguration();
+    }
+
+    /**
+     * Get field view attributes for the given property
+     *
+     * @param ReflectionProperty $property
+     *
+     * @return array<string, scalar>
+     * @see FieldView::$attributes
+     */
+    private function attributes(ReflectionProperty $property): array
+    {
+        $attributes = [];
+
+        if ($property->getType()?->allowsNull() === false) {
+            $attributes['required'] = true;
+        }
+
+        foreach ($property->getAttributes(FieldViewAttributesProviderInterface::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            $attributes += $attribute->newInstance()->getAttributes();
+        }
+
+        return $attributes;
     }
 }

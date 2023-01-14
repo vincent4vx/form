@@ -27,6 +27,14 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
          * @var array<string, string>
          */
         private readonly array $fieldsNameMapping,
+
+        /**
+         * Get provided attributes for a field
+         * The key is the field name, the value is the attributes
+         *
+         * @var array<string, array<string, scalar>>
+         */
+        private readonly array $attributesByField,
     ) {
     }
 
@@ -55,7 +63,7 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
                 $fullFieldName,
                 $value[$fieldName] ?? null,
                 $errors[$name] ?? null,
-                [] // @todo attributes
+                $this->attributesByField[$name] ?? [],
             );
         }
 

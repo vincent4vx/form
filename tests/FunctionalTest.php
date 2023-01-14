@@ -279,6 +279,9 @@ class FunctionalTest extends FormTestCase
             'otherField' => new FieldView('other', 456, null, []),
         ], $view->fields);
         $this->assertSame(['my_complex_name' => 'bar', 'other' => 456], $view->value);
+
+        $this->assertEquals('<input name="my_complex_name" value="bar" />', (string) $view->fields['myComplexName']);
+        $this->assertEquals('<input name="other" value="456" />', (string) $view->fields['otherField']);
     }
 
     public function test_view_with_constraint_error()
@@ -288,10 +291,13 @@ class FunctionalTest extends FormTestCase
         $view = $form->submit(['bar' => 'a'])->view();
 
         $this->assertEquals([
-            'foo' => new FieldView('foo', null, new FieldError('This value is required', [], Required::CODE, DummyTranslator::instance()), []),
-            'bar' => new FieldView('bar', 'a', new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE, DummyTranslator::instance())),
+            'foo' => new FieldView('foo', null, new FieldError('This value is required', [], Required::CODE, DummyTranslator::instance()), ['required' => true]),
+            'bar' => new FieldView('bar', 'a', new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE, DummyTranslator::instance()), ['required' => true, 'minlength' => 3]),
         ], $view->fields);
         $this->assertSame(['bar' => 'a'], $view->value);
+
+        $this->assertEquals('<input name="foo" value="" required />', (string) $view->fields['foo']);
+        $this->assertEquals('<input name="bar" value="a" required minlength="3" />', (string) $view->fields['bar']);
     }
 
     public function form(string $dataClass): FormInterface

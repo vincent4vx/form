@@ -9,6 +9,7 @@ use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
+use Quatrevieux\Form\View\Provider\FieldViewAttributesProviderInterface;
 
 /**
  * Mark a field as required
@@ -36,7 +37,7 @@ use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
  * @implements ConstraintValidatorGeneratorInterface<static>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Required extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface
+final class Required extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface, FieldViewAttributesProviderInterface
 {
     public const CODE = 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5';
 
@@ -65,5 +66,13 @@ final class Required extends SelfValidatedConstraint implements ConstraintValida
         $error = Code::new('FieldError', [$constraint->message, [], self::CODE]);
 
         return FieldErrorExpression::single(fn (string $fieldAccessor) => "$fieldAccessor === null || $fieldAccessor === '' || $fieldAccessor === [] ? $error : null");
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttributes(): array
+    {
+        return ['required' => true];
     }
 }

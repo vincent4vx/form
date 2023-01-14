@@ -5,6 +5,7 @@ namespace Quatrevieux\Form\View;
 use Quatrevieux\Form\Embedded\Embedded;
 use Quatrevieux\Form\Fixtures\EmbeddedForm;
 use Quatrevieux\Form\Fixtures\FormWithCustomView;
+use Quatrevieux\Form\Fixtures\RequiredParametersRequest;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\Fixtures\WithEmbedded;
 use Quatrevieux\Form\Fixtures\WithFieldNameMapping;
@@ -26,6 +27,7 @@ class RuntimeFormViewInstantiatorFactoryTest extends FormTestCase
                 'bar' => new FieldViewConfiguration(),
             ],
             [],
+            [],
         ), $instantiator);
     }
 
@@ -45,6 +47,7 @@ class RuntimeFormViewInstantiatorFactoryTest extends FormTestCase
                 'myComplexName' => 'my_complex_name',
                 'otherField' => 'other',
             ],
+            [],
         ), $instantiator);
     }
 
@@ -60,6 +63,7 @@ class RuntimeFormViewInstantiatorFactoryTest extends FormTestCase
                 'count' => new FieldViewConfiguration(type: 'number', id: 'form_count', attributes: ['min' => 0, 'max' => 100]),
                 'name' => new FieldViewConfiguration(type: 'text', id: 'form_name', defaultValue: 'example'),
             ],
+            [],
             [],
         ), $instantiator);
     }
@@ -78,6 +82,27 @@ class RuntimeFormViewInstantiatorFactoryTest extends FormTestCase
                 'embedded' => new Embedded(EmbeddedForm::class),
             ],
             [],
+            [],
+        ), $instantiator);
+    }
+
+    public function test_create_with_required()
+    {
+        $factory = new RuntimeFormViewInstantiatorFactory($this->registry);
+
+        $instantiator = $factory->create(RequiredParametersRequest::class);
+
+        $this->assertEquals(new RuntimeFormViewInstantiator(
+            $this->registry,
+            [
+                'foo' => new FieldViewConfiguration(),
+                'bar' => new FieldViewConfiguration(),
+            ],
+            [],
+            [
+                'foo' => ['required' => true],
+                'bar' => ['required' => true, 'minlength' => 3],
+            ],
         ), $instantiator);
     }
 }

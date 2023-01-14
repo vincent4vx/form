@@ -77,6 +77,19 @@ class LengthTest extends FormTestCase
         $this->assertTrue($result->valid());
     }
 
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_field_view(bool $generated)
+    {
+        $form = $generated ? $this->generatedForm : $this->form;
+
+        $this->assertEquals('<input name="onlyMin" value="" minlength="3" />', $form->view()['onlyMin']);
+        $this->assertEquals('<input name="onlyMax" value="" maxlength="6" />', $form->view()['onlyMax']);
+        $this->assertEquals('<input name="both" value="" minlength="3" maxlength="6" />', $form->view()['both']);
+    }
+
     public function test_generated_code()
     {
         $generator = new ValidatorGenerator(new DefaultRegistry());

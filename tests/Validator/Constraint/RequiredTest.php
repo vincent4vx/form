@@ -38,6 +38,17 @@ class RequiredTest extends FormTestCase
         $this->assertTrue($form->submit(['value' => ['foo']])->valid());
     }
 
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_field_view(bool $generated)
+    {
+        $form = $generated ? $this->generatedForm : $this->form;
+
+        $this->assertEquals('<input name="value" value="" required />', $form->view()['value']);
+    }
+
     public function test_generated_code()
     {
         $defaultMessage = new Required();
