@@ -13,6 +13,7 @@ use Quatrevieux\Form\Util\Functions;
 use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 use Quatrevieux\Form\Validator\RuntimeValidatorFactory;
+use Quatrevieux\Form\View\RuntimeFormViewInstantiatorFactory;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -58,11 +59,15 @@ class BenchUtils
             registry: $registry,
             savePathResolver: $savePathResolver,
         ));
+        $registry->setFormViewInstantiatorFactory($formViewInstantiatorFactory = new RuntimeFormViewInstantiatorFactory(
+            registry: $registry,
+        ));
 
         return new DefaultFormFactory(
             instantiatorFactory: $instantiatorFactory,
             validatorFactory: $validatorFactory,
             transformerFactory: $formTransformerFactory,
+            formViewInstantiatorFactory: $formViewInstantiatorFactory,
         );
     }
 
