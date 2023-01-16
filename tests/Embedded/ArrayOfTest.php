@@ -8,6 +8,9 @@ use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Validator\Constraint\Length;
+use Quatrevieux\Form\Validator\FieldError;
+use Quatrevieux\Form\View\FieldView;
+use Quatrevieux\Form\View\FormView;
 
 class ArrayOfTest extends FormTestCase
 {
@@ -141,6 +144,57 @@ class ArrayOfTest extends FormTestCase
         $this->assertGeneratedValidator('!is_array(($data->foo ?? null)) ? null : (function ($value) {$validator = $this->registry->getValidatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\');$errors = [];foreach ($value as $key => $item) {if ($itemErrors = $validator->validate($item)) {$errors[$key] = $itemErrors;}}return $errors ?: null;})(($data->foo ?? null))', $arrayOf);
         $this->assertSame('!is_array($__tmp_44e18f0f3b2a419fae74cbbaef66f40e = $data->foo ?? null) ? null : (function ($value) {$transformer = $this->registry->getTransformerFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\');$instantiator = $this->registry->getInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\');$result = [];$errors = [];foreach ($value as $key => $item) {$transformationResult = $transformer->transformFromHttp((array) $item);if ($transformationResult->errors) {$errors[$key] = $transformationResult->errors;} else {$result[$key] = $instantiator->instantiate($transformationResult->values);}}if ($errors) {throw new \Quatrevieux\Form\Transformer\TransformerException(\'Some elements are invalid\', $errors);}return $result;})($__tmp_44e18f0f3b2a419fae74cbbaef66f40e)', $transformer->generateTransformFromHttp($arrayOf, '$data->foo ?? null', $generator));
         $this->assertSame('!is_array($__tmp_44e18f0f3b2a419fae74cbbaef66f40e = $data->foo ?? null) ? null : (function ($value) {$transformer = $this->registry->getTransformerFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\');$instantiator = $this->registry->getInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\');$result = [];foreach ($value as $key => $item) {$result[$key] = $transformer->transformToHttp($instantiator->export($item));}return $result;})($__tmp_44e18f0f3b2a419fae74cbbaef66f40e)', $transformer->generateTransformToHttp($arrayOf, '$data->foo ?? null', $generator));
+    }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_view(bool $generated)
+    {
+        $form = $generated ? $this->generatedForm(ArrayContainer::class) : $this->runtimeForm(ArrayContainer::class);
+
+        $view = $form->submit([
+            'items' => [
+                ['name' => 'foo', 'value' => '42'],
+                ['name' => 'bar', 'value' => '66'],
+            ],
+        ])->view();
+
+        $this->assertEquals(new FormView(
+            fields: [
+                'name' => new FieldView('items[][name]', null, null, ['required' => true, 'minlength' => 3]),
+                'value' => new FieldView('items[][value]', null, null, ['required' => true]),
+            ]
+        ), $view['items']->template);
+
+        $this->assertSame([
+            'items' => [
+                ['name' => 'foo', 'value' => '42'],
+                ['name' => 'bar', 'value' => '66'],
+            ],
+        ], $view->value);
+
+        $this->assertCount(2, $view->fields);
+
+        $this->assertEquals('<input name="items[0][name]" value="foo" required minlength="3" />', (string) $view->fields['items'][0]->fields['name']);
+        $this->assertEquals('<input name="items[0][value]" value="42" required />', (string) $view->fields['items'][0]->fields['value']);
+        $this->assertEquals('<input name="items[1][name]" value="bar" required minlength="3" />', (string) $view->fields['items'][1]->fields['name']);
+        $this->assertEquals('<input name="items[1][value]" value="66" required />', (string) $view->fields['items'][1]->fields['value']);
+
+        $view = $form->submit([
+            'items' => [
+                ['name' => 'a', 'value' => null],
+            ],
+        ])->view();
+
+        $this->assertEquals('The value is too short. It should have 3 characters or more.', (string) $view->fields['items'][0]->fields['name']->error);
+        $this->assertEquals('This value is required', (string) $view->fields['items'][0]->fields['value']->error);
+
+        $view = $form->submit([])->view();
+
+        $this->assertEmpty($view->fields['items']->fields);
+        $this->assertEquals('This value is required', (string) $view['items']->error);
     }
 }
 

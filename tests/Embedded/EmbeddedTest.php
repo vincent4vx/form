@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form\Embedded;
 
+use Quatrevieux\Form\DummyTranslator;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Transformer\Field\ArrayCast;
 use Quatrevieux\Form\Transformer\Field\CastType;
@@ -10,6 +11,8 @@ use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Validator\Constraint\Length;
+use Quatrevieux\Form\Validator\Constraint\Required;
+use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\View\FieldView;
 use Quatrevieux\Form\View\FormView;
 
@@ -230,6 +233,24 @@ class EmbeddedTest extends FormTestCase
             ],
             'optionalEmbedded' => null,
         ], $view->value);
+
+        $view = $form->submit([
+            'name' => 'foo',
+            'value' => '42',
+        ])->view();
+
+        $this->assertEquals([
+            'name' => new FieldView('name', 'foo', null, ['required' => true]),
+            'value' => new FieldView('value', '42', null, ['required' => true]),
+            'embedded' => new FormView([
+                'foo' => new FieldView('embedded[foo]', null, null, ['minlength' => 3, 'maxlength' => 5, 'required' => true]),
+                'bar' => new FieldView('embedded[bar]', null, null, ['required' => true]),
+            ], [], error: new FieldError('This value is required', code: Required::CODE, translator: DummyTranslator::instance())),
+            'optionalEmbedded' => new FormView([
+                'foo' => new FieldView('optionalEmbedded[foo]', null, null, ['minlength' => 3, 'maxlength' => 5, 'required' => true]),
+                'bar' => new FieldView('optionalEmbedded[bar]', null, null, ['required' => true]),
+            ], []),
+        ], $view->fields);
     }
 
     /**

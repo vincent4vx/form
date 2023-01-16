@@ -8,6 +8,8 @@ use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
+use Quatrevieux\Form\View\Provider\FieldViewProviderConfigurationInterface;
+use Quatrevieux\Form\View\Provider\FieldViewProviderInterface;
 
 /**
  * Create an array of embedded forms.
@@ -29,7 +31,7 @@ use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
  * }
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class ArrayOf implements ConstraintInterface, DelegatedFieldTransformerInterface
+final class ArrayOf implements ConstraintInterface, DelegatedFieldTransformerInterface, FieldViewProviderConfigurationInterface
 {
     public function __construct(
         /**
@@ -55,5 +57,13 @@ final class ArrayOf implements ConstraintInterface, DelegatedFieldTransformerInt
     public function getTransformer(RegistryInterface $registry): ConfigurableFieldTransformerInterface
     {
         return new ArrayOfTransformer($registry);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getViewProvider(RegistryInterface $registry): FieldViewProviderInterface
+    {
+        return new ArrayOfViewProvider($registry->getFormViewInstantiatorFactory());
     }
 }

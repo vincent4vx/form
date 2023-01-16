@@ -29,9 +29,25 @@ final class EmbeddedViewProvider implements FieldViewProviderInterface
         $viewInstantiator = $this->instantiatorFactory->create($configuration->class);
 
         $value = is_array($value) ? $value : [];
-        /** @var FieldError[] $error */
-        $error = is_array($error) ? $error : [];
 
-        return $viewInstantiator->submitted($value, $error, $name);
+        if (!$error) {
+            $fieldsErrors = [];
+            $globalError = null;
+        } elseif (is_array($error)) {
+            /** @var array<FieldError|mixed[]> $fieldsErrors */
+            $fieldsErrors = $error;
+            $globalError = null;
+        } else {
+            $fieldsErrors = [];
+            $globalError = $error;
+        }
+
+        $formView = $viewInstantiator->submitted($value, $fieldsErrors, $name);
+
+        if ($globalError) {
+            $formView->error = $globalError;
+        }
+
+        return $formView;
     }
 }
