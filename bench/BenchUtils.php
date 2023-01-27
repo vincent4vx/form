@@ -13,6 +13,7 @@ use Quatrevieux\Form\Util\Functions;
 use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 use Quatrevieux\Form\Validator\RuntimeValidatorFactory;
+use Quatrevieux\Form\View\GeneratedFormViewInstantiatorFactory;
 use Quatrevieux\Form\View\RuntimeFormViewInstantiatorFactory;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -59,7 +60,7 @@ class BenchUtils
             registry: $registry,
             savePathResolver: $savePathResolver,
         ));
-        $registry->setFormViewInstantiatorFactory($formViewInstantiatorFactory = new RuntimeFormViewInstantiatorFactory(
+        $registry->setFormViewInstantiatorFactory($formViewInstantiatorFactory = new GeneratedFormViewInstantiatorFactory(
             registry: $registry,
         ));
 

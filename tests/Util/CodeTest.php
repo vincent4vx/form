@@ -4,9 +4,9 @@ namespace Quatrevieux\Form\Util;
 
 use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\Transformer\Field\ArrayCast;
-use Quatrevieux\Form\Transformer\Field\Cast;
 use Quatrevieux\Form\Transformer\Field\CastType;
 use Quatrevieux\Form\Transformer\Field\Csv;
+use Quatrevieux\Form\Validator\FieldError;
 
 class CodeTest extends TestCase
 {
@@ -75,6 +75,12 @@ class CodeTest extends TestCase
     {
         $this->assertSame("new \Quatrevieux\Form\Transformer\Field\Csv(';')", Code::new(Csv::class, [';']));
         $this->assertSame("new Csv(';')", Code::new('Csv', [';']));
+    }
+
+    public function test_instanceOfOrNull()
+    {
+        $this->assertSame('($__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 = $foo["bar"]) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 : null', Code::instanceOfOrNull('$foo["bar"]', FieldError::class));
+        $this->assertSame('null', Code::instanceOfOrNull('null', FieldError::class));
     }
 }
 

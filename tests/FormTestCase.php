@@ -14,6 +14,7 @@ use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 use Quatrevieux\Form\Validator\RuntimeValidatorFactory;
+use Quatrevieux\Form\View\GeneratedFormViewInstantiatorFactory;
 use Quatrevieux\Form\View\RuntimeFormViewInstantiatorFactory;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -55,13 +56,16 @@ class FormTestCase extends TestCase
                 registry: $generatedFormRegistry,
                 savePathResolver: $savePathResolver
             ),
-            new RuntimeFormViewInstantiatorFactory($generatedFormRegistry),
+            $generatedFormViewInstantiatorFactory = new GeneratedFormViewInstantiatorFactory(
+                registry: $generatedFormRegistry,
+                savePathResolver: $savePathResolver,
+            ),
         );
 
         $generatedFormRegistry->setInstantiatorFactory($generatedInstantiatorFactory);
         $generatedFormRegistry->setValidatorFactory($generatedValidatorFactory);
         $generatedFormRegistry->setTransformerFactory($generatedFormTransformerFactory);
-        $generatedFormRegistry->setFormViewInstantiatorFactory(new RuntimeFormViewInstantiatorFactory($generatedFormRegistry)); // @todo change this to generated
+        $generatedFormRegistry->setFormViewInstantiatorFactory($generatedFormViewInstantiatorFactory);
     }
 
     protected function tearDown(): void

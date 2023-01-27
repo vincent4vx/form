@@ -212,6 +212,29 @@ final class Code
     }
 
     /**
+     * Generate an expression that check the instance of the given expression, and return null if the type does not match
+     *
+     * Example:
+     * `Code::instanceOfOrNull('$foo["bar"] ?? null', Foo::class)`
+     * will generate a code like `($tmp = $foo["bar"] ?? null) instanceof Foo ? $foo : null`
+     *
+     * @param string $expression PHP value expression
+     * @param class-string $className
+     *
+     * @return string
+     */
+    public static function instanceOfOrNull(string $expression, string $className): string
+    {
+        if ($expression === 'null') {
+            return 'null';
+        }
+
+        $varName = self::varName($expression);
+
+        return "({$varName} = {$expression}) instanceof \\{$className} ? {$varName} : null";
+    }
+
+    /**
      * Wrap a PHP expression into to ensure that it will not be converted to a string expression by `Code::value()`
      *
      * @param string $code PHP code to wrap

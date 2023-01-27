@@ -27,6 +27,15 @@ class FieldViewConfigurationTest extends FormTestCase
         $this->assertEquals(new FieldView('withDefault', 'bar', null, []), $view->fields['withDefault']);
         $this->assertEquals(new FieldView('withIdAndType', 'baz', null, ['id' => 'foo', 'type' => 'text']), $view->fields['withIdAndType']);
     }
+
+    public function test_generate()
+    {
+        $generator = (new FieldViewConfiguration());
+
+        $this->assertSame('new \Quatrevieux\Form\View\FieldView(\'foo\', $value["foo"] ?? null, ($__tmp_6fb11202bf82766a881ea3ed253bc52c = $errors["foo"] ?? null) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_6fb11202bf82766a881ea3ed253bc52c : null, [\'min\' => 3, \'required\' => true])', $generator->generateFieldViewExpression(new FieldViewConfiguration(), 'foo', ['min' => 3, 'required' => true])('$value["foo"] ?? null', '$errors["foo"] ?? null', null));
+        $this->assertSame('new \Quatrevieux\Form\View\FieldView("{$rootField}[foo]", $value["foo"] ?? null, ($__tmp_6fb11202bf82766a881ea3ed253bc52c = $errors["foo"] ?? null) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_6fb11202bf82766a881ea3ed253bc52c : null, [\'min\' => 3, \'required\' => true])', $generator->generateFieldViewExpression(new FieldViewConfiguration(), 'foo', ['min' => 3, 'required' => true])('$value["foo"] ?? null', '$errors["foo"] ?? null', '$rootField'));
+        $this->assertSame('new \Quatrevieux\Form\View\FieldView(\'foo\', $value["foo"] ?? null ?? -1, ($__tmp_6fb11202bf82766a881ea3ed253bc52c = $errors["foo"] ?? null) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_6fb11202bf82766a881ea3ed253bc52c : null, [\'min\' => 3, \'required\' => true, \'step\' => 3, \'id\' => \'input_foo\', \'type\' => \'number\'])', $generator->generateFieldViewExpression(new FieldViewConfiguration(type: 'number', id: 'input_foo', defaultValue: -1, attributes: ['step' => 3]), 'foo', ['min' => 3, 'required' => true])('$value["foo"] ?? null', '$errors["foo"] ?? null', null));
+    }
 }
 
 class FormWithFieldViewConfiguration

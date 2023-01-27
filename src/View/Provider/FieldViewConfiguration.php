@@ -3,9 +3,12 @@
 namespace Quatrevieux\Form\View\Provider;
 
 use Attribute;
+use Closure;
 use Quatrevieux\Form\RegistryInterface;
+use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\View\FieldView;
+use Quatrevieux\Form\View\Generator\FieldViewProviderGeneratorInterface;
 
 /**
  * Default configuration for the field view generation
@@ -21,10 +24,11 @@ use Quatrevieux\Form\View\FieldView;
  * </code>
  *
  * @implements FieldViewProviderInterface<self>
+ * @implements FieldViewProviderGeneratorInterface<self>
  * @todo empty instance for default ?
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class FieldViewConfiguration implements FieldViewProviderConfigurationInterface, FieldViewProviderInterface
+final class FieldViewConfiguration implements FieldViewProviderConfigurationInterface, FieldViewProviderInterface, FieldViewProviderGeneratorInterface
 {
     public function __construct(
         /**
@@ -70,19 +74,42 @@ final class FieldViewConfiguration implements FieldViewProviderConfigurationInte
     {
         $defaultAttributes = $configuration->attributes;
 
-        if ($this->id) {
-            $defaultAttributes['id'] = $this->id;
+        if ($configuration->id) {
+            $defaultAttributes['id'] = $configuration->id;
         }
 
-        if ($this->type) {
-            $defaultAttributes['type'] = $this->type;
+        if ($configuration->type) {
+            $defaultAttributes['type'] = $configuration->type;
         }
 
         return new FieldView(
             $name,
-            $value ?? $this->defaultValue,
+            $value ?? $configuration->defaultValue,
             $error instanceof FieldError ? $error : null, // @todo handle array of errors?
             $attributes + $defaultAttributes,
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generateFieldViewExpression(FieldViewProviderConfigurationInterface $configuration, string $name, array $attributes): Closure
+    {
+        $attributes += $configuration->attributes;
+
+        if ($configuration->id) {
+            $attributes['id'] ??= $configuration->id;
+        }
+
+        if ($configuration->type) {
+            $attributes['type'] ??= $configuration->type;
+        }
+
+        return static fn (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) => Code::new(FieldView::class, [
+            $rootFieldNameAccessor ? Code::raw('"{' . $rootFieldNameAccessor. '}[' . $name . ']"') : $name,
+            $configuration->defaultValue !== null ? Code::raw($valueAccessor . ' ?? ' . Code::value($configuration->defaultValue)) : Code::raw($valueAccessor),
+            Code::raw(Code::instanceOfOrNull($errorAccessor, FieldError::class)),
+            $attributes
+        ]);
     }
 }

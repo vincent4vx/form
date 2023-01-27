@@ -18,7 +18,7 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
          *
          * @var array<string, FieldViewProviderConfigurationInterface>
          */
-        private readonly array $providerConfigurations,
+        public readonly array $providerConfigurations,
 
         /**
          * Map DTO field name to HTTP field name
@@ -26,7 +26,7 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
          *
          * @var array<string, string>
          */
-        private readonly array $fieldsNameMapping,
+        public readonly array $fieldsNameMapping,
 
         /**
          * Get provided attributes for a field
@@ -34,7 +34,7 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
          *
          * @var array<string, array<string, scalar>>
          */
-        private readonly array $attributesByField,
+        public readonly array $attributesByField,
     ) {
     }
 
