@@ -71,10 +71,10 @@ enum FieldTemplate: string
             $attributesString .= htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5);
 
             if ($value !== true) {
-                $attributesString .= '="' . htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5) . '"';
+                $attributesString .= '="' . htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5) . '" ';
+            } else {
+                $attributesString .= ' ';
             }
-
-            $attributesString .= ' ';
         }
 
         return $attributesString;
