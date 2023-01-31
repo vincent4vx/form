@@ -102,7 +102,6 @@ final class ArrayOfViewProvider implements FieldViewProviderInterface, FieldView
                 ? Code::raw('"{' . $rootFieldNameAccessor . '}[' . $name . '][{$index}]"')
                 : Code::raw('"'.$name.'[{$index}]"')
             ;
-            $fieldErrorExpression = Code::expr('$fieldError');
             $use = $rootFieldNameAccessor ? " use($rootFieldNameAccessor)" : '';
 
             $closure = Code::expr(
