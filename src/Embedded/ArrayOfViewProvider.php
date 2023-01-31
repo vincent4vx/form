@@ -2,10 +2,14 @@
 
 namespace Quatrevieux\Form\Embedded;
 
+use Closure;
+use Quatrevieux\Form\Util\Code;
+use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\View\FormView;
 use Quatrevieux\Form\View\FormViewInstantiatorFactoryInterface;
 use Quatrevieux\Form\View\FormViewInstantiatorInterface;
+use Quatrevieux\Form\View\Generator\FieldViewProviderGeneratorInterface;
 use Quatrevieux\Form\View\Provider\FieldViewProviderConfigurationInterface;
 use Quatrevieux\Form\View\Provider\FieldViewProviderInterface;
 
@@ -13,9 +17,10 @@ use function is_array;
 
 /**
  * @implements FieldViewProviderInterface<ArrayOf>
+ * @implements FieldViewProviderGeneratorInterface<ArrayOf>
  * @internal Used and instantiated by {@see ArrayOf::getViewProvider()}
  */
-final class ArrayOfViewProvider implements FieldViewProviderInterface
+final class ArrayOfViewProvider implements FieldViewProviderInterface, FieldViewProviderGeneratorInterface
 {
     public function __construct(
         private readonly FormViewInstantiatorFactoryInterface $viewInstantiatorFactory
@@ -83,5 +88,54 @@ final class ArrayOfViewProvider implements FieldViewProviderInterface
         }
 
         return $formView;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generateFieldViewExpression(FieldViewProviderConfigurationInterface $configuration, string $name, array $attributes): Closure
+    {
+        $instantiatorFactory = Expr::this()->registry->getFormViewInstantiatorFactory()->create($configuration->class);
+
+        return static function (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) use ($instantiatorFactory, $name): string {
+            $fieldNameExpression = $rootFieldNameAccessor
+                ? Code::raw('"{' . $rootFieldNameAccessor . '}[' . $name . '][{$index}]"')
+                : Code::raw('"'.$name.'[{$index}]"')
+            ;
+            $fieldErrorExpression = Code::expr('$fieldError');
+            $use = $rootFieldNameAccessor ? " use($rootFieldNameAccessor)" : '';
+
+            $closure = Code::expr(
+                'function ($values, $errors)' . $use . ' {' .
+                    '$instantiator = ' . $instantiatorFactory . ';' .
+                    '$fieldsErrors = is_array($errors) ? $errors : [];' .
+                    '$fields = [];' .
+                    'foreach ($values as $index => $item) {' .
+                        '$fieldError = $fieldsErrors[$index] ?? [];' .
+                        '$fields[$index] = $field = ' . Code::expr('$instantiator')->submitted(
+                            Code::raw('(array) $item'),
+                            Code::raw('is_array($fieldError) ? $fieldError : []'),
+                            $fieldNameExpression
+                        ) . ';' .
+                        '$field->error = $fieldError instanceof \\' . FieldError::class . ' ? $fieldError : null;' .
+                    '}' .
+                    'return ' . Code::new(FormView::class, [
+                        Code::raw('$fields'),
+                        Code::raw('$values'),
+                        Code::expr('$instantiator')->default(
+                            $rootFieldNameAccessor
+                                ? Code::raw('"{' . $rootFieldNameAccessor . '}[' . $name . '][]"')
+                                : $name . '[]'
+                        ),
+                        Code::raw('$errors instanceof \\' . FieldError::class . ' ? $errors : null'),
+                    ]) . ';' .
+                '}'
+            );
+
+            return $closure(
+                Code::raw("(array) ($valueAccessor)"),
+                Code::raw($errorAccessor)
+            );
+        };
     }
 }

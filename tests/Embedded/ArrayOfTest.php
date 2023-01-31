@@ -196,6 +196,14 @@ class ArrayOfTest extends FormTestCase
         $this->assertEmpty($view->fields['items']->fields);
         $this->assertEquals('This value is required', (string) $view['items']->error);
     }
+
+    public function test_generate_view()
+    {
+        $view = new ArrayOf(ArrayItem::class);
+
+        $this->assertSame('(function ($values, $errors) use($rootField) {$instantiator = $this->registry->getFormViewInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\');$fieldsErrors = is_array($errors) ? $errors : [];$fields = [];foreach ($values as $index => $item) {$fieldError = $fieldsErrors[$index] ?? [];$fields[$index] = $field = $instantiator->submitted((array) $item, is_array($fieldError) ? $fieldError : [], "{$rootField}[foo][{$index}]");$field->error = $fieldError instanceof \Quatrevieux\Form\Validator\FieldError ? $fieldError : null;}return new \Quatrevieux\Form\View\FormView($fields, $values, $instantiator->default("{$rootField}[foo][]"), $errors instanceof \Quatrevieux\Form\Validator\FieldError ? $errors : null);})((array) ($value["foo"] ?? null), $errors["foo"] ?? null)', $view->getViewProvider($this->registry)->generateFieldViewExpression($view, 'foo', [])('$value["foo"] ?? null', '$errors["foo"] ?? null', '$rootField'));
+        $this->assertSame('(function ($values, $errors) {$instantiator = $this->registry->getFormViewInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\');$fieldsErrors = is_array($errors) ? $errors : [];$fields = [];foreach ($values as $index => $item) {$fieldError = $fieldsErrors[$index] ?? [];$fields[$index] = $field = $instantiator->submitted((array) $item, is_array($fieldError) ? $fieldError : [], "foo[{$index}]");$field->error = $fieldError instanceof \Quatrevieux\Form\Validator\FieldError ? $fieldError : null;}return new \Quatrevieux\Form\View\FormView($fields, $values, $instantiator->default(\'foo[]\'), $errors instanceof \Quatrevieux\Form\Validator\FieldError ? $errors : null);})((array) ($value["foo"] ?? null), $errors["foo"] ?? null)', $view->getViewProvider($this->registry)->generateFieldViewExpression($view, 'foo', [])('$value["foo"] ?? null', '$errors["foo"] ?? null', null));
+    }
 }
 
 class ArrayContainer

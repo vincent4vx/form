@@ -82,6 +82,23 @@ class CodeTest extends TestCase
         $this->assertSame('($__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 = $foo["bar"]) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 : null', Code::instanceOfOrNull('$foo["bar"]', FieldError::class));
         $this->assertSame('null', Code::instanceOfOrNull('null', FieldError::class));
     }
+
+    public function test_instanceOfOr()
+    {
+        $this->assertSame('($__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 = $foo["bar"]) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 : new \Quatrevieux\Form\Validator\FieldError(message: \'default\', parameters: [], code: \'bb8ebf72-1310-4d65-bdb5-9192708543ee\', translator: NULL)', Code::instanceOfOr('$foo["bar"]', FieldError::class, new FieldError('default')));
+    }
+
+    public function test_isArrayOr()
+    {
+        $this->assertSame('(is_array($__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 = $foo["bar"]) ? $__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 : [])', Code::isArrayOr('$foo["bar"]', []));
+        $this->assertSame('(is_array($__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 = $foo["bar"]) ? $__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 : NULL)', Code::isArrayOr('$foo["bar"]', null));
+    }
+
+    public function test_expr()
+    {
+        $this->assertInstanceOf(Expr::class, Code::expr('$foo'));
+        $this->assertSame('$foo["bar"] ?? null', (string) Code::expr('$foo["bar"] ?? null'));
+    }
 }
 
 class NewExprTestObject

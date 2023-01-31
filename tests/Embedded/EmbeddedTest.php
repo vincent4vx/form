@@ -454,6 +454,14 @@ class EmbeddedTest extends FormTestCase
         $transformer = new Embedded(EmbeddedForm::class);
         $this->assertSame('is_object($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? $this->registry->getTransformerFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->transformToHttp($this->registry->getInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->export($__tmp_4e6c78d168de10f915401b0dad567ede)) : null', $transformer->getTransformer($this->registry)->generateTransformToHttp($transformer, '$data["foo"]', new FormTransformerGenerator($this->registry)));
     }
+
+    public function test_generate_view()
+    {
+        $view = new Embedded(EmbeddedForm::class);
+
+        $this->assertSame('(function ($value, $fieldsErrors, $globalError) use ($rootField) {$formView = $this->registry->getFormViewInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->submitted($value, $fieldsErrors, "{$rootField}[foo]");$formView->error = $globalError;return $formView;})((is_array($__tmp_8c1eadde24330f528169b03c5b69ee4e = $value["foo"] ?? null) ? $__tmp_8c1eadde24330f528169b03c5b69ee4e : []), (is_array($__tmp_6fb11202bf82766a881ea3ed253bc52c = $errors["foo"] ?? null) ? $__tmp_6fb11202bf82766a881ea3ed253bc52c : []), ($__tmp_6fb11202bf82766a881ea3ed253bc52c = $errors["foo"] ?? null) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_6fb11202bf82766a881ea3ed253bc52c : NULL)', $view->getViewProvider($this->registry)->generateFieldViewExpression($view, 'foo', [])('$value["foo"] ?? null', '$errors["foo"] ?? null', '$rootField'));
+        $this->assertSame('(function ($value, $fieldsErrors, $globalError) {$formView = $this->registry->getFormViewInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->submitted($value, $fieldsErrors, \'foo\');$formView->error = $globalError;return $formView;})((is_array($__tmp_8c1eadde24330f528169b03c5b69ee4e = $value["foo"] ?? null) ? $__tmp_8c1eadde24330f528169b03c5b69ee4e : []), (is_array($__tmp_6fb11202bf82766a881ea3ed253bc52c = $errors["foo"] ?? null) ? $__tmp_6fb11202bf82766a881ea3ed253bc52c : []), ($__tmp_6fb11202bf82766a881ea3ed253bc52c = $errors["foo"] ?? null) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_6fb11202bf82766a881ea3ed253bc52c : NULL)', $view->getViewProvider($this->registry)->generateFieldViewExpression($view, 'foo', [])('$value["foo"] ?? null', '$errors["foo"] ?? null', null));
+    }
 }
 
 class BaseForm

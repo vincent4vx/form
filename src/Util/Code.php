@@ -225,13 +225,60 @@ final class Code
      */
     public static function instanceOfOrNull(string $expression, string $className): string
     {
+        return self::instanceOfOr($expression, $className, Code::raw('null'));
+    }
+
+    /**
+     * Generate an expression that check the instance of the given expression,
+     * and return a fallback value if the type does not match
+     *
+     * Example:
+     * - `Code::instanceOfOr('$foo["bar"] ?? null', Foo::class, null)` * will generate a code like `($tmp = $foo["bar"] ?? null) instanceof Foo ? $foo : null`
+     * - `Code::instanceOfOr('$foo["bar"] ?? null', Foo::class, new NullFoo())` * will generate a code like `($tmp = $foo["bar"] ?? null) instanceof Foo ? $foo : new NullFoo()`
+     *
+     * @param string $expression PHP value expression
+     * @param class-string $className
+     * @param mixed $fallback Fallback value to use if the type does not match
+     *
+     * @return string
+     */
+    public static function instanceOfOr(string $expression, string $className, mixed $fallback): string
+    {
+        $fallback = self::value($fallback);
+
         if ($expression === 'null') {
-            return 'null';
+            return $fallback;
         }
 
         $varName = self::varName($expression);
 
-        return "({$varName} = {$expression}) instanceof \\{$className} ? {$varName} : null";
+        return "({$varName} = {$expression}) instanceof \\{$className} ? {$varName} : {$fallback}";
+    }
+
+    /**
+     * Generate an expression that check is the given expression is an array,
+     * and return a fallback value if the type does not match
+     *
+     * Example:
+     * - `Code::instanceOfOr('$foo["bar"] ?? null', Foo::class, null)` * will generate a code like `($tmp = $foo["bar"] ?? null) instanceof Foo ? $foo : null`
+     * - `Code::instanceOfOr('$foo["bar"] ?? null', Foo::class, new NullFoo())` * will generate a code like `($tmp = $foo["bar"] ?? null) instanceof Foo ? $foo : new NullFoo()`
+     *
+     * @param string $expression PHP value expression
+     * @param mixed[]|PhpExpressionInterface|null $fallback Fallback value to use if the value is not an array
+     *
+     * @return string
+     */
+    public static function isArrayOr(string $expression, array|PhpExpressionInterface|null $fallback): string
+    {
+        $fallback = self::value($fallback);
+
+        if ($expression === 'null') {
+            return $fallback;
+        }
+
+        $varName = Code::varName($expression);
+
+        return "(is_array({$varName} = {$expression}) ? {$varName} : {$fallback})";
     }
 
     /**
@@ -253,6 +300,18 @@ final class Code
                 return $this->code;
             }
         };
+    }
+
+    /**
+     * Create an expression builder for the given PHP expression
+     *
+     * @param string $expression PHP code to wrap
+     *
+     * @return Expr
+     */
+    public static function expr(string $expression): PhpExpressionInterface
+    {
+        return new Expr($expression);
     }
 
     /**
