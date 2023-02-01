@@ -31,21 +31,21 @@ class BenchUtils
     private ?FormFactoryInterface $generatedFactory = null;
     private ?SfFormFactory $symfonyFactory = null;
 
-    public function runtimeFormFactory(): FormFactoryInterface
+    public function runtimeFormFactory(bool $viewSupport = false): FormFactoryInterface
     {
-        return DefaultFormFactory::runtime();
+        return DefaultFormFactory::runtime(enabledView: $viewSupport);
     }
 
-    public function runtimeForm(string $dataClass): FormInterface
+    public function runtimeForm(string $dataClass, bool $viewSupport = false): FormInterface
     {
         if (!$this->runtimeFactory) {
-            $this->runtimeFactory = $this->runtimeFormFactory();
+            $this->runtimeFactory = $this->runtimeFormFactory($viewSupport);
         }
 
         return $this->runtimeFactory->create($dataClass);
     }
 
-    public function generatedFormFactory(): FormFactoryInterface
+    public function generatedFormFactory(bool $viewSupport = false): FormFactoryInterface
     {
         $savePathResolver = Functions::savePathResolver(self::GENERATED_DIR);
         $registry = new DefaultRegistry();
@@ -60,9 +60,14 @@ class BenchUtils
             registry: $registry,
             savePathResolver: $savePathResolver,
         ));
-        $registry->setFormViewInstantiatorFactory($formViewInstantiatorFactory = new GeneratedFormViewInstantiatorFactory(
-            registry: $registry,
-        ));
+
+        if ($viewSupport) {
+            $registry->setFormViewInstantiatorFactory($formViewInstantiatorFactory = new GeneratedFormViewInstantiatorFactory(
+                registry: $registry,
+            ));
+        } else {
+            $formViewInstantiatorFactory = null;
+        }
 
         return new DefaultFormFactory(
             instantiatorFactory: $instantiatorFactory,
@@ -72,10 +77,10 @@ class BenchUtils
         );
     }
 
-    public function generatedForm(string $dataClass): FormInterface
+    public function generatedForm(string $dataClass, bool $viewSupport = false): FormInterface
     {
         if (!$this->generatedFactory) {
-            $this->generatedFactory = $this->generatedFormFactory();
+            $this->generatedFactory = $this->generatedFormFactory($viewSupport);
         }
 
         return $this->generatedFactory->create($dataClass);

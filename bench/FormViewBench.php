@@ -20,7 +20,7 @@ class FormViewBench extends BenchUtils
     #[Groups(['default', 'runtime'])]
     public function benchRuntimeDefault()
     {
-        $form = $this->runtimeForm(SimpleForm::class);
+        $form = $this->runtimeForm(SimpleForm::class, true);
         $view = $form->view();
 
         return SimpleFormTemplate::render($view);
@@ -29,7 +29,7 @@ class FormViewBench extends BenchUtils
     #[Groups(['default', 'generated'])]
     public function benchGeneratedDefault()
     {
-        $form = $this->generatedForm(SimpleForm::class);
+        $form = $this->generatedForm(SimpleForm::class, true);
         $view = $form->view();
 
         return SimpleFormTemplate::render($view);
@@ -45,7 +45,7 @@ class FormViewBench extends BenchUtils
     #[Groups(['submitted', 'runtime'])]
     public function benchRuntimeSubmitted()
     {
-        $form = $this->runtimeForm(SimpleForm::class);
+        $form = $this->runtimeForm(SimpleForm::class, true);
         $submitted = $form->submit(['first_name' => 'John', 'last_name' => 'Doe', 'age' => '42']);
         $view = $submitted->view();
 
@@ -55,7 +55,7 @@ class FormViewBench extends BenchUtils
     #[Groups(['submitted', 'generated'])]
     public function benchGeneratedSubmitted()
     {
-        $form = $this->generatedForm(SimpleForm::class);
+        $form = $this->generatedForm(SimpleForm::class, true);
         $submitted = $form->submit(['first_name' => 'John', 'last_name' => 'Doe', 'age' => '42']);
         $view = $submitted->view();
 

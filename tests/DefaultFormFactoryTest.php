@@ -2,8 +2,8 @@
 
 namespace Quatrevieux\Form;
 
+use BadMethodCallException;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Quatrevieux\Form\Fixtures\ConfiguredLengthValidator;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\Fixtures\TestConfig;
@@ -40,5 +40,14 @@ class DefaultFormFactoryTest extends TestCase
         $this->assertInstanceOf(SimpleRequest::class, $form->submit([])->value());
 
         $this->assertSame($form, $factory->create(SimpleRequest::class));
+    }
+
+    public function test_create_without_view()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('View system disabled for the form');
+
+        $factory = DefaultFormFactory::runtime(enabledView: false);
+        $factory->create(SimpleRequest::class)->view();
     }
 }

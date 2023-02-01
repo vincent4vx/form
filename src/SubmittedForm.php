@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form;
 
+use BadMethodCallException;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\View\FormView;
 use Quatrevieux\Form\View\FormViewInstantiatorInterface;
@@ -30,7 +31,7 @@ final class SubmittedForm implements SubmittedFormInterface
          * @var array<string, FieldError|mixed[]>
          */
         private readonly array $errors,
-        private readonly FormViewInstantiatorInterface $viewInstantiator,
+        private readonly ?FormViewInstantiatorInterface $viewInstantiator = null,
     ) {
     }
 
@@ -63,6 +64,8 @@ final class SubmittedForm implements SubmittedFormInterface
      */
     public function view(): FormView
     {
-        return $this->viewInstantiator->submitted($this->httpValue, $this->errors);
+        $viewInstantiator = $this->viewInstantiator ?? throw new BadMethodCallException('View system disabled for the form');
+
+        return $viewInstantiator->submitted($this->httpValue, $this->errors);
     }
 }

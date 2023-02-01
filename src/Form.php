@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form;
 
+use BadMethodCallException;
 use Quatrevieux\Form\Instantiator\InstantiatorInterface;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Validator\ValidatorInterface;
@@ -33,9 +34,9 @@ final class Form implements FormInterface
         private readonly ValidatorInterface $validator,
 
         /**
-         * @var FormViewInstantiatorInterface
+         * @var FormViewInstantiatorInterface|null
          */
-        private readonly FormViewInstantiatorInterface $viewInstantiator, // @todo allow null to disable view system
+        private readonly ?FormViewInstantiatorInterface $viewInstantiator,
     ) {
     }
 
@@ -68,6 +69,8 @@ final class Form implements FormInterface
      */
     public function view(): FormView
     {
-        return $this->viewInstantiator->default();
+        $viewInstantiator = $this->viewInstantiator ?? throw new BadMethodCallException('View system disabled for the form');
+
+        return $viewInstantiator->default();
     }
 }

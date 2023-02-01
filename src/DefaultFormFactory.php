@@ -27,7 +27,7 @@ final class DefaultFormFactory implements FormFactoryInterface
         private readonly InstantiatorFactoryInterface $instantiatorFactory,
         private readonly ValidatorFactoryInterface $validatorFactory,
         private readonly FormTransformerFactoryInterface $transformerFactory,
-        private readonly FormViewInstantiatorFactoryInterface $formViewInstantiatorFactory,
+        private readonly ?FormViewInstantiatorFactoryInterface $formViewInstantiatorFactory = null,
     ) {
     }
 
@@ -40,7 +40,7 @@ final class DefaultFormFactory implements FormFactoryInterface
             $this->transformerFactory->create($dataClass),
             $this->instantiatorFactory->create($dataClass),
             $this->validatorFactory->create($dataClass),
-            $this->formViewInstantiatorFactory->create($dataClass),
+            $this->formViewInstantiatorFactory?->create($dataClass),
         );
     }
 
@@ -51,14 +51,19 @@ final class DefaultFormFactory implements FormFactoryInterface
      *
      * @return DefaultFormFactory
      */
-    public static function runtime(?RegistryInterface $registry = null): DefaultFormFactory
+    public static function runtime(?RegistryInterface $registry = null, bool $enabledView = true): DefaultFormFactory
     {
         $registry ??= new DefaultRegistry();
 
         $registry->setInstantiatorFactory($instantiatorFactory = new RuntimeInstantiatorFactory());
         $registry->setValidatorFactory($validatorFactory = new RuntimeValidatorFactory($registry));
         $registry->setTransformerFactory($transformerFactory = new RuntimeFormTransformerFactory($registry));
-        $registry->setFormViewInstantiatorFactory($viewInstantiatorFactory = new RuntimeFormViewInstantiatorFactory($registry));
+
+        if ($enabledView) {
+            $registry->setFormViewInstantiatorFactory($viewInstantiatorFactory = new RuntimeFormViewInstantiatorFactory($registry));
+        } else {
+            $viewInstantiatorFactory = null;
+        }
 
         return new DefaultFormFactory($instantiatorFactory, $validatorFactory, $transformerFactory, $viewInstantiatorFactory);
     }
