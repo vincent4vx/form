@@ -11,6 +11,8 @@ use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
 use Quatrevieux\Form\View\FormViewInstantiatorFactoryInterface;
 use Quatrevieux\Form\View\RuntimeFormViewInstantiatorFactory;
 
+use function get_class;
+
 /**
  * Default implementation of FormFactoryInterface
  *
@@ -42,6 +44,14 @@ final class DefaultFormFactory implements FormFactoryInterface
             $this->validatorFactory->create($dataClass),
             $this->formViewInstantiatorFactory?->create($dataClass),
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function import(object $data): FormInterface
+    {
+        return $this->create(get_class($data))->import($data);
     }
 
     /**

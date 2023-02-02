@@ -42,6 +42,21 @@ class DefaultFormFactoryTest extends TestCase
         $this->assertSame($form, $factory->create(SimpleRequest::class));
     }
 
+    public function test_import()
+    {
+        $factory = DefaultFormFactory::runtime();
+
+        $data = new SimpleRequest();
+        $data->foo = 'aaa';
+        $data->bar = 'bbb';
+
+        $form = $factory->import($data);
+
+        $this->assertInstanceOf(ImportedForm::class, $form);
+        $this->assertSame($data, $form->value());
+        $this->assertSame(['foo' => 'aaa', 'bar' => 'bbb'], $form->httpValue());
+    }
+
     public function test_create_without_view()
     {
         $this->expectException(BadMethodCallException::class);

@@ -4,8 +4,6 @@ namespace Quatrevieux\Form;
 
 /**
  * Factory for creates forms
- *
- * @todo import method ? call both create and import
  */
 interface FormFactoryInterface
 {
@@ -19,4 +17,16 @@ interface FormFactoryInterface
      * @template T as object
      */
     public function create(string $dataClass): FormInterface;
+
+    /**
+     * Create a form and import data into it
+     * This is equivalent to calling `$factory->create(get_class($data))->import($data)`
+     *
+     * @param T $data DTO instance to import
+     *
+     * @return FormInterface<T>
+     *
+     * @template T as object
+     */
+    public function import(object $data): FormInterface;
 }
