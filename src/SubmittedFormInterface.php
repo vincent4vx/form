@@ -6,17 +6,15 @@ use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\View\FormView;
 
 /**
+ * Type for form which has been submitted and validated
+ *
  * @template T as object
+ * @extends FilledFormInterface<T>
+ *
+ * @see FormInterface::submit() For create a submitted form
  */
-interface SubmittedFormInterface
+interface SubmittedFormInterface extends FilledFormInterface
 {
-    /**
-     * Get validated and normalized value
-     *
-     * @return T
-     */
-    public function value(): object;
-
     /**
      * Does submitted data are valid ?
      *
@@ -33,6 +31,4 @@ interface SubmittedFormInterface
      * @return array<string, FieldError|mixed[]>
      */
     public function errors(): array;
-
-    public function view(): FormView; // @todo extends FormInterface
 }

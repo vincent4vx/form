@@ -4,48 +4,20 @@ namespace Quatrevieux\Form;
 
 use BadMethodCallException;
 use Quatrevieux\Form\View\FormView;
-use Quatrevieux\Form\View\FormViewInstantiatorInterface;
 
 /**
+ * Default implementation of ImportedFormInterface
+ *
  * @template T as object
+ * @extends AbstractFilledForm<T>
  * @implements ImportedFormInterface<T>
  */
-final class ImportedForm implements ImportedFormInterface
+final class ImportedForm extends AbstractFilledForm implements ImportedFormInterface
 {
-    public function __construct(
-        /**
-         * @var T
-         */
-        private readonly object $value,
-
-        /**
-         * @var mixed[]
-         */
-        private readonly array $httpValue,
-        private readonly ?FormViewInstantiatorInterface $viewInstantiator,
-    ) {
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function value(): object
-    {
-        return $this->value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function httpValue(): array
-    {
-        return $this->httpValue;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function view(): FormView
+    final public function view(): FormView
     {
         $viewInstantiator = $this->viewInstantiator ?? throw new BadMethodCallException('View system disabled for the form');
 

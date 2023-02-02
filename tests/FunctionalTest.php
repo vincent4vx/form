@@ -300,6 +300,49 @@ class FunctionalTest extends FormTestCase
         $this->assertEquals('<input name="bar" value="a" required minlength="3" />', (string) $view->fields['bar']);
     }
 
+    public function test_import_then_submit_should_perform_patch()
+    {
+        $form = $this->form(RequiredParametersRequest::class);
+
+        $request = new RequiredParametersRequest();
+        $request->foo = 456;
+        $request->bar = 'azerty';
+
+        $submitted = $form->import($request)->submit([]);
+
+        $this->assertTrue($submitted->valid());
+        $this->assertEquals($request, $submitted->value());
+
+        $submitted = $form->import($request)->submit(['foo' => 123]);
+
+        $this->assertTrue($submitted->valid());
+        $this->assertNotEquals($request, $submitted->value());
+        $this->assertSame(123, $submitted->value()->foo);
+        $this->assertSame('azerty', $submitted->value()->bar);
+    }
+
+    public function test_submit_twice_will_perform_patch()
+    {
+        $form = $this->form(RequiredParametersRequest::class);
+
+        $submitted = $form->submit(['foo' => '123'])->submit(['bar' => 'azerty']);
+
+        $this->assertTrue($submitted->valid());
+        $this->assertSame(123, $submitted->value()->foo);
+        $this->assertSame('azerty', $submitted->value()->bar);
+
+        $submitted = $submitted->submit(['foo' => '456']);
+
+        $this->assertTrue($submitted->valid());
+        $this->assertSame(456, $submitted->value()->foo);
+        $this->assertSame('azerty', $submitted->value()->bar);
+
+        $submitted = $submitted->submit(['foo' => null]);
+
+        $this->assertFalse($submitted->valid());
+        $this->assertErrors(['foo' => 'This value is required'], $submitted->errors());
+    }
+
     public function form(string $dataClass): FormInterface
     {
         return $this->runtimeForm($dataClass);

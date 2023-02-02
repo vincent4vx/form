@@ -8,39 +8,30 @@ use Quatrevieux\Form\View\FormView;
 use Quatrevieux\Form\View\FormViewInstantiatorInterface;
 
 /**
- * @template T as object
+ * Default implementation of SubmittedFormInterface
  *
+ * @template T as object
  * @implements SubmittedFormInterface<T>
  */
-final class SubmittedForm implements SubmittedFormInterface
+final class SubmittedForm extends AbstractFilledForm implements SubmittedFormInterface
 {
-    public function __construct(
-        /**
-         * Raw submitted HTTP data
-         *
-         * @var array<string, mixed>
-         */
-        private readonly array $httpValue,
-
-        /**
-         * @var T
-         */
-        private readonly object $data,
-
-        /**
-         * @var array<string, FieldError|mixed[]>
-         */
-        private readonly array $errors,
-        private readonly ?FormViewInstantiatorInterface $viewInstantiator = null,
-    ) {
-    }
+    /**
+     * @var array<string, FieldError|mixed[]>
+     */
+    private readonly array $errors;
 
     /**
-     * {@inheritdoc}
+     * @param FormInterface<T> $form Base form instance
+     * @param FormViewInstantiatorInterface|null $viewInstantiator View instantiator. Can be null to disable view system
+     * @param mixed[] $httpValue Submitted value
+     * @param T $data DTO of submitted value transformed to PHP data
+     * @param array<string, FieldError|mixed[]> $errors Errors of submitted value
      */
-    public function value(): object
+    public function __construct(FormInterface $form, ?FormViewInstantiatorInterface $viewInstantiator, array $httpValue, object $data, array $errors)
     {
-        return $this->data;
+        parent::__construct($form, $viewInstantiator, $data, $httpValue);
+
+        $this->errors = $errors;
     }
 
     /**

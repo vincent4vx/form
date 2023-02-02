@@ -49,7 +49,13 @@ final class Form implements FormInterface
         $dto = $this->instantiator->instantiate($transformation->values);
         $errors = $this->validator->validate($dto, $transformation->errors);
 
-        return new SubmittedForm($data, $dto, $errors, $this->viewInstantiator);
+        return new SubmittedForm(
+            $this,
+            $this->viewInstantiator,
+            $data,
+            $dto,
+            $errors,
+        );
     }
 
     /**
@@ -57,10 +63,12 @@ final class Form implements FormInterface
      */
     public function import(object $data): ImportedFormInterface
     {
+        /** @var ImportedForm<T> */
         return new ImportedForm(
+            $this,
+            $this->viewInstantiator,
             $data,
             $this->transformer->transformToHttp($this->instantiator->export($data)),
-            $this->viewInstantiator,
         );
     }
 

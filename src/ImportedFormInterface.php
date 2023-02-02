@@ -2,26 +2,14 @@
 
 namespace Quatrevieux\Form;
 
-use Quatrevieux\Form\View\FormView;
-
 /**
+ * Type for form with imported value
+ *
  * @template T as object
+ * @extends FilledFormInterface<T>
+ *
+ * @see FormInterface::import() For create an imported form
  */
-interface ImportedFormInterface
+interface ImportedFormInterface extends FilledFormInterface
 {
-    /**
-     * Get imported value
-     *
-     * @return T
-     */
-    public function value(): object;
-
-    /**
-     * Get imported value normalized as HTTP value
-     *
-     * @return array<string, mixed>
-     */
-    public function httpValue(): array;
-
-    public function view(): FormView; // @todo extends FormInterface
 }
