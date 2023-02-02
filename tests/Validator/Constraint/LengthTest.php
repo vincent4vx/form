@@ -3,12 +3,16 @@
 namespace Quatrevieux\Form\Validator\Constraint;
 
 use Quatrevieux\Form\DefaultRegistry;
+use Quatrevieux\Form\FormInterface;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
 
 class LengthTest extends FormTestCase
 {
+    private FormInterface $form;
+    private FormInterface $generatedForm;
+
     protected function setUp(): void
     {
         parent::setUp();

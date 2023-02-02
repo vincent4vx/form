@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['8.1']
+        php-versions: ['8.1', '8.2']
     name: PHP ${{ matrix.php-versions }}
 
     steps:
@@ -27,7 +27,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: json
-          ini-values: date.timezone=Europe/Paris
+          ini-values: date.timezone=Europe/Paris, error_reporting=-1, display_errors=On
       - name: Check PHP Version
         run: php -v
 
