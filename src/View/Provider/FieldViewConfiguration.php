@@ -25,11 +25,12 @@ use Quatrevieux\Form\View\Generator\FieldViewProviderGeneratorInterface;
  *
  * @implements FieldViewProviderInterface<self>
  * @implements FieldViewProviderGeneratorInterface<self>
- * @todo empty instance for default ?
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class FieldViewConfiguration implements FieldViewProviderConfigurationInterface, FieldViewProviderInterface, FieldViewProviderGeneratorInterface
 {
+    private static ?FieldViewConfiguration $default = null;
+
     public function __construct(
         /**
          * The HTML input type
@@ -85,7 +86,7 @@ final class FieldViewConfiguration implements FieldViewProviderConfigurationInte
         return new FieldView(
             $name,
             $value ?? $configuration->defaultValue,
-            $error instanceof FieldError ? $error : null, // @todo handle array of errors?
+            $error instanceof FieldError ? $error : null,
             $attributes + $defaultAttributes,
         );
     }
@@ -111,5 +112,13 @@ final class FieldViewConfiguration implements FieldViewProviderConfigurationInte
             Code::raw(Code::instanceOfOrNull($errorAccessor, FieldError::class)),
             $attributes
         ]);
+    }
+
+    /**
+     * Get the default (i.e. empty) view configuration instance
+     */
+    public static function default(): FieldViewConfiguration
+    {
+        return self::$default ??= new FieldViewConfiguration();
     }
 }

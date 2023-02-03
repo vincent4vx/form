@@ -35,7 +35,6 @@ final class PublicPropertyInstantiator implements InstantiatorInterface
         $object = new $className();
 
         foreach ($fields as $name => $value) {
-            // @todo in case of default value ?
             try {
                 $object->$name = $value;
             } catch (TypeError $e) {

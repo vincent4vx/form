@@ -5,17 +5,11 @@ namespace Quatrevieux\Form;
 use FilesystemIterator;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
-use Quatrevieux\Form\Transformer\GeneratedFormTransformerFactory;
 use Quatrevieux\Form\Util\Functions;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 use Quatrevieux\Form\Validator\FieldError;
-use Quatrevieux\Form\Validator\GeneratedValidatorFactory;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
-use Quatrevieux\Form\Validator\RuntimeValidatorFactory;
-use Quatrevieux\Form\View\GeneratedFormViewInstantiatorFactory;
-use Quatrevieux\Form\View\RuntimeFormViewInstantiatorFactory;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -39,33 +33,10 @@ class FormTestCase extends TestCase
         $this->registry = new ContainerRegistry($this->container);
 
         $this->runtimeFormFactory = DefaultFormFactory::runtime($this->registry);
-
-        $savePathResolver = Functions::savePathResolver(self::GENERATED_DIR);
-
-        $generatedFormRegistry = new ContainerRegistry($this->container);
-
-        $this->generatedFormFactory = new DefaultFormFactory(
-            $generatedInstantiatorFactory = new GeneratedInstantiatorFactory(savePathResolver: $savePathResolver),
-            $generatedValidatorFactory = new GeneratedValidatorFactory(
-                factory: new RuntimeValidatorFactory($generatedFormRegistry),
-                generator: new ValidatorGenerator($generatedFormRegistry),
-                registry: $generatedFormRegistry,
-                savePathResolver: $savePathResolver,
-            ),
-            $generatedFormTransformerFactory = new GeneratedFormTransformerFactory(
-                registry: $generatedFormRegistry,
-                savePathResolver: $savePathResolver
-            ),
-            $generatedFormViewInstantiatorFactory = new GeneratedFormViewInstantiatorFactory(
-                registry: $generatedFormRegistry,
-                savePathResolver: $savePathResolver,
-            ),
+        $this->generatedFormFactory = DefaultFormFactory::generated(
+            registry: new ContainerRegistry($this->container),
+            savePathResolver: Functions::savePathResolver(self::GENERATED_DIR),
         );
-
-        $generatedFormRegistry->setInstantiatorFactory($generatedInstantiatorFactory);
-        $generatedFormRegistry->setValidatorFactory($generatedValidatorFactory);
-        $generatedFormRegistry->setTransformerFactory($generatedFormTransformerFactory);
-        $generatedFormRegistry->setFormViewInstantiatorFactory($generatedFormViewInstantiatorFactory);
     }
 
     protected function tearDown(): void

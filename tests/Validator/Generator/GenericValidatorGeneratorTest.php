@@ -43,7 +43,7 @@ class MyCustomConstraint implements ConstraintInterface
 
     public function getValidator(RegistryInterface $registry): ConstraintValidatorInterface
     {
-        return $registry->getValidator(MyCustomConstraintValidator::class);
+        return $registry->getConstraintValidator(MyCustomConstraintValidator::class);
     }
 }
 

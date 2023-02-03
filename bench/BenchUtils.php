@@ -47,33 +47,9 @@ class BenchUtils
 
     public function generatedFormFactory(bool $viewSupport = false): FormFactoryInterface
     {
-        $savePathResolver = Functions::savePathResolver(self::GENERATED_DIR);
-        $registry = new DefaultRegistry();
-        $registry->setInstantiatorFactory($instantiatorFactory = new GeneratedInstantiatorFactory(
-            savePathResolver: $savePathResolver
-        ));
-        $registry->setTransformerFactory($formTransformerFactory = new GeneratedFormTransformerFactory(
-            registry: $registry,
-            savePathResolver: $savePathResolver,
-        ));
-        $registry->setValidatorFactory($validatorFactory = new GeneratedValidatorFactory(
-            registry: $registry,
-            savePathResolver: $savePathResolver,
-        ));
-
-        if ($viewSupport) {
-            $registry->setFormViewInstantiatorFactory($formViewInstantiatorFactory = new GeneratedFormViewInstantiatorFactory(
-                registry: $registry,
-            ));
-        } else {
-            $formViewInstantiatorFactory = null;
-        }
-
-        return new DefaultFormFactory(
-            instantiatorFactory: $instantiatorFactory,
-            validatorFactory: $validatorFactory,
-            transformerFactory: $formTransformerFactory,
-            formViewInstantiatorFactory: $formViewInstantiatorFactory,
+        return DefaultFormFactory::generated(
+            savePathResolver: Functions::savePathResolver(self::GENERATED_DIR),
+            enabledView: $viewSupport
         );
     }
 

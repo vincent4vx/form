@@ -25,7 +25,7 @@ final class ContainerRegistry implements RegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function getValidator(string $className): ConstraintValidatorInterface
+    public function getConstraintValidator(string $className): ConstraintValidatorInterface
     {
         // @phpstan-ignore-next-line
         return $this->container->get($className);
@@ -46,7 +46,7 @@ final class ContainerRegistry implements RegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function getTransformer(string $className): ConfigurableFieldTransformerInterface
+    public function getFieldTransformer(string $className): ConfigurableFieldTransformerInterface
     {
         // @phpstan-ignore-next-line
         return $this->container->get($className);

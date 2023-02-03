@@ -59,6 +59,6 @@ final class ValidateBy implements ConstraintInterface
      */
     public function getValidator(RegistryInterface $registry): ConstraintValidatorInterface
     {
-        return $registry->getValidator($this->validatorClass);
+        return $registry->getConstraintValidator($this->validatorClass);
     }
 }

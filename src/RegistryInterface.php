@@ -17,7 +17,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 interface RegistryInterface
 {
     /**
-     * @todo rename
      * Get transformer implementation for a {@see DelegatedFieldTransformerInterface}
      *
      * @param class-string<T> $className Class name of the implementation
@@ -25,10 +24,9 @@ interface RegistryInterface
      * @return T
      * @template T as ConfigurableFieldTransformerInterface
      */
-    public function getTransformer(string $className): ConfigurableFieldTransformerInterface;
+    public function getFieldTransformer(string $className): ConfigurableFieldTransformerInterface;
 
     /**
-     * @todo rename
      * Get a validator instance
      *
      * @param class-string<V> $className Validator class name
@@ -38,7 +36,7 @@ interface RegistryInterface
      *
      * @see ConstraintInterface::getValidator()
      */
-    public function getValidator(string $className): ConstraintValidatorInterface;
+    public function getConstraintValidator(string $className): ConstraintValidatorInterface;
 
     /**
      * Get the configured translator instance

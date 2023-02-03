@@ -89,7 +89,6 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
      */
     protected function generate(string $generatedClassName, object $runtime): ?string
     {
-        // @todo handle other validator instances ?
         if ($runtime instanceof RuntimeValidator) {
             // @phpstan-ignore-next-line
             $generator = $this->generator ??= new ValidatorGenerator($this->registry);

@@ -82,8 +82,7 @@ final class RuntimeFormViewInstantiatorFactory implements FormViewInstantiatorFa
             return $fieldViewProviderConfigurationAttribute->newInstance();
         }
 
-        // @todo keep instance
-        return new FieldViewConfiguration();
+        return FieldViewConfiguration::default();
     }
 
     /**

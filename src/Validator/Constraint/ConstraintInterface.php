@@ -31,7 +31,7 @@ interface ConstraintInterface
      *
      * @return ConstraintValidatorInterface<static>
      *
-     * @see RegistryInterface::getValidator()
+     * @see RegistryInterface::getConstraintValidator()
      */
     public function getValidator(RegistryInterface $registry): ConstraintValidatorInterface;
 }

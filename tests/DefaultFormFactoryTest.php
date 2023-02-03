@@ -3,11 +3,15 @@
 namespace Quatrevieux\Form;
 
 use BadMethodCallException;
+use PhpBench\Reflection\ReflectionClass;
 use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\Fixtures\ConfiguredLengthValidator;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\Fixtures\TestConfig;
 use Quatrevieux\Form\Fixtures\WithExternalDependencyConstraintRequest;
+use Quatrevieux\Form\Util\Functions;
+use Quatrevieux\Form\View\FormView;
+use ReflectionProperty;
 
 class DefaultFormFactoryTest extends TestCase
 {
@@ -64,5 +68,53 @@ class DefaultFormFactoryTest extends TestCase
 
         $factory = DefaultFormFactory::runtime(enabledView: false);
         $factory->create(SimpleRequest::class)->view();
+    }
+
+    public function test_generated()
+    {
+        $factory = DefaultFormFactory::generated(
+            savePathResolver: Functions::savePathResolver(__DIR__ . '/_tmp')
+        );
+        $form = $factory->create(SimpleRequest::class);
+
+        $this->assertInstanceOf(Form::class, $form);
+        $this->assertInstanceOf(SimpleRequest::class, $form->submit([])->value());
+        $this->assertInstanceOf(FormView::class, $form->view());
+
+        $transformer = (new ReflectionProperty($form, 'transformer'))->getValue($form);
+        $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestTransformer', $transformer);
+
+        $validator = (new ReflectionProperty($form, 'validator'))->getValue($form);
+        $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestValidator', $validator);
+
+        $instantiator = (new ReflectionProperty($form, 'instantiator'))->getValue($form);
+        $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestInstantiator', $instantiator);
+
+        $viewInstantiator = (new ReflectionProperty($form, 'viewInstantiator'))->getValue($form);
+        $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestViewInstantiator', $viewInstantiator);
+    }
+
+    public function test_generated_without_view()
+    {
+        $factory = DefaultFormFactory::generated(
+            savePathResolver: Functions::savePathResolver(__DIR__ . '/_tmp'),
+            enabledView: false,
+        );
+        $form = $factory->create(SimpleRequest::class);
+
+        $this->assertInstanceOf(Form::class, $form);
+        $this->assertInstanceOf(SimpleRequest::class, $form->submit([])->value());
+
+        $transformer = (new ReflectionProperty($form, 'transformer'))->getValue($form);
+        $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestTransformer', $transformer);
+
+        $validator = (new ReflectionProperty($form, 'validator'))->getValue($form);
+        $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestValidator', $validator);
+
+        $instantiator = (new ReflectionProperty($form, 'instantiator'))->getValue($form);
+        $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestInstantiator', $instantiator);
+
+        $viewInstantiator = (new ReflectionProperty($form, 'viewInstantiator'))->getValue($form);
+        $this->assertNull($viewInstantiator);
     }
 }

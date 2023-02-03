@@ -33,7 +33,7 @@ final class DefaultRegistry implements RegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function getTransformer(string $className): ConfigurableFieldTransformerInterface
+    public function getFieldTransformer(string $className): ConfigurableFieldTransformerInterface
     {
         // @phpstan-ignore-next-line
         return $this->transformers[$className] ?? throw new InvalidArgumentException(sprintf('Transformer "%s" is not registered', $className));
@@ -42,7 +42,7 @@ final class DefaultRegistry implements RegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function getValidator(string $className): ConstraintValidatorInterface
+    public function getConstraintValidator(string $className): ConstraintValidatorInterface
     {
         // @phpstan-ignore-next-line
         return $this->validators[$className] ?? throw new InvalidArgumentException(sprintf('Validator "%s" is not registered', $className));

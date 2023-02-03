@@ -20,7 +20,7 @@ class DefaultRegistryTest extends TestCase
         $this->expectExceptionMessage('Transformer "foo" is not registered');
 
         $registry = new DefaultRegistry();
-        $registry->getTransformer('foo');
+        $registry->getFieldTransformer('foo');
     }
 
     public function test_getValidator_not_found()
@@ -29,7 +29,7 @@ class DefaultRegistryTest extends TestCase
         $this->expectExceptionMessage('Validator "foo" is not registered');
 
         $registry = new DefaultRegistry();
-        $registry->getValidator('foo');
+        $registry->getConstraintValidator('foo');
     }
 
     public function test_get_set_translator()
@@ -46,10 +46,10 @@ class DefaultRegistryTest extends TestCase
         $registry = new DefaultRegistry();
 
         $registry->registerTransformer($transformer = $this->createMock(ConfigurableFieldTransformerInterface::class));
-        $this->assertSame($transformer, $registry->getTransformer(get_class($transformer)));
+        $this->assertSame($transformer, $registry->getFieldTransformer(get_class($transformer)));
 
         $registry->registerTransformer($transformer = $this->createMock(ConfigurableFieldTransformerInterface::class), 'foo');
-        $this->assertSame($transformer, $registry->getTransformer('foo'));
+        $this->assertSame($transformer, $registry->getFieldTransformer('foo'));
     }
 
     public function test_registerValidator()
@@ -57,10 +57,10 @@ class DefaultRegistryTest extends TestCase
         $registry = new DefaultRegistry();
 
         $registry->registerValidator($validator = $this->createMock(ConstraintValidatorInterface::class));
-        $this->assertSame($validator, $registry->getValidator(get_class($validator)));
+        $this->assertSame($validator, $registry->getConstraintValidator(get_class($validator)));
 
         $registry->registerValidator($validator = $this->createMock(ConstraintValidatorInterface::class), 'foo');
-        $this->assertSame($validator, $registry->getValidator('foo'));
+        $this->assertSame($validator, $registry->getConstraintValidator('foo'));
     }
 
     public function test_get_set_modules()

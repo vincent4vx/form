@@ -278,7 +278,7 @@ class MyDelegatedTransformer implements DelegatedFieldTransformerInterface
 {
     public function getTransformer(RegistryInterface $registry): ConfigurableFieldTransformerInterface
     {
-        return $registry->getTransformer(MyDelegatedTransformerImpl::class);
+        return $registry->getFieldTransformer(MyDelegatedTransformerImpl::class);
     }
 }
 

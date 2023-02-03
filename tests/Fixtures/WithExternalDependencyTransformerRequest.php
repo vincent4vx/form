@@ -23,7 +23,7 @@ class FooTransformer implements DelegatedFieldTransformerInterface
 
     public function getTransformer(RegistryInterface $registry): ConfigurableFieldTransformerInterface
     {
-        return $registry->getTransformer(FooImplementation::class);
+        return $registry->getFieldTransformer(FooImplementation::class);
     }
 }
 

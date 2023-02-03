@@ -702,7 +702,7 @@ class DelegatedTransformerParameters implements DelegatedFieldTransformerInterfa
 
     public function getTransformer(RegistryInterface $registry): ConfigurableFieldTransformerInterface
     {
-        return $registry->getTransformer(DelegatedTransformerImpl::class);
+        return $registry->getFieldTransformer(DelegatedTransformerImpl::class);
     }
 }
 

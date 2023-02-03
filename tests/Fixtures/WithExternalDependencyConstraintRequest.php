@@ -24,7 +24,7 @@ class ConfiguredLength implements ConstraintInterface
 
     public function getValidator(RegistryInterface $registry): ConstraintValidatorInterface
     {
-        return $registry->getValidator(ConfiguredLengthValidator::class);
+        return $registry->getConstraintValidator(ConfiguredLengthValidator::class);
     }
 }
 
