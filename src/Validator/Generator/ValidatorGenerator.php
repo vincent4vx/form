@@ -30,7 +30,7 @@ final class ValidatorGenerator
     {
         $classHelper = new ValidatorClass($className);
 
-        foreach ($validator->getFieldsConstraints() as $field => $constraints) {
+        foreach ($validator->fieldsConstraints as $field => $constraints) {
             foreach ($constraints as $constraint) {
                 $classHelper->addConstraintCode($field, $this->validator($constraint));
             }

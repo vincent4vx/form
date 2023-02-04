@@ -43,10 +43,10 @@ final class FormTransformerGenerator
     public function generate(string $transformerClassName, RuntimeFormTransformer $transformer): string
     {
         $classHelper = new FormTransformerClass($transformerClassName);
-        $fieldNameMapping = $transformer->getFieldsNameMapping();
-        $fieldErrorConfigurations = $transformer->getFieldsTransformationErrors();
+        $fieldNameMapping = $transformer->fieldsNameMapping;
+        $fieldErrorConfigurations = $transformer->fieldsTransformationErrors;
 
-        foreach ($transformer->getFieldsTransformers() as $fieldName => $transformers) {
+        foreach ($transformer->fieldsTransformers as $fieldName => $transformers) {
             $classHelper->declareField(
                 $fieldName,
                 $fieldNameMapping[$fieldName] ?? $fieldName,

@@ -35,9 +35,9 @@ class RuntimeFormTransformerTest extends FormTestCase
             ],
         );
 
-        $this->assertEquals($transformers, $transformer->getFieldsTransformers());
-        $this->assertEquals($mapping, $transformer->getFieldsNameMapping());
-        $this->assertEquals($errorConfig, $transformer->getFieldsTransformationErrors());
+        $this->assertEquals($transformers, $transformer->fieldsTransformers);
+        $this->assertEquals($mapping, $transformer->fieldsNameMapping);
+        $this->assertEquals($errorConfig, $transformer->fieldsTransformationErrors);
     }
 
     public function test_without_transformers()

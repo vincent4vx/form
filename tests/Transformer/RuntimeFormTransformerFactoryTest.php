@@ -39,13 +39,13 @@ class RuntimeFormTransformerFactoryTest extends FormTestCase
             'bar' => 'bar',
         ]));
 
-        $this->assertEquals([], $transformer->getFieldsNameMapping());
-        $this->assertEquals([], $transformer->getFieldsTransformationErrors());
+        $this->assertEquals([], $transformer->fieldsNameMapping);
+        $this->assertEquals([], $transformer->fieldsTransformationErrors);
 
         $this->assertEquals([
             'foo' => [new Cast(CastType::String)],
             'bar' => [new Cast(CastType::String)],
-        ], $transformer->getFieldsTransformers());
+        ], $transformer->fieldsTransformers);
     }
 
     public function test_create_with_transformers()
@@ -68,11 +68,11 @@ class RuntimeFormTransformerFactoryTest extends FormTestCase
             'list' => ['foo', 'bar'],
         ]));
 
-        $this->assertEquals([], $transformer->getFieldsNameMapping());
-        $this->assertEquals([], $transformer->getFieldsTransformationErrors());
+        $this->assertEquals([], $transformer->fieldsNameMapping);
+        $this->assertEquals([], $transformer->fieldsTransformationErrors);
         $this->assertEquals([
             'list' => [new Csv(enclosure: '"'), new Cast(CastType::Array)],
-        ], $transformer->getFieldsTransformers());
+        ], $transformer->fieldsTransformers);
     }
 
     public function test_create_with_transformation_error_configuration()
@@ -81,16 +81,16 @@ class RuntimeFormTransformerFactoryTest extends FormTestCase
 
         $transformer = $factory->create(FailingTransformerRequest::class);
 
-        $this->assertEquals([], $transformer->getFieldsNameMapping());
+        $this->assertEquals([], $transformer->fieldsNameMapping);
         $this->assertEquals([
             'foo' => [new UnsafeJsonTransformer(), new Cast(CastType::Object)],
             'customTransformerErrorHandling' => [new UnsafeBase64(), new Cast(CastType::String)],
             'ignoreError' => [new UnsafeBase64(), new Cast(CastType::String)],
-        ], $transformer->getFieldsTransformers());
+        ], $transformer->fieldsTransformers);
         $this->assertEquals([
             'customTransformerErrorHandling' => new TransformationError(message: 'invalid data', keepOriginalValue: true, code: 'd2e95635-fdb6-4752-acb4-aa8f76f64de6'),
             'ignoreError' => new TransformationError(ignore: true),
-        ], $transformer->getFieldsTransformationErrors());
+        ], $transformer->fieldsTransformationErrors);
     }
 
     public function test_create_with_field_name_mapping()
@@ -102,6 +102,6 @@ class RuntimeFormTransformerFactoryTest extends FormTestCase
         $this->assertEquals([
             'myComplexName' => 'my_complex_name',
             'otherField' => 'other',
-        ], $transformer->getFieldsNameMapping());
+        ], $transformer->fieldsNameMapping);
     }
 }

@@ -5,6 +5,8 @@ namespace Quatrevieux\Form\Validator;
 use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 
+use function is_array;
+
 /**
  * Simple runtime implementation of form validator using associative array to map constraints on each field.
  * Field validation will be stopped on the first constraint violation.
@@ -21,7 +23,7 @@ final class RuntimeValidator implements ValidatorInterface
          *
          * @var array<string, list<ConstraintInterface>>
          */
-        private readonly array $fieldsConstraints,
+        public readonly array $fieldsConstraints,
     ) {
     }
 
@@ -56,15 +58,5 @@ final class RuntimeValidator implements ValidatorInterface
         }
 
         return $errors;
-    }
-
-    /**
-     * Get configured constraints indexed by field name
-     *
-     * @return array<string, list<ConstraintInterface>>
-     */
-    public function getFieldsConstraints(): array
-    {
-        return $this->fieldsConstraints;
     }
 }

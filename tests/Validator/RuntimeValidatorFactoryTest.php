@@ -16,7 +16,7 @@ class RuntimeValidatorFactoryTest extends TestCase
         $factory = new RuntimeValidatorFactory(new DefaultRegistry());
 
         $this->assertInstanceOf(RuntimeValidator::class, $factory->create(SimpleRequest::class));
-        $this->assertEmpty($factory->create(SimpleRequest::class)->getFieldsConstraints());
+        $this->assertEmpty($factory->create(SimpleRequest::class)->fieldsConstraints);
     }
 
     public function test_create_with_constraints()
@@ -26,6 +26,6 @@ class RuntimeValidatorFactoryTest extends TestCase
         $this->assertEquals([
             'foo' => [new Required()],
             'bar' => [new Required('bar must be set'), new Length(min: 3)],
-        ], $factory->create(RequiredParametersRequest::class)->getFieldsConstraints());
+        ], $factory->create(RequiredParametersRequest::class)->fieldsConstraints);
     }
 }

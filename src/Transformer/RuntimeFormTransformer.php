@@ -26,21 +26,21 @@ final class RuntimeFormTransformer implements FormTransformerInterface
          *
          * @var array<string, list<FieldTransformerInterface|DelegatedFieldTransformerInterface>>
          */
-        private readonly array $fieldsTransformers,
+        public readonly array $fieldsTransformers,
 
         /**
          * Map DTO field name to HTTP field name
          *
          * @var array<string, string>
          */
-        private readonly array $fieldsNameMapping,
+        public readonly array $fieldsNameMapping,
 
         /**
          * Associate a field name with its error handling configuration
          *
          * @var array<string, TransformationError>
          */
-        private readonly array $fieldsTransformationErrors,
+        public readonly array $fieldsTransformationErrors,
     ) {
     }
 
@@ -97,36 +97,6 @@ final class RuntimeFormTransformer implements FormTransformerInterface
         }
 
         return $normalized;
-    }
-
-    /**
-     * Get loaded transformers
-     *
-     * @return array<string, list<FieldTransformerInterface|DelegatedFieldTransformerInterface>>
-     */
-    public function getFieldsTransformers(): array
-    {
-        return $this->fieldsTransformers;
-    }
-
-    /**
-     * Get the mapping of DTO field name to HTTP field name
-     *
-     * @return array<string, string>
-     */
-    public function getFieldsNameMapping(): array
-    {
-        return $this->fieldsNameMapping;
-    }
-
-    /**
-     * Get the error handling configuration for each field
-     *
-     * @return array<string, TransformationError>
-     */
-    public function getFieldsTransformationErrors(): array
-    {
-        return $this->fieldsTransformationErrors;
     }
 
     /**
