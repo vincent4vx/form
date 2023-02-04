@@ -5,6 +5,7 @@ namespace Quatrevieux\Form\Transformer;
 use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\Cast;
 use Quatrevieux\Form\Transformer\Field\CastType;
+use Quatrevieux\Form\Transformer\Field\DefaultValue;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\HttpField;
@@ -100,6 +101,7 @@ final class RuntimeFormTransformerFactory implements FormTransformerFactoryInter
     {
         $transformers = [];
         $needCast = $property->hasType();
+        $needDefaultValue = $property->getDefaultValue() !== null;
 
         foreach ($property->getAttributes() as $attribute) {
             $className = $attribute->getName();
@@ -115,11 +117,19 @@ final class RuntimeFormTransformerFactory implements FormTransformerFactoryInter
             if ($needCast && $className === Cast::class) {
                 $needCast = false;
             }
+
+            if ($needDefaultValue && $className === DefaultValue::class) {
+                $needDefaultValue = false;
+            }
         }
 
         if ($needCast) {
             /** @phpstan-ignore-next-line $property->getType() is not null */
             $transformers[] = new Cast(CastType::fromReflectionType($property->getType()));
+        }
+
+        if ($needDefaultValue) {
+            $transformers[] = new DefaultValue($property->getDefaultValue());
         }
 
         return $transformers;

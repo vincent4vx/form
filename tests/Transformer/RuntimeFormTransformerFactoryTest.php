@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\Transformer;
 
 use Quatrevieux\Form\ContainerRegistry;
 use Quatrevieux\Form\Fixtures\FailingTransformerRequest;
+use Quatrevieux\Form\Fixtures\RequestWithDefaultValue;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\Fixtures\UnsafeBase64;
 use Quatrevieux\Form\Fixtures\UnsafeJsonTransformer;
@@ -13,6 +14,7 @@ use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Transformer\Field\Cast;
 use Quatrevieux\Form\Transformer\Field\CastType;
 use Quatrevieux\Form\Transformer\Field\Csv;
+use Quatrevieux\Form\Transformer\Field\DefaultValue;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 
 class RuntimeFormTransformerFactoryTest extends FormTestCase
@@ -103,5 +105,17 @@ class RuntimeFormTransformerFactoryTest extends FormTestCase
             'myComplexName' => 'my_complex_name',
             'otherField' => 'other',
         ], $transformer->fieldsNameMapping);
+    }
+
+    public function test_create_with_default()
+    {
+        $factory = new RuntimeFormTransformerFactory(new ContainerRegistry($this->container));
+
+        $transformer = $factory->create(RequestWithDefaultValue::class);
+
+        $this->assertEquals([
+            'foo' => [new Cast(CastType::Int), new DefaultValue(42)],
+            'bar' => [new Cast(CastType::String), new DefaultValue('???')],
+        ], $transformer->fieldsTransformers);
     }
 }

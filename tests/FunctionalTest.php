@@ -2,9 +2,11 @@
 
 namespace Quatrevieux\Form;
 
+use http\Exception\InvalidArgumentException;
 use Quatrevieux\Form\Fixtures\ConfiguredLengthValidator;
 use Quatrevieux\Form\Fixtures\FailingTransformerRequest;
 use Quatrevieux\Form\Fixtures\FooImplementation;
+use Quatrevieux\Form\Fixtures\RequestWithDefaultValue;
 use Quatrevieux\Form\Fixtures\RequiredParametersRequest;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\Fixtures\TestConfig;
@@ -341,6 +343,26 @@ class FunctionalTest extends FormTestCase
 
         $this->assertFalse($submitted->valid());
         $this->assertErrors(['foo' => 'This value is required'], $submitted->errors());
+    }
+
+    public function test_default_value()
+    {
+        $form = $this->form(RequestWithDefaultValue::class);
+
+        $submitted = $form->submit([]);
+
+        $this->assertTrue($submitted->valid());
+        $this->assertSame(42, $submitted->value()->foo);
+        $this->assertSame('???', $submitted->value()->bar);
+
+        $submitted = $form->submit([
+            'foo' => 123,
+            'bar' => 'abc',
+        ]);
+
+        $this->assertTrue($submitted->valid());
+        $this->assertSame(123, $submitted->value()->foo);
+        $this->assertSame('abc', $submitted->value()->bar);
     }
 
     public function form(string $dataClass): FormInterface
