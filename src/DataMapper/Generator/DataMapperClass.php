@@ -1,16 +1,16 @@
 <?php
 
-namespace Quatrevieux\Form\Instantiator\Generator;
+namespace Quatrevieux\Form\DataMapper\Generator;
 
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
-use Quatrevieux\Form\Instantiator\InstantiatorInterface;
+use Quatrevieux\Form\DataMapper\DataMapperInterface;
 
 /**
- * Class generator helper for generates {@see InstantiatorInterface} class
+ * Class generator helper for generates {@see DataMapperInterface} class
  */
 final class InstantiatorClass
 {
@@ -28,11 +28,11 @@ final class InstantiatorClass
         $this->file = new PhpFile();
         $this->class = $this->file->addClass($className);
 
-        $this->classNameMethod = Method::from([InstantiatorInterface::class, 'className']);
-        $this->instantiateMethod = Method::from([InstantiatorInterface::class, 'instantiate']);
-        $this->exportMethod = Method::from([InstantiatorInterface::class, 'export']);
+        $this->classNameMethod = Method::from([DataMapperInterface::class, 'className'])->setComment(null);
+        $this->instantiateMethod = Method::from([DataMapperInterface::class, 'toDataObject'])->setComment(null);
+        $this->exportMethod = Method::from([DataMapperInterface::class, 'toArray'])->setComment(null);
 
-        $this->class->addImplement(InstantiatorInterface::class);
+        $this->class->addImplement(DataMapperInterface::class);
         $this->class->addMember($this->classNameMethod);
         $this->class->addMember($this->instantiateMethod);
         $this->class->addMember($this->exportMethod);

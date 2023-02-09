@@ -12,7 +12,7 @@ final class InstantiateWith
 {
     public function __construct(
         /**
-         * @var class-string<InstantiatorInterface>
+         * @var class-string<DataMapperInterface>
          */
         public readonly string $instantiatorClassName,
     ) {

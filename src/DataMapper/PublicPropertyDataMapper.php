@@ -4,11 +4,13 @@ namespace Quatrevieux\Form\Instantiator;
 
 use TypeError;
 
+use function get_object_vars;
+
 /**
  * @template T as object
- * @implements InstantiatorInterface<T>
+ * @implements DataMapperInterface<T>
  */
-final class PublicPropertyInstantiator implements InstantiatorInterface
+final class PublicPropertyDataMapper implements DataMapperInterface
 {
     public function __construct(
         /**
@@ -46,7 +48,7 @@ final class PublicPropertyInstantiator implements InstantiatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function export(object $data): array
     {

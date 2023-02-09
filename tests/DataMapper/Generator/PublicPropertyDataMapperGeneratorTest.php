@@ -1,23 +1,23 @@
 <?php
 
-namespace Quatrevieux\Form\Instantiator\Generator;
+namespace Quatrevieux\Form\DataMapper\Generator;
 
 use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
-use Quatrevieux\Form\Instantiator\PublicPropertyInstantiator;
+use Quatrevieux\Form\DataMapper\PublicPropertyDataMapper;
 
 class PublicPropertyInstantiatorGeneratorTest extends TestCase
 {
     public function test_generate_simple()
     {
-        $generator = new PublicPropertyInstantiatorGenerator();
-        $class = new InstantiatorClass('InstantiatorTestGenerateSimple');
-        $generator->generate(new PublicPropertyInstantiator(SimpleRequest::class), $class);
+        $generator = new PublicPropertyDataMapperGenerator();
+        $class = new DataMapperClass('InstantiatorTestGenerateSimple');
+        $generator->generate(new PublicPropertyDataMapper(SimpleRequest::class), $class);
 
         $this->assertEquals(<<<'PHP'
 <?php
 
-class InstantiatorTestGenerateSimple implements Quatrevieux\Form\Instantiator\InstantiatorInterface
+class InstantiatorTestGenerateSimple implements Quatrevieux\Form\DataMapper\DataMapperInterface
 {
     /**
      * @return class-string<T>

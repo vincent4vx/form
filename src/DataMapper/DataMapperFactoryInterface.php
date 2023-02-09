@@ -1,6 +1,6 @@
 <?php
 
-namespace Quatrevieux\Form\Instantiator;
+namespace Quatrevieux\Form\DataMapper;
 
 use Quatrevieux\Form\FormInterface;
 
@@ -14,9 +14,9 @@ interface InstantiatorFactoryInterface
      *
      * @param class-string<T> $dataClass DTO class name
      *
-     * @return InstantiatorInterface<T>
+     * @return DataMapperInterface<T>
      *
      * @template T as object
      */
-    public function create(string $dataClass): InstantiatorInterface;
+    public function create(string $dataClass): DataMapperInterface;
 }

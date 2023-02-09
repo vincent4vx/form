@@ -1,6 +1,6 @@
 <?php
 
-namespace Quatrevieux\Form\Instantiator;
+namespace Quatrevieux\Form\DataMapper;
 
 use ReflectionClass;
 
@@ -10,21 +10,21 @@ use ReflectionClass;
 final class RuntimeInstantiatorFactory implements InstantiatorFactoryInterface
 {
     /**
-     * @var array<class-string<InstantiatorInterface>, callable(class-string):InstantiatorInterface>
+     * @var array<class-string<DataMapperInterface>, callable(class-string):DataMapperInterface>
      */
     private array $factories = [];
 
     public function __construct()
     {
-        $this->factories[PublicPropertyInstantiator::class] = fn (string $className) => /* @phpstan-ignore-line */ new PublicPropertyInstantiator($className);
+        $this->factories[PublicPropertyDataMapper::class] = fn (string $className) => /* @phpstan-ignore-line */ new PublicPropertyDataMapper($className);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function create(string $dataClass): InstantiatorInterface
+    public function create(string $dataClass): DataMapperInterface
     {
-        $instantiatorClassName = PublicPropertyInstantiator::class;
+        $instantiatorClassName = PublicPropertyDataMapper::class;
 
         foreach ((new ReflectionClass($dataClass))->getAttributes(InstantiateWith::class) as $attribute) {
             $instantiatorClassName = $attribute->newInstance()->instantiatorClassName;

@@ -1,17 +1,17 @@
 <?php
 
-namespace Quatrevieux\Form\Instantiator;
+namespace Quatrevieux\Form\DataMapper;
 
 use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
 
 class GeneratedInstantiatorFactoryTest extends TestCase
 {
-    private GeneratedInstantiatorFactory $factory;
+    private GeneratedDataMapperFactory $factory;
 
     protected function setUp(): void
     {
-        $this->factory = new GeneratedInstantiatorFactory(
+        $this->factory = new GeneratedDataMapperFactory(
             savePathResolver: fn(string $className) => __DIR__.'/_tmp/'.$className.'.php',
             classNameResolver: fn(string $dataClass) => 'Test'.(new \ReflectionClass($dataClass))->getShortName().'Instantiator'
         );
@@ -38,13 +38,13 @@ class GeneratedInstantiatorFactoryTest extends TestCase
     {
         $instantiator = $this->factory->create(SimpleRequest::class);
 
-        $this->assertInstanceOf(InstantiatorInterface::class, $instantiator);
+        $this->assertInstanceOf(DataMapperInterface::class, $instantiator);
         $this->assertInstanceOf('TestSimpleRequestInstantiator', $instantiator);
         $this->assertFileExists(__DIR__.'/_tmp/TestSimpleRequestInstantiator.php');
         $this->assertEquals(<<<'PHP'
 <?php
 
-class TestSimpleRequestInstantiator implements Quatrevieux\Form\Instantiator\InstantiatorInterface
+class TestSimpleRequestInstantiator implements Quatrevieux\Form\DataMapper\DataMapperInterface
 {
     /**
      * @return class-string<T>
@@ -84,7 +84,7 @@ PHP
     public function test_create_should_load_and_instantiate_generated_instantiator()
     {
         $this->factory->create(SimpleRequest::class);
-        $this->assertInstanceOf(InstantiatorInterface::class, $this->factory->create(SimpleRequest::class));
+        $this->assertInstanceOf(DataMapperInterface::class, $this->factory->create(SimpleRequest::class));
         $this->assertSame(SimpleRequest::class, $this->factory->create(SimpleRequest::class)->className());
         $this->assertInstanceOf('TestSimpleRequestInstantiator', $this->factory->create(SimpleRequest::class));
     }

@@ -1,22 +1,22 @@
 <?php
 
-namespace Quatrevieux\Form\Instantiator;
+namespace Quatrevieux\Form\DataMapper;
 
 use Closure;
-use Quatrevieux\Form\Instantiator\Generator\InstantiatorGenerator;
+use Quatrevieux\Form\DataMapper\Generator\InstantiatorGenerator;
 use Quatrevieux\Form\Util\AbstractGeneratedFactory;
 use Quatrevieux\Form\Util\Functions;
 
 /**
  * Implentation of InstantiatorFactoryInterface using generated instantiator instead of runtime one
  *
- * @extends AbstractGeneratedFactory<InstantiatorInterface>
+ * @extends AbstractGeneratedFactory<DataMapperInterface>
  */
 final class GeneratedInstantiatorFactory extends AbstractGeneratedFactory implements InstantiatorFactoryInterface
 {
     /**
      * Fallback instantiator factory
-     * Will be lazily instantiated to {@see RuntimeInstantiatorFactory} if not provided in constructor
+     * Will be lazily instantiated to {@see RuntimeDataMapperFactory} if not provided in constructor
      *
      * @var InstantiatorFactoryInterface
      */
@@ -31,7 +31,7 @@ final class GeneratedInstantiatorFactory extends AbstractGeneratedFactory implem
     private readonly InstantiatorGenerator $generator;
 
     /**
-     * @param InstantiatorFactoryInterface|null $factory Fallback instantiator factory. If not provided, will be lazily instantiated to {@see RuntimeInstantiatorFactory}.
+     * @param InstantiatorFactoryInterface|null $factory Fallback instantiator factory. If not provided, will be lazily instantiated to {@see RuntimeDataMapperFactory}.
      * @param InstantiatorGenerator|null $generator Code generator instance. If not provided, will be lazily instantiated.
      * @param (Closure(string):string)|null $savePathResolver Resolve instatiator class file path using instantiator class name as parameter. By default, save into `sys_get_temp_dir()`
      * @param (Closure(string):string)|null $classNameResolver Resolve instantiator class name using DTO class name as parameter. By default, replace namespace seprator by "_", and add "Instantiator" suffix
@@ -41,7 +41,7 @@ final class GeneratedInstantiatorFactory extends AbstractGeneratedFactory implem
         parent::__construct(
             $savePathResolver ?? Functions::savePathResolver(),
             $classNameResolver ?? Functions::classNameResolver('Instantiator'),
-            InstantiatorInterface::class
+            DataMapperInterface::class
         );
 
         if ($factory) {
@@ -56,7 +56,7 @@ final class GeneratedInstantiatorFactory extends AbstractGeneratedFactory implem
     /**
      * {@inheritdoc}
      */
-    public function create(string $dataClass): InstantiatorInterface
+    public function create(string $dataClass): DataMapperInterface
     {
         return $this->createOrGenerate($dataClass);
     }
@@ -64,7 +64,7 @@ final class GeneratedInstantiatorFactory extends AbstractGeneratedFactory implem
     /**
      * {@inheritdoc}
      */
-    protected function callConstructor(string $generatedClass): InstantiatorInterface
+    protected function callConstructor(string $generatedClass): DataMapperInterface
     {
         return new $generatedClass();
     }
@@ -72,10 +72,10 @@ final class GeneratedInstantiatorFactory extends AbstractGeneratedFactory implem
     /**
      * {@inheritdoc}
      */
-    protected function createRuntime(string $dataClass): InstantiatorInterface
+    protected function createRuntime(string $dataClass): DataMapperInterface
     {
         // @phpstan-ignore-next-line
-        $factory = $this->factory ??= new RuntimeInstantiatorFactory();
+        $factory = $this->factory ??= new RuntimeDataMapperFactory();
         return $factory->create($dataClass);
     }
 
