@@ -69,7 +69,7 @@ final class Embedded implements ConstraintInterface, DelegatedFieldTransformerIn
      */
     public function getTransformer(RegistryInterface $registry): ConfigurableFieldTransformerInterface
     {
-        return new EmbeddedTransformer($registry->getTransformerFactory(), $registry->getInstantiatorFactory());
+        return new EmbeddedTransformer($registry->getTransformerFactory(), $registry->getDataMapperFactory());
     }
 
     /**

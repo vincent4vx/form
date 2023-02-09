@@ -3,7 +3,7 @@
 namespace Quatrevieux\Form;
 
 use Psr\Container\ContainerInterface;
-use Quatrevieux\Form\Instantiator\InstantiatorFactoryInterface;
+use Quatrevieux\Form\DataMapper\DataMapperFactoryInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;

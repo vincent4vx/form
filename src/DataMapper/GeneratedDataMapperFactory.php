@@ -3,44 +3,44 @@
 namespace Quatrevieux\Form\DataMapper;
 
 use Closure;
-use Quatrevieux\Form\DataMapper\Generator\InstantiatorGenerator;
+use Quatrevieux\Form\DataMapper\Generator\DataMapperGenerator;
 use Quatrevieux\Form\Util\AbstractGeneratedFactory;
 use Quatrevieux\Form\Util\Functions;
 
 /**
- * Implentation of InstantiatorFactoryInterface using generated instantiator instead of runtime one
+ * Create generated data mapper
  *
  * @extends AbstractGeneratedFactory<DataMapperInterface>
  */
-final class GeneratedInstantiatorFactory extends AbstractGeneratedFactory implements InstantiatorFactoryInterface
+final class GeneratedDataMapperFactory extends AbstractGeneratedFactory implements DataMapperFactoryInterface
 {
     /**
-     * Fallback instantiator factory
+     * Fallback data mapper factory
      * Will be lazily instantiated to {@see RuntimeDataMapperFactory} if not provided in constructor
      *
-     * @var InstantiatorFactoryInterface
+     * @var DataMapperFactoryInterface
      */
-    private readonly InstantiatorFactoryInterface $factory;
+    private readonly DataMapperFactoryInterface $factory;
 
     /**
      * Code generator
      * Will be lazily instantiated if not provided in constructor
      *
-     * @var InstantiatorGenerator
+     * @var DataMapperGenerator
      */
-    private readonly InstantiatorGenerator $generator;
+    private readonly DataMapperGenerator $generator;
 
     /**
-     * @param InstantiatorFactoryInterface|null $factory Fallback instantiator factory. If not provided, will be lazily instantiated to {@see RuntimeDataMapperFactory}.
-     * @param InstantiatorGenerator|null $generator Code generator instance. If not provided, will be lazily instantiated.
-     * @param (Closure(string):string)|null $savePathResolver Resolve instatiator class file path using instantiator class name as parameter. By default, save into `sys_get_temp_dir()`
-     * @param (Closure(string):string)|null $classNameResolver Resolve instantiator class name using DTO class name as parameter. By default, replace namespace seprator by "_", and add "Instantiator" suffix
+     * @param DataMapperFactoryInterface|null $factory Fallback data mapper factory. If not provided, will be lazily instantiated to {@see RuntimeDataMapperFactory}.
+     * @param DataMapperGenerator|null $generator Code generator instance. If not provided, will be lazily instantiated.
+     * @param (Closure(string):string)|null $savePathResolver Resolve data mapper class file path using data mapper class name as parameter. By default, save into `sys_get_temp_dir()`
+     * @param (Closure(string):string)|null $classNameResolver Resolve data mapper class name using DTO class name as parameter. By default, replace namespace seprator by "_", and add "DataMapper" suffix
      */
-    public function __construct(?InstantiatorFactoryInterface $factory = null, ?InstantiatorGenerator $generator = null, ?Closure $savePathResolver = null, ?Closure $classNameResolver = null)
+    public function __construct(?DataMapperFactoryInterface $factory = null, ?DataMapperGenerator $generator = null, ?Closure $savePathResolver = null, ?Closure $classNameResolver = null)
     {
         parent::__construct(
             $savePathResolver ?? Functions::savePathResolver(),
-            $classNameResolver ?? Functions::classNameResolver('Instantiator'),
+            $classNameResolver ?? Functions::classNameResolver('DataMapper'),
             DataMapperInterface::class
         );
 
@@ -85,7 +85,7 @@ final class GeneratedInstantiatorFactory extends AbstractGeneratedFactory implem
     protected function generate(string $generatedClassName, object $runtime): ?string
     {
         // @phpstan-ignore-next-line
-        $generator = $this->generator ??= new InstantiatorGenerator();
+        $generator = $this->generator ??= new DataMapperGenerator();
         return $generator->generate($generatedClassName, $runtime);
     }
 }

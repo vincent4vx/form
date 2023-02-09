@@ -1,12 +1,14 @@
 <?php
 
-namespace Quatrevieux\Form\Instantiator;
+namespace Quatrevieux\Form\DataMapper;
 
 use TypeError;
 
 use function get_object_vars;
 
 /**
+ * Simple data mapper implementation using default constructor and fill directly public properties
+ *
  * @template T as object
  * @implements DataMapperInterface<T>
  */
@@ -14,6 +16,8 @@ final class PublicPropertyDataMapper implements DataMapperInterface
 {
     public function __construct(
         /**
+         * Data transfer object class name
+         *
          * @var class-string<T> $className
          */
         private readonly string $className,
@@ -31,7 +35,7 @@ final class PublicPropertyDataMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function instantiate(array $fields): object
+    public function toDataObject(array $fields): object
     {
         $className = $this->className;
         $object = new $className();
@@ -50,7 +54,7 @@ final class PublicPropertyDataMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function export(object $data): array
+    public function toArray(object $data): array
     {
         return get_object_vars($data);
     }

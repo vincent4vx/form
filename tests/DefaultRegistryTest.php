@@ -3,8 +3,8 @@
 namespace Quatrevieux\Form;
 
 use PHPUnit\Framework\TestCase;
-use Quatrevieux\Form\Instantiator\InstantiatorFactoryInterface;
-use Quatrevieux\Form\Instantiator\InstantiatorInterface;
+use Quatrevieux\Form\DataMapper\DataMapperFactoryInterface;
+use Quatrevieux\Form\DataMapper\DataMapperInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
@@ -67,17 +67,17 @@ class DefaultRegistryTest extends TestCase
     {
         $registry = new DefaultRegistry();
 
-        $instantiatorFactory = $this->createMock(InstantiatorFactoryInterface::class);
+        $instantiatorFactory = $this->createMock(DataMapperFactoryInterface::class);
         $transformerFactory = $this->createMock(FormTransformerFactoryInterface::class);
         $validatorFactory = $this->createMock(ValidatorFactoryInterface::class);
         $viewInstantiatorFactory = $this->createMock(FormViewInstantiatorFactoryInterface::class);
 
-        $registry->setInstantiatorFactory($instantiatorFactory);
+        $registry->setDataMapperFactory($instantiatorFactory);
         $registry->setTransformerFactory($transformerFactory);
         $registry->setValidatorFactory($validatorFactory);
         $registry->setFormViewInstantiatorFactory($viewInstantiatorFactory);
 
-        $this->assertSame($instantiatorFactory, $registry->getInstantiatorFactory());
+        $this->assertSame($instantiatorFactory, $registry->getDataMapperFactory());
         $this->assertSame($transformerFactory, $registry->getTransformerFactory());
         $this->assertSame($validatorFactory, $registry->getValidatorFactory());
         $this->assertSame($viewInstantiatorFactory, $registry->getFormViewInstantiatorFactory());

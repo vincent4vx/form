@@ -2,13 +2,13 @@
 
 namespace Quatrevieux\Form\Transformer;
 
-use Quatrevieux\Form\Instantiator\InstantiatorInterface;
+use Quatrevieux\Form\DataMapper\DataMapperInterface;
 
 /**
  * Base type for transform raw HTTP fields to array of data class properties values
  *
- * This transformer is called juste before {@see InstantiatorInterface::instantiate()} on submit,
- * or juste after {@see InstantiatorInterface::export()} on httpValue normalisation.
+ * This transformer is called juste before {@see DataMapperInterface::toDataObject()} on submit,
+ * or juste after {@see DataMapperInterface::toArray()} on httpValue normalisation.
  *
  * The transformer implementation must filter all extra HTTP fields to ensure that undesired properties will not be filled on data object.
  */

@@ -3,7 +3,7 @@
 namespace Quatrevieux\Form;
 
 use BadMethodCallException;
-use Quatrevieux\Form\Instantiator\InstantiatorInterface;
+use Quatrevieux\Form\DataMapper\DataMapperInterface;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Validator\ValidatorInterface;
 use Quatrevieux\Form\View\FormView;
@@ -24,9 +24,9 @@ final class Form implements FormInterface
         private readonly FormTransformerInterface $transformer,
 
         /**
-         * @var InstantiatorInterface<T>
+         * @var DataMapperInterface<T>
          */
-        private readonly InstantiatorInterface $instantiator,
+        private readonly DataMapperInterface $dataMapper,
 
         /**
          * @var ValidatorInterface<T>
@@ -46,7 +46,7 @@ final class Form implements FormInterface
     public function submit(array $data): SubmittedFormInterface
     {
         $transformation = $this->transformer->transformFromHttp($data);
-        $dto = $this->instantiator->instantiate($transformation->values);
+        $dto = $this->dataMapper->toDataObject($transformation->values);
         $errors = $this->validator->validate($dto, $transformation->errors);
 
         return new SubmittedForm(
@@ -68,7 +68,7 @@ final class Form implements FormInterface
             $this,
             $this->viewInstantiator,
             $data,
-            $this->transformer->transformToHttp($this->instantiator->export($data)),
+            $this->transformer->transformToHttp($this->dataMapper->toArray($data)),
         );
     }
 

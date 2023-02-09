@@ -11,28 +11,30 @@ use Quatrevieux\Form\DataMapper\DataMapperInterface;
 use Quatrevieux\Form\DataMapper\PublicPropertyDataMapper;
 
 /**
- * @implements InstantiatorTypeGeneratorInterface<PublicPropertyDataMapper>
+ * Generate data mapper with same behavior as {@see PublicPropertyDataMapper}
+ *
+ * @implements DataMapperTypeGeneratorInterface<PublicPropertyDataMapper>
  */
-final class PublicPropertyInstantiatorGenerator implements InstantiatorTypeGeneratorInterface
+final class PublicPropertyDataMapperGenerator implements DataMapperTypeGeneratorInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function supports(DataMapperInterface $instantiator): bool
+    public function supports(DataMapperInterface $dataMapper): bool
     {
-        return $instantiator instanceof PublicPropertyDataMapper;
+        return $dataMapper instanceof PublicPropertyDataMapper;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generate(DataMapperInterface $instantiator, DataMapperClass $class): void
+    public function generate(DataMapperInterface $dataMapper, DataMapperClass $class): void
     {
-        $class->setClassName($instantiator->className());
+        $class->setClassName($dataMapper->className());
 
-        $class->addToDataObjectBody('$object = new ?();', [new Literal($instantiator->className())]);
+        $class->addToDataObjectBody('$object = new ?();', [new Literal($dataMapper->className())]);
 
-        $classReflection = new ReflectionClass($instantiator->className());
+        $classReflection = new ReflectionClass($dataMapper->className());
 
         foreach ($classReflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
             if (!$property->getType() || $property->getType()->allowsNull()) {

@@ -2,7 +2,7 @@
 
 namespace Quatrevieux\Form;
 
-use Quatrevieux\Form\Instantiator\InstantiatorFactoryInterface;
+use Quatrevieux\Form\DataMapper\DataMapperFactoryInterface;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
 use Quatrevieux\Form\View\FormViewInstantiatorFactoryInterface;
@@ -12,17 +12,17 @@ use Quatrevieux\Form\View\FormViewInstantiatorFactoryInterface;
  */
 trait RegistryTrait
 {
-    private InstantiatorFactoryInterface $instantiatorFactory;
+    private DataMapperFactoryInterface $dataMapperFactory;
     private FormTransformerFactoryInterface $transformerFactory;
     private ValidatorFactoryInterface $validatorFactory;
     private FormViewInstantiatorFactoryInterface $formViewInstantiatorFactory;
 
     /**
-     * Implements {@see RegistryInterface::getInstantiatorFactory()}
+     * Implements {@see RegistryInterface::getDataMapperFactory()}
      */
-    public function getInstantiatorFactory(): InstantiatorFactoryInterface
+    public function getDataMapperFactory(): DataMapperFactoryInterface
     {
-        return $this->instantiatorFactory;
+        return $this->dataMapperFactory;
     }
 
     /**
@@ -42,11 +42,11 @@ trait RegistryTrait
     }
 
     /**
-     * Implements {@see RegistryInterface::setInstantiatorFactory()}
+     * Implements {@see RegistryInterface::setDataMapperFactory()}
      */
-    public function setInstantiatorFactory(InstantiatorFactoryInterface $factory): void
+    public function setDataMapperFactory(DataMapperFactoryInterface $factory): void
     {
-        $this->instantiatorFactory = $factory;
+        $this->dataMapperFactory = $factory;
     }
 
     /**

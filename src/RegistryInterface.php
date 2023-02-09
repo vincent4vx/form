@@ -2,7 +2,7 @@
 
 namespace Quatrevieux\Form;
 
-use Quatrevieux\Form\Instantiator\InstantiatorFactoryInterface;
+use Quatrevieux\Form\DataMapper\DataMapperFactoryInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
@@ -49,7 +49,7 @@ interface RegistryInterface
     /**
      * @internal
      */
-    public function getInstantiatorFactory(): InstantiatorFactoryInterface;
+    public function getDataMapperFactory(): DataMapperFactoryInterface;
 
     /**
      * @internal
@@ -69,7 +69,7 @@ interface RegistryInterface
     /**
      * @internal
      */
-    public function setInstantiatorFactory(InstantiatorFactoryInterface $factory): void;
+    public function setDataMapperFactory(DataMapperFactoryInterface $factory): void;
 
     /**
      * @internal

@@ -6,32 +6,25 @@ use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\DataMapper\PublicPropertyDataMapper;
 
-class PublicPropertyInstantiatorGeneratorTest extends TestCase
+class PublicPropertyDataMapperGeneratorTest extends TestCase
 {
     public function test_generate_simple()
     {
         $generator = new PublicPropertyDataMapperGenerator();
-        $class = new DataMapperClass('InstantiatorTestGenerateSimple');
+        $class = new DataMapperClass('DataMapperTestGenerateSimple');
         $generator->generate(new PublicPropertyDataMapper(SimpleRequest::class), $class);
 
         $this->assertEquals(<<<'PHP'
 <?php
 
-class InstantiatorTestGenerateSimple implements Quatrevieux\Form\DataMapper\DataMapperInterface
+class DataMapperTestGenerateSimple implements Quatrevieux\Form\DataMapper\DataMapperInterface
 {
-    /**
-     * @return class-string<T>
-     */
     function className(): string
     {
         return Quatrevieux\Form\Fixtures\SimpleRequest::class;
     }
 
-    /**
-     * @param array<string, mixed> $fields
-     * @return T
-     */
-    function instantiate(array $fields): object
+    function toDataObject(array $fields): object
     {
         $object = new Quatrevieux\Form\Fixtures\SimpleRequest();
         $object->foo = $fields['foo'] ?? null;
@@ -39,11 +32,7 @@ class InstantiatorTestGenerateSimple implements Quatrevieux\Form\DataMapper\Data
         return $object;
     }
 
-    /**
-     * @param T $data
-     * @return array<string, mixed>
-     */
-    function export(object $data): array
+    function toArray(object $data): array
     {
         return get_object_vars($data);
     }
@@ -55,11 +44,11 @@ PHP
 
         eval(str_replace('<?php', '', $class->code()));
 
-        $generatedInstantiator = new  \InstantiatorTestGenerateSimple();
+        $generatedDataMapper = new  \DataMapperTestGenerateSimple();
 
-        $this->assertSame(SimpleRequest::class, $generatedInstantiator->className());
+        $this->assertSame(SimpleRequest::class, $generatedDataMapper->className());
 
-        $request = $generatedInstantiator->instantiate([
+        $request = $generatedDataMapper->toDataObject([
             'foo' => 'aaa',
             'bar' => 'bbb',
         ]);

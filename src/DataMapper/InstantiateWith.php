@@ -1,11 +1,11 @@
 <?php
 
-namespace Quatrevieux\Form\Instantiator;
+namespace Quatrevieux\Form\DataMapper;
 
 use Attribute;
 
 /**
- * Define instantiator class to use for instantiate data object
+ * Define data mapper class to use for instantiate data object
  */
 #[Attribute(Attribute::TARGET_CLASS)]
 final class InstantiateWith
@@ -14,7 +14,7 @@ final class InstantiateWith
         /**
          * @var class-string<DataMapperInterface>
          */
-        public readonly string $instantiatorClassName,
+        public readonly string $dataMapperClassName,
     ) {
     }
 }

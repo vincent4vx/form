@@ -4,7 +4,7 @@ namespace Quatrevieux\Form;
 
 use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
-use Quatrevieux\Form\Instantiator\PublicPropertyInstantiator;
+use Quatrevieux\Form\DataMapper\PublicPropertyDataMapper;
 use Quatrevieux\Form\Transformer\RuntimeFormTransformer;
 use Quatrevieux\Form\Validator\RuntimeValidator;
 use Quatrevieux\Form\View\RuntimeFormViewInstantiator;
@@ -15,7 +15,7 @@ class FormTest extends TestCase
     {
         $form = new Form(
             new RuntimeFormTransformer(new DefaultRegistry(), ['foo' => [], 'bar' => []], [], []),
-            new PublicPropertyInstantiator(SimpleRequest::class),
+            new PublicPropertyDataMapper(SimpleRequest::class),
             new RuntimeValidator(new DefaultRegistry(), []),
             new RuntimeFormViewInstantiator(new DefaultRegistry(), [], [], []),
         );

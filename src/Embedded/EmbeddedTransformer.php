@@ -2,7 +2,7 @@
 
 namespace Quatrevieux\Form\Embedded;
 
-use Quatrevieux\Form\Instantiator\InstantiatorFactoryInterface;
+use Quatrevieux\Form\DataMapper\DataMapperFactoryInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
@@ -25,7 +25,7 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
 {
     public function __construct(
         private readonly FormTransformerFactoryInterface $transformerFactory,
-        private readonly InstantiatorFactoryInterface $instantiatorFactory
+        private readonly DataMapperFactoryInterface $dataMapperFactory
     ) {
     }
 
@@ -39,7 +39,7 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
         }
 
         $transformer = $this->transformerFactory->create($configuration->class);
-        $instantiator = $this->instantiatorFactory->create($configuration->class);
+        $dataMapper = $this->dataMapperFactory->create($configuration->class);
 
         $transformationResult = $transformer->transformFromHttp($value);
 
@@ -47,7 +47,7 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
             throw new TransformerException('Embedded form has errors', $transformationResult->errors);
         }
 
-        return $instantiator->instantiate($transformationResult->values);
+        return $dataMapper->toDataObject($transformationResult->values);
     }
 
     /**
@@ -61,10 +61,10 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
             return null;
         }
 
-        $instantiator = $this->instantiatorFactory->create($configuration->class);
+        $dataMapper = $this->dataMapperFactory->create($configuration->class);
         $transformer = $this->transformerFactory->create($configuration->class);
 
-        return $transformer->transformToHttp($instantiator->export($value));
+        return $transformer->transformToHttp($dataMapper->toArray($value));
     }
 
     /**
@@ -73,13 +73,13 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
     public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $varName = Code::varName($previousExpression);
-        $instantiator = Call::object('$this->registry->getInstantiatorFactory()')->create($transformer->class);
+        $dataMapper = Call::object('$this->registry->getDataMapperFactory()')->create($transformer->class);
         $transformer = Call::object('$this->registry->getTransformerFactory()')->create($transformer->class);
         $transformationResult = Call::object($transformer)->transformFromHttp(Code::raw($varName));
         $transformationResultVarName = Code::varName($transformationResult);
         $transformerException = Code::new(TransformerException::class, ['Embedded form has errors', Code::raw($transformationResultVarName . '->errors')]);
 
-        return "is_array({$varName} = {$previousExpression}) ? {$instantiator}->instantiate(({$transformationResultVarName} = {$transformationResult})->errors ? throw {$transformerException} : {$transformationResultVarName}->values) : null";
+        return "is_array({$varName} = {$previousExpression}) ? {$dataMapper}->toDataObject(({$transformationResultVarName} = {$transformationResult})->errors ? throw {$transformerException} : {$transformationResultVarName}->values) : null";
     }
 
     /**
@@ -88,9 +88,9 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
     public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $varName = Code::varName($previousExpression);
-        $instantiator = Call::object('$this->registry->getInstantiatorFactory()')->create($transformer->class);
+        $dataMapper = Call::object('$this->registry->getDataMapperFactory()')->create($transformer->class);
         $transformer = Call::object('$this->registry->getTransformerFactory()')->create($transformer->class);
 
-        return "is_object({$varName} = {$previousExpression}) ? {$transformer}->transformToHttp({$instantiator}->export({$varName})) : null";
+        return "is_object({$varName} = {$previousExpression}) ? {$transformer}->transformToHttp({$dataMapper}->toArray({$varName})) : null";
     }
 }

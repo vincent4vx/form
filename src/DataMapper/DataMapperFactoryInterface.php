@@ -2,15 +2,13 @@
 
 namespace Quatrevieux\Form\DataMapper;
 
-use Quatrevieux\Form\FormInterface;
-
 /**
- *
+ * Base type for perform creation of DataMapperInterface instance
  */
-interface InstantiatorFactoryInterface
+interface DataMapperFactoryInterface
 {
     /**
-     * Create instantiator instance which handle given DTO class
+     * Create data mapper instance which handle given DTO class
      *
      * @param class-string<T> $dataClass DTO class name
      *

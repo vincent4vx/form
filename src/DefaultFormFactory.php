@@ -3,9 +3,9 @@
 namespace Quatrevieux\Form;
 
 use Closure;
-use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
-use Quatrevieux\Form\Instantiator\InstantiatorFactoryInterface;
-use Quatrevieux\Form\Instantiator\RuntimeInstantiatorFactory;
+use Quatrevieux\Form\DataMapper\GeneratedDataMapperFactory;
+use Quatrevieux\Form\DataMapper\DataMapperFactoryInterface;
+use Quatrevieux\Form\DataMapper\RuntimeDataMapperFactory;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Transformer\GeneratedFormTransformerFactory;
 use Quatrevieux\Form\Transformer\RuntimeFormTransformerFactory;
@@ -29,7 +29,7 @@ final class DefaultFormFactory implements FormFactoryInterface
     private array $cache = [];
 
     public function __construct(
-        private readonly InstantiatorFactoryInterface $instantiatorFactory,
+        private readonly DataMapperFactoryInterface $dataMapperFactory,
         private readonly ValidatorFactoryInterface $validatorFactory,
         private readonly FormTransformerFactoryInterface $transformerFactory,
         private readonly ?FormViewInstantiatorFactoryInterface $formViewInstantiatorFactory = null,
@@ -43,7 +43,7 @@ final class DefaultFormFactory implements FormFactoryInterface
     {
         return $this->cache[$dataClass] ??= new Form(
             $this->transformerFactory->create($dataClass),
-            $this->instantiatorFactory->create($dataClass),
+            $this->dataMapperFactory->create($dataClass),
             $this->validatorFactory->create($dataClass),
             $this->formViewInstantiatorFactory?->create($dataClass),
         );
@@ -69,7 +69,7 @@ final class DefaultFormFactory implements FormFactoryInterface
     {
         $registry ??= new DefaultRegistry();
 
-        $registry->setInstantiatorFactory($instantiatorFactory = new RuntimeInstantiatorFactory());
+        $registry->setDataMapperFactory($dataMapperFactory = new RuntimeDataMapperFactory());
         $registry->setValidatorFactory($validatorFactory = new RuntimeValidatorFactory($registry));
         $registry->setTransformerFactory($transformerFactory = new RuntimeFormTransformerFactory($registry));
 
@@ -79,7 +79,7 @@ final class DefaultFormFactory implements FormFactoryInterface
             $viewInstantiatorFactory = null;
         }
 
-        return new DefaultFormFactory($instantiatorFactory, $validatorFactory, $transformerFactory, $viewInstantiatorFactory);
+        return new DefaultFormFactory($dataMapperFactory, $validatorFactory, $transformerFactory, $viewInstantiatorFactory);
     }
 
     /**
@@ -95,7 +95,7 @@ final class DefaultFormFactory implements FormFactoryInterface
     {
         $registry ??= new DefaultRegistry();
 
-        $registry->setInstantiatorFactory($instantiatorFactory = new GeneratedInstantiatorFactory(
+        $registry->setDataMapperFactory($dataMapperFactory = new GeneratedDataMapperFactory(
             savePathResolver: $savePathResolver,
         ));
         $registry->setValidatorFactory($validatorFactory = new GeneratedValidatorFactory(
@@ -116,6 +116,6 @@ final class DefaultFormFactory implements FormFactoryInterface
             $viewInstantiatorFactory = null;
         }
 
-        return new DefaultFormFactory($instantiatorFactory, $validatorFactory, $transformerFactory, $viewInstantiatorFactory);
+        return new DefaultFormFactory($dataMapperFactory, $validatorFactory, $transformerFactory, $viewInstantiatorFactory);
     }
 }

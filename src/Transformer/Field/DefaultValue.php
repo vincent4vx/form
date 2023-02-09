@@ -7,6 +7,8 @@ use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Util\Code;
 
+use function str_replace;
+
 /**
  * Defines a default value for a field.
  *
@@ -78,7 +80,7 @@ final class DefaultValue implements FieldTransformerInterface, FieldTransformerG
         $expression = $previousExpression . ' ?? ' . Code::value($transformer->value);
 
         // Remove useless null coalescing with null
-        return \str_replace(' ?? null ?? ', ' ?? ', $expression);
+        return str_replace(' ?? null ?? ', ' ?? ', $expression);
     }
 
     /**

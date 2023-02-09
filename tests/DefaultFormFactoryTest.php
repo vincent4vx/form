@@ -87,8 +87,8 @@ class DefaultFormFactoryTest extends TestCase
         $validator = (new ReflectionProperty($form, 'validator'))->getValue($form);
         $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestValidator', $validator);
 
-        $instantiator = (new ReflectionProperty($form, 'instantiator'))->getValue($form);
-        $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestInstantiator', $instantiator);
+        $dataMapper = (new ReflectionProperty($form, 'dataMapper'))->getValue($form);
+        $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestDataMapper', $dataMapper);
 
         $viewInstantiator = (new ReflectionProperty($form, 'viewInstantiator'))->getValue($form);
         $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestViewInstantiator', $viewInstantiator);
@@ -111,8 +111,8 @@ class DefaultFormFactoryTest extends TestCase
         $validator = (new ReflectionProperty($form, 'validator'))->getValue($form);
         $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestValidator', $validator);
 
-        $instantiator = (new ReflectionProperty($form, 'instantiator'))->getValue($form);
-        $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestInstantiator', $instantiator);
+        $dataMapper = (new ReflectionProperty($form, 'dataMapper'))->getValue($form);
+        $this->assertInstanceOf('Quatrevieux_Form_Fixtures_SimpleRequestDataMapper', $dataMapper);
 
         $viewInstantiator = (new ReflectionProperty($form, 'viewInstantiator'))->getValue($form);
         $this->assertNull($viewInstantiator);

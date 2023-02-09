@@ -5,7 +5,7 @@ namespace Quatrevieux\Form\DataMapper;
 use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
 
-class GeneratedInstantiatorFactoryTest extends TestCase
+class GeneratedDataMapperFactoryTest extends TestCase
 {
     private GeneratedDataMapperFactory $factory;
 
@@ -13,7 +13,7 @@ class GeneratedInstantiatorFactoryTest extends TestCase
     {
         $this->factory = new GeneratedDataMapperFactory(
             savePathResolver: fn(string $className) => __DIR__.'/_tmp/'.$className.'.php',
-            classNameResolver: fn(string $dataClass) => 'Test'.(new \ReflectionClass($dataClass))->getShortName().'Instantiator'
+            classNameResolver: fn(string $dataClass) => 'Test'.(new \ReflectionClass($dataClass))->getShortName().'DataMapper'
         );
     }
 
@@ -39,26 +39,19 @@ class GeneratedInstantiatorFactoryTest extends TestCase
         $instantiator = $this->factory->create(SimpleRequest::class);
 
         $this->assertInstanceOf(DataMapperInterface::class, $instantiator);
-        $this->assertInstanceOf('TestSimpleRequestInstantiator', $instantiator);
-        $this->assertFileExists(__DIR__.'/_tmp/TestSimpleRequestInstantiator.php');
+        $this->assertInstanceOf('TestSimpleRequestDataMapper', $instantiator);
+        $this->assertFileExists(__DIR__.'/_tmp/TestSimpleRequestDataMapper.php');
         $this->assertEquals(<<<'PHP'
 <?php
 
-class TestSimpleRequestInstantiator implements Quatrevieux\Form\DataMapper\DataMapperInterface
+class TestSimpleRequestDataMapper implements Quatrevieux\Form\DataMapper\DataMapperInterface
 {
-    /**
-     * @return class-string<T>
-     */
     function className(): string
     {
         return Quatrevieux\Form\Fixtures\SimpleRequest::class;
     }
 
-    /**
-     * @param array<string, mixed> $fields
-     * @return T
-     */
-    function instantiate(array $fields): object
+    function toDataObject(array $fields): object
     {
         $object = new Quatrevieux\Form\Fixtures\SimpleRequest();
         $object->foo = $fields['foo'] ?? null;
@@ -66,18 +59,14 @@ class TestSimpleRequestInstantiator implements Quatrevieux\Form\DataMapper\DataM
         return $object;
     }
 
-    /**
-     * @param T $data
-     * @return array<string, mixed>
-     */
-    function export(object $data): array
+    function toArray(object $data): array
     {
         return get_object_vars($data);
     }
 }
 
 PHP
-        , file_get_contents(__DIR__.'/_tmp/TestSimpleRequestInstantiator.php')
+        , file_get_contents(__DIR__.'/_tmp/TestSimpleRequestDataMapper.php')
 );
     }
 
@@ -86,6 +75,6 @@ PHP
         $this->factory->create(SimpleRequest::class);
         $this->assertInstanceOf(DataMapperInterface::class, $this->factory->create(SimpleRequest::class));
         $this->assertSame(SimpleRequest::class, $this->factory->create(SimpleRequest::class)->className());
-        $this->assertInstanceOf('TestSimpleRequestInstantiator', $this->factory->create(SimpleRequest::class));
+        $this->assertInstanceOf('TestSimpleRequestDataMapper', $this->factory->create(SimpleRequest::class));
     }
 }

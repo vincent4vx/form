@@ -1,6 +1,6 @@
 <?php
 
-namespace Quatrevieux\Form\Instantiator;
+namespace Quatrevieux\Form\DataMapper;
 
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 
@@ -26,9 +26,9 @@ interface DataMapperInterface
      * @return T
      *
      * @see FormTransformerInterface::transformFromHttp() For converting HTTP data to the correct type, to be passed to this method
-     * @see DataMapperInterface::export() For the reverse operation
+     * @see DataMapperInterface::toArray() For the reverse operation
      */
-    public function instantiate(array $fields): object;
+    public function toDataObject(array $fields): object;
 
     /**
      * Extract the data object into an associative array of fields
@@ -36,9 +36,9 @@ interface DataMapperInterface
      * @param T $data
      * @return array<string, mixed>
      *
-     * @see DataMapperInterface::instantiate() For the reverse operation
+     * @see DataMapperInterface::toDataObject() For the reverse operation
      */
-    public function export(object $data): array;
+    public function toArray(object $data): array;
 
     /**
      * Get the handled data class name

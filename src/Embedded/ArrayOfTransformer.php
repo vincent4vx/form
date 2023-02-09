@@ -42,7 +42,7 @@ final class ArrayOfTransformer implements ConfigurableFieldTransformerInterface,
         $className = $configuration->class;
 
         $transformer = $this->registry->getTransformerFactory()->create($className);
-        $instantiator = $this->registry->getInstantiatorFactory()->create($className);
+        $dataMapper = $this->registry->getDataMapperFactory()->create($className);
 
         $result = [];
         $errors = [];
@@ -53,7 +53,7 @@ final class ArrayOfTransformer implements ConfigurableFieldTransformerInterface,
             if ($transformationResult->errors) {
                 $errors[$key] = $transformationResult->errors;
             } else {
-                $result[$key] = $instantiator->instantiate($transformationResult->values);
+                $result[$key] = $dataMapper->toDataObject($transformationResult->values);
             }
         }
 
@@ -78,12 +78,12 @@ final class ArrayOfTransformer implements ConfigurableFieldTransformerInterface,
         $className = $configuration->class;
 
         $transformer = $this->registry->getTransformerFactory()->create($className);
-        $instantiator = $this->registry->getInstantiatorFactory()->create($className);
+        $dataMapper = $this->registry->getDataMapperFactory()->create($className);
 
         $result = [];
 
         foreach ($value as $key => $item) {
-            $result[$key] = $transformer->transformToHttp($instantiator->export($item));
+            $result[$key] = $transformer->transformToHttp($dataMapper->toArray($item));
         }
 
         return $result;
@@ -97,7 +97,7 @@ final class ArrayOfTransformer implements ConfigurableFieldTransformerInterface,
         $varName = Code::varName($previousExpression);
         $body = 'function ($value) {' .
             '$transformer = ' . Call::object('$this->registry->getTransformerFactory()')->create($transformer->class) . ';' .
-            '$instantiator = ' . Call::object('$this->registry->getInstantiatorFactory()')->create($transformer->class) . ';' .
+            '$dataMapper = ' . Call::object('$this->registry->getDataMapperFactory()')->create($transformer->class) . ';' .
             '$result = [];' .
             '$errors = [];' .
             'foreach ($value as $key => $item) {' .
@@ -105,7 +105,7 @@ final class ArrayOfTransformer implements ConfigurableFieldTransformerInterface,
                 'if ($transformationResult->errors) {' .
                     '$errors[$key] = $transformationResult->errors;' .
                 '} else {' .
-                    '$result[$key] = $instantiator->instantiate($transformationResult->values);' .
+                    '$result[$key] = $dataMapper->toDataObject($transformationResult->values);' .
                 '}' .
             '}' .
             'if ($errors) {' .
@@ -125,10 +125,10 @@ final class ArrayOfTransformer implements ConfigurableFieldTransformerInterface,
         $varName = Code::varName($previousExpression);
         $body = 'function ($value) {' .
             '$transformer = ' . Call::object('$this->registry->getTransformerFactory()')->create($transformer->class) . ';' .
-            '$instantiator = ' . Call::object('$this->registry->getInstantiatorFactory()')->create($transformer->class) . ';' .
+            '$dataMapper = ' . Call::object('$this->registry->getDataMapperFactory()')->create($transformer->class) . ';' .
             '$result = [];' .
             'foreach ($value as $key => $item) {' .
-                '$result[$key] = $transformer->transformToHttp($instantiator->export($item));' .
+                '$result[$key] = $transformer->transformToHttp($dataMapper->toArray($item));' .
             '}' .
             'return $result;' .
         '}';

@@ -16,7 +16,7 @@ use Quatrevieux\Form\Util\Functions;
 final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory implements FormTransformerFactoryInterface
 {
     /**
-     * Fallback instantiator factory
+     * Fallback transformer factory
      * Will be lazily initialized to {@see RuntimeFormTransformerFactory} if not passed in constructor
      *
      * @var FormTransformerFactoryInterface
@@ -33,9 +33,9 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
     private readonly RegistryInterface $registry;
 
     /**
-     * @param (Closure(string):string)|null $savePathResolver Resolve instatiator class file path using instantiator class name as parameter. By default, save into `sys_get_temp_dir()`
-     * @param (Closure(string):string)|null $classNameResolver Resolve instantiator class name using DTO class name as parameter. By default, replace namespace seprator by "_", and add "Instantiator" suffix
-     * @param FormTransformerFactoryInterface|null $factory Fallback instantiator factory.
+     * @param (Closure(string):string)|null $savePathResolver Resolve transformer class file path using transformer class name as parameter. By default, save into `sys_get_temp_dir()`
+     * @param (Closure(string):string)|null $classNameResolver Resolve transformer class name using DTO class name as parameter. By default, replace namespace seprator by "_", and add "Transformer" suffix
+     * @param FormTransformerFactoryInterface|null $factory Fallback transformer factory.
      * @param FormTransformerGenerator|null $generator Code generator instance.
      */
     public function __construct(RegistryInterface $registry, ?FormTransformerFactoryInterface $factory = null, ?FormTransformerGenerator $generator = null, ?Closure $savePathResolver = null, ?Closure $classNameResolver = null)

@@ -7,7 +7,7 @@ use Quatrevieux\Form\DefaultFormFactory;
 use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormFactoryInterface;
 use Quatrevieux\Form\FormInterface;
-use Quatrevieux\Form\Instantiator\GeneratedInstantiatorFactory;
+use Quatrevieux\Form\DataMapper\GeneratedDataMapperFactory;
 use Quatrevieux\Form\Transformer\GeneratedFormTransformerFactory;
 use Quatrevieux\Form\Util\Functions;
 use Quatrevieux\Form\Validator\GeneratedValidatorFactory;

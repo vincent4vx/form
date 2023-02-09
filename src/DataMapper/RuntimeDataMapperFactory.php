@@ -5,9 +5,10 @@ namespace Quatrevieux\Form\DataMapper;
 use ReflectionClass;
 
 /**
- * Factory returning runtime instantiator
+ * Factory returning runtime data mapper
+ * Resolve the data mapper to use from attributes
  */
-final class RuntimeInstantiatorFactory implements InstantiatorFactoryInterface
+final class RuntimeDataMapperFactory implements DataMapperFactoryInterface
 {
     /**
      * @var array<class-string<DataMapperInterface>, callable(class-string):DataMapperInterface>
@@ -24,16 +25,16 @@ final class RuntimeInstantiatorFactory implements InstantiatorFactoryInterface
      */
     public function create(string $dataClass): DataMapperInterface
     {
-        $instantiatorClassName = PublicPropertyDataMapper::class;
+        $dataMapperClassName = PublicPropertyDataMapper::class;
 
         foreach ((new ReflectionClass($dataClass))->getAttributes(InstantiateWith::class) as $attribute) {
-            $instantiatorClassName = $attribute->newInstance()->instantiatorClassName;
+            $dataMapperClassName = $attribute->newInstance()->dataMapperClassName;
         }
 
-        $factory = $this->factories[$instantiatorClassName] ?? null;
+        $factory = $this->factories[$dataMapperClassName] ?? null;
 
         if (!$factory) {
-            return new $instantiatorClassName($dataClass);
+            return new $dataMapperClassName($dataClass);
         }
 
         return $factory($dataClass);

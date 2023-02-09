@@ -2,24 +2,25 @@
 
 namespace Quatrevieux\Form\DataMapper\Generator;
 
-use Nette\PhpGenerator\ClassType;
 use Quatrevieux\Form\DataMapper\DataMapperInterface;
 
 /**
+ * Type for generate data mapper methods
+ *
  * @template I as DataMapperInterface
  */
-interface InstantiatorTypeGeneratorInterface
+interface DataMapperTypeGeneratorInterface
 {
     /**
-     * @param DataMapperInterface $instantiator
+     * @param DataMapperInterface $dataMapper
      * @return bool
-     * @psalm-assert-if-true I $instantiator
+     * @psalm-assert-if-true I $dataMapper
      */
-    public function supports(DataMapperInterface $instantiator): bool;
+    public function supports(DataMapperInterface $dataMapper): bool;
 
     /**
-     * @param I $instantiator Instantiator instance to generate
+     * @param I $dataMapper Data mapper instance to generate
      * @param DataMapperClass $class Class generator helper
      */
-    public function generate(DataMapperInterface $instantiator, DataMapperClass $class): void;
+    public function generate(DataMapperInterface $dataMapper, DataMapperClass $class): void;
 }

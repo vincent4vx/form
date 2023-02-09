@@ -446,13 +446,13 @@ class EmbeddedTest extends FormTestCase
     public function test_generate_from_http()
     {
         $transformer = new Embedded(EmbeddedForm::class);
-        $this->assertSame('is_array($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? $this->registry->getInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->instantiate(($__tmp_8e69f24495b190aeee9b13db3b08f883 = $this->registry->getTransformerFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->transformFromHttp($__tmp_4e6c78d168de10f915401b0dad567ede))->errors ? throw new \Quatrevieux\Form\Transformer\TransformerException(\'Embedded form has errors\', $__tmp_8e69f24495b190aeee9b13db3b08f883->errors) : $__tmp_8e69f24495b190aeee9b13db3b08f883->values) : null', $transformer->getTransformer($this->registry)->generateTransformFromHttp($transformer, '$data["foo"]', new FormTransformerGenerator($this->registry)));
+        $this->assertSame('is_array($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? $this->registry->getDataMapperFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->toDataObject(($__tmp_8e69f24495b190aeee9b13db3b08f883 = $this->registry->getTransformerFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->transformFromHttp($__tmp_4e6c78d168de10f915401b0dad567ede))->errors ? throw new \Quatrevieux\Form\Transformer\TransformerException(\'Embedded form has errors\', $__tmp_8e69f24495b190aeee9b13db3b08f883->errors) : $__tmp_8e69f24495b190aeee9b13db3b08f883->values) : null', $transformer->getTransformer($this->registry)->generateTransformFromHttp($transformer, '$data["foo"]', new FormTransformerGenerator($this->registry)));
     }
 
     public function test_generate_to_http()
     {
         $transformer = new Embedded(EmbeddedForm::class);
-        $this->assertSame('is_object($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? $this->registry->getTransformerFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->transformToHttp($this->registry->getInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->export($__tmp_4e6c78d168de10f915401b0dad567ede)) : null', $transformer->getTransformer($this->registry)->generateTransformToHttp($transformer, '$data["foo"]', new FormTransformerGenerator($this->registry)));
+        $this->assertSame('is_object($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? $this->registry->getTransformerFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->transformToHttp($this->registry->getDataMapperFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\EmbeddedForm\')->toArray($__tmp_4e6c78d168de10f915401b0dad567ede)) : null', $transformer->getTransformer($this->registry)->generateTransformToHttp($transformer, '$data["foo"]', new FormTransformerGenerator($this->registry)));
     }
 
     public function test_generate_view()

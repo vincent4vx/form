@@ -81,7 +81,7 @@ class FormTestCase extends TestCase
     {
         $baseName = self::GENERATED_DIR . '/' . str_replace('\\', '_', $dataClass);
 
-        $this->assertFileExists($baseName . 'Instantiator.php');
+        $this->assertFileExists($baseName . 'DataMapper.php');
         $this->assertFileExists($baseName . 'Validator.php');
         $this->assertFileExists($baseName . 'Transformer.php');
     }
