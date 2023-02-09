@@ -2,13 +2,12 @@
 
 namespace Quatrevieux\Form\DataMapper\Generator;
 
-use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Literal;
-use Nette\PhpGenerator\Method;
-use ReflectionClass;
-use ReflectionProperty;
 use Quatrevieux\Form\DataMapper\DataMapperInterface;
 use Quatrevieux\Form\DataMapper\PublicPropertyDataMapper;
+use Quatrevieux\Form\Util\Code;
+use ReflectionClass;
+use ReflectionProperty;
 
 /**
  * Generate data mapper with same behavior as {@see PublicPropertyDataMapper}
@@ -40,12 +39,12 @@ final class PublicPropertyDataMapperGenerator implements DataMapperTypeGenerator
             if (!$property->getType() || $property->getType()->allowsNull()) {
                 $class->addToDataObjectBody('$object->? = $fields[?] \?\? null;', [$property->name, $property->name]);
             } else {
-                $tmpVarname = '___tmp' . bin2hex(random_bytes(8));
+                $tmpVarname = new Literal(Code::varName($property->name));
 
                 $class->addToDataObjectBody(
                     <<<'PHP'
-                    if (($? = $fields[?] \?\? null) !== null) {
-                        $object->? = $?;
+                    if ((? = $fields[?] \?\? null) !== null) {
+                        $object->? = ?;
                     }
                     PHP
                     ,
