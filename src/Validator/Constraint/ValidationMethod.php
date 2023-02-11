@@ -75,7 +75,7 @@ use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
  *     }
  * }
  *
- * @implements ConstraintValidatorGeneratorInterface<self>
+ * @implements ConstraintValidatorGeneratorInterface<ValidationMethod>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class ValidationMethod extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface

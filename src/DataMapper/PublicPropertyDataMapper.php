@@ -16,7 +16,7 @@ use function get_object_vars;
  *
  * @template T as object
  * @implements DataMapperInterface<T>
- * @implements DataMapperTypeGeneratorInterface<PublicPropertyDataMapper>
+ * @implements DataMapperTypeGeneratorInterface<PublicPropertyDataMapper<T>>
  */
 final class PublicPropertyDataMapper implements DataMapperInterface, DataMapperTypeGeneratorInterface
 {

@@ -23,7 +23,7 @@ use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
  * }
  * </code>
  *
- * @implements ConstraintValidatorGeneratorInterface<self>
+ * @implements ConstraintValidatorGeneratorInterface<EqualsWith>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class EqualsWith extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface

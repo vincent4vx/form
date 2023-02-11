@@ -89,7 +89,7 @@ final class Expr implements PhpExpressionInterface
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->expr;
     }

@@ -16,7 +16,7 @@ use Quatrevieux\Form\View\Provider\FieldViewAttributesProviderInterface;
  * Validate the length of a string field
  * If the field is not a string, this validator will be ignored
  *
- * @implements ConstraintValidatorGeneratorInterface<static>
+ * @implements ConstraintValidatorGeneratorInterface<Length>
  */
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 final class Length extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface, FieldViewAttributesProviderInterface

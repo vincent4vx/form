@@ -16,7 +16,8 @@ use function count;
  * Structure for the form view
  * Note: Unlike most form components, this class is mutable. So a new instance should be created for each form view.
  *
- * @implements ArrayAccess<array-key, FormView>
+ * @implements ArrayAccess<array-key, FieldView|FormView>
+ * @implements IteratorAggregate<array-key, FieldView|FormView>
  *
  * @see FormInterface::view() For creating a new instance
  */

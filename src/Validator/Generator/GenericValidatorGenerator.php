@@ -12,6 +12,8 @@ use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
  *
  * Generated code example:
  * '($__constraint_14ab54f6d = new MyConstraint(foo: "bar"))->getValidator($this->registry)->validate($__constraint_14ab54f6d, ($data->foo ?? null), $data)'
+ *
+ * @implements ConstraintValidatorGeneratorInterface<ConstraintInterface>
  */
 final class GenericValidatorGenerator implements ConstraintValidatorGeneratorInterface
 {

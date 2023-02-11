@@ -60,9 +60,9 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
     /**
      * {@inheritdoc}
      */
-    public function create(string $dataClass): FormTransformerInterface
+    public function create(string $dataClassName): FormTransformerInterface
     {
-        return $this->createOrGenerate($dataClass);
+        return $this->createOrGenerate($dataClassName);
     }
 
     /**

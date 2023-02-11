@@ -25,6 +25,7 @@ final class DefaultFormFactory implements FormFactoryInterface
 {
     /**
      * @var array<class-string, FormInterface>
+     * @psalm-var class-string-map<T, FormInterface<T>>
      */
     private array $cache = [];
 

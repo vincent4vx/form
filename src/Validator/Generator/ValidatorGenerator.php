@@ -14,6 +14,9 @@ final class ValidatorGenerator
 {
     public function __construct(
         private readonly RegistryInterface $registry,
+        /**
+         * @var ConstraintValidatorGeneratorInterface<ConstraintInterface>
+         */
         private readonly ConstraintValidatorGeneratorInterface $genericValidatorGenerator = new GenericValidatorGenerator(),
     ) {
     }
@@ -22,7 +25,7 @@ final class ValidatorGenerator
      * Generates the class implementation of {@see ValidatorInterface} following constrains stored into given validator
      *
      * @param string $className Class name of the validator class to generate
-     * @param RuntimeValidator $validator Validator containing constraints to generate
+     * @param RuntimeValidator<object> $validator Validator containing constraints to generate
      *
      * @return string PHP file code
      */

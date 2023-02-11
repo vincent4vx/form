@@ -34,7 +34,7 @@ use Quatrevieux\Form\View\Provider\FieldViewAttributesProviderInterface;
  *    public string $baz;
  * }
  *
- * @implements ConstraintValidatorGeneratorInterface<static>
+ * @implements ConstraintValidatorGeneratorInterface<Required>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Required extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface, FieldViewAttributesProviderInterface

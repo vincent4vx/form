@@ -11,6 +11,7 @@ use Quatrevieux\Form\View\FormViewInstantiatorInterface;
  * Default implementation of SubmittedFormInterface
  *
  * @template T as object
+ * @extends AbstractFilledForm<T>
  * @implements SubmittedFormInterface<T>
  */
 final class SubmittedForm extends AbstractFilledForm implements SubmittedFormInterface

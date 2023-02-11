@@ -39,7 +39,7 @@ final class ValidateBy implements ConstraintInterface
          * Validator class to use
          * Must be registered in the ConstraintValidatorRegistry
          *
-         * @var class-string<ConstraintValidatorInterface>
+         * @var class-string<ConstraintValidatorInterface<ValidateBy>>
          */
         public readonly string $validatorClass,
 
