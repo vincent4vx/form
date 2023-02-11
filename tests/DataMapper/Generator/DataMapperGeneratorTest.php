@@ -36,7 +36,7 @@ class DataMapperWithSimpleProperties implements Quatrevieux\Form\DataMapper\Data
 
     function toDataObject(array $fields): object
     {
-        $object = new Quatrevieux\Form\Fixtures\SimpleRequest();
+        $object = new \Quatrevieux\Form\Fixtures\SimpleRequest();
         $object->foo = $fields['foo'] ?? null;
         $object->bar = $fields['bar'] ?? null;
         return $object;
@@ -70,7 +70,7 @@ class DataMapperWithNonNullableProperties implements Quatrevieux\Form\DataMapper
 
     function toDataObject(array $fields): object
     {
-        $object = new Quatrevieux\Form\Fixtures\RequiredParametersRequest();
+        $object = new \Quatrevieux\Form\Fixtures\RequiredParametersRequest();
         if (($__tmp_acbd18db4cc2f85cedef654fccc4a4d8 = $fields['foo'] ?? null) !== null) {
             $object->foo = $__tmp_acbd18db4cc2f85cedef654fccc4a4d8;
         }

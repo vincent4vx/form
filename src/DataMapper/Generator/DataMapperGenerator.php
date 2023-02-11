@@ -10,20 +10,6 @@ use Quatrevieux\Form\DataMapper\DataMapperInterface;
 final class DataMapperGenerator
 {
     /**
-     * @var list<DataMapperTypeGeneratorInterface>
-     */
-    private array $generators;
-
-    /**
-     * @param list<DataMapperTypeGeneratorInterface> $generators
-     */
-    public function __construct(array $generators = [])
-    {
-        $this->generators = $generators;
-        $this->generators[] = new PublicPropertyDataMapperGenerator();
-    }
-
-    /**
      * Generate the data mapper class code
      *
      * @param string $className Class name of the validator class to generate
@@ -33,17 +19,16 @@ final class DataMapperGenerator
      */
     public function generate(string $className, DataMapperInterface $dataMapper): ?string
     {
-        foreach ($this->generators as $generator) {
-            if (!$generator->supports($dataMapper)) {
-                continue;
-            }
-
-            $classHelper = new DataMapperClass($className);
-            $generator->generate($dataMapper, $classHelper);
-
-            return $classHelper->code();
+        if (!$dataMapper instanceof DataMapperTypeGeneratorInterface) {
+            return null;
         }
 
-        return null;
+        $classHelper = new DataMapperClass($className);
+
+        $classHelper->setClassName($dataMapper->className());
+        $classHelper->setToDataObjectBody($dataMapper->generateToDataObject($dataMapper));
+        $classHelper->setToArrayBody($dataMapper->generateToArray($dataMapper));
+
+        return $classHelper->code();
     }
 }

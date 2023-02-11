@@ -7,20 +7,29 @@ use Quatrevieux\Form\DataMapper\DataMapperInterface;
 /**
  * Type for generate data mapper methods
  *
- * @template I as DataMapperInterface
+ * @template M as DataMapperInterface
  */
 interface DataMapperTypeGeneratorInterface
 {
     /**
-     * @param DataMapperInterface $dataMapper
-     * @return bool
-     * @psalm-assert-if-true I $dataMapper
+     * Generate PHP code of the {@see DataMapperInterface::toDataObject()} method
+     *
+     * @param M $dataMapper
+     *
+     * @return string Body of the method
+     *
+     * @see DataMapperInterface::toDataObject()
      */
-    public function supports(DataMapperInterface $dataMapper): bool;
+    public function generateToDataObject(DataMapperInterface $dataMapper): string;
 
     /**
-     * @param I $dataMapper Data mapper instance to generate
-     * @param DataMapperClass $class Class generator helper
+     * Generate PHP code of the {@see DataMapperInterface::toArray()} method
+     *
+     * @param M $dataMapper
+     *
+     * @return string Body of the method
+     *
+     * @see DataMapperInterface::toArray()
      */
-    public function generate(DataMapperInterface $dataMapper, DataMapperClass $class): void;
+    public function generateToArray(DataMapperInterface $dataMapper): string;
 }

@@ -56,33 +56,27 @@ final class DataMapperClass
     }
 
     /**
-     * Add code to the `toDataObject()` method body
+     * Set the body of the `toDataObject()` method
      *
-     * @param string $code Line of code to add. Use ? as placeholder.
-     * @param list<mixed>|null $args Placeholder parameters. Use `new Litteral()` to ignore autoformatting strings.
+     * @param string $code Body of the method
      *
      * @return void
-     *
-     * @see Method::addBody() Method call internally
      */
-    public function addToDataObjectBody(string $code, ?array $args = null): void
+    public function setToDataObjectBody(string $code): void
     {
-        $this->toDataObjectMethod->addBody($code, $args);
+        $this->toDataObjectMethod->setBody($code);
     }
 
     /**
-     * Add code to the `toArray()` method body
+     * Set the body of the `toArray()` method
      *
-     * @param string $code Line of code to add. Use ? as placeholder.
-     * @param list<mixed>|null $args Placeholder parameters. Use `new Litteral()` to ignore autoformatting strings.
+     * @param string $code Body of the method
      *
      * @return void
-     *
-     * @see Method::addBody() Method call internally
      */
-    public function addToArrayBody(string $code, ?array $args = null): void
+    public function setToArrayBody(string $code): void
     {
-        $this->toArrayMethod->addBody($code, $args);
+        $this->toArrayMethod->setBody($code);
     }
 
     /**

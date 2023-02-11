@@ -53,7 +53,7 @@ class TestSimpleRequestDataMapper implements Quatrevieux\Form\DataMapper\DataMap
 
     function toDataObject(array $fields): object
     {
-        $object = new Quatrevieux\Form\Fixtures\SimpleRequest();
+        $object = new \Quatrevieux\Form\Fixtures\SimpleRequest();
         $object->foo = $fields['foo'] ?? null;
         $object->bar = $fields['bar'] ?? null;
         return $object;
