@@ -17,7 +17,7 @@ class GenericValidatorGeneratorTest extends FormTestCase
     public function test_generate()
     {
         $generator = new ValidatorGenerator(new DefaultRegistry());
-        $this->assertSame("(\$__constraint_8e4856679a2fbb68dd545df21d00d9c7 = new \Quatrevieux\Form\Validator\Constraint\Length(min: 5, max: NULL, message: NULL))->validate(\$__constraint_8e4856679a2fbb68dd545df21d00d9c7, \$data->foo ?? null, \$data)", (new GenericValidatorGenerator())->generate(new Length(min: 5), $generator)->generate('$data->foo ?? null'));
+        $this->assertSame("(\$__constraint_caa8b2e38487dae9d3a54ed611a6fa21 = new \Quatrevieux\Form\Validator\Constraint\Length(min: 5))->validate(\$__constraint_caa8b2e38487dae9d3a54ed611a6fa21, \$data->foo ?? null, \$data)", (new GenericValidatorGenerator())->generate(new Length(min: 5), $generator)->generate('$data->foo ?? null'));
         $this->assertSame("(\$__constraint_63ba69d6fe3ff5f84a29bcaaaeae7448 = new \Quatrevieux\Form\Validator\Generator\MyCustomConstraint(foo: 5))->getValidator(\$this->registry)->validate(\$__constraint_63ba69d6fe3ff5f84a29bcaaaeae7448, \$data->foo ?? null, \$data)", (new GenericValidatorGenerator())->generate(new MyCustomConstraint(foo: 5), $generator)->generate('$data->foo ?? null'));
     }
 

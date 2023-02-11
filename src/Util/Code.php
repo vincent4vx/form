@@ -54,12 +54,14 @@ final class Code
             is_string($value) => str_replace(PHP_EOL, '\' . PHP_EOL . \'', var_export($value, true)),
             is_object($value) => self::dumpObject($value),
             is_array($value) => self::dumpArray($value),
+            $value === null => 'null',
             default => var_export($value, true),
         };
     }
 
     /**
      * Generate the `new XXX()` PHP expression for construct given object
+     * Default values of promoted properties will be ignored
      *
      * Note: promoted properties will be used for instantiate the object, so the constructor must use it to works
      *
@@ -77,7 +79,11 @@ final class Code
 
         foreach ($reflection->getProperties() as $property) {
             if ($property->isPromoted()) {
-                $properties[$property->name] = $property->getValue($o);
+                $value = $property->getValue($o);
+
+                if ($value !== $property->getDefaultValue()) {
+                    $properties[$property->name] = $property->getValue($o);
+                }
             }
         }
 

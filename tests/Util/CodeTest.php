@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\Transformer\Field\ArrayCast;
 use Quatrevieux\Form\Transformer\Field\CastType;
 use Quatrevieux\Form\Transformer\Field\Csv;
+use Quatrevieux\Form\Validator\Constraint\Length;
 use Quatrevieux\Form\Validator\FieldError;
 
 class CodeTest extends TestCase
@@ -23,7 +24,7 @@ class CodeTest extends TestCase
         $this->assertSame('12.3', Code::value(12.3));
         $this->assertSame('true', Code::value(true));
         $this->assertSame('false', Code::value(false));
-        $this->assertSame('NULL', Code::value(null));
+        $this->assertSame('null', Code::value(null));
         $this->assertSame("'foo'", Code::value('foo'));
         $this->assertSame("'foo' . PHP_EOL . 'bar'", Code::value('foo' . PHP_EOL . 'bar'));
         $this->assertSame("[]", Code::value([]));
@@ -39,6 +40,7 @@ class CodeTest extends TestCase
     public function test_instantiate()
     {
         $this->assertSame("new \Quatrevieux\Form\Util\NewExprTestObject(pub: 'foo', prot: 123, priv: false)", Code::instantiate(new NewExprTestObject('foo', 123, false)));
+        $this->assertSame("new \Quatrevieux\Form\Validator\Constraint\Length(max: 5)", Code::instantiate(new Length(max: 5)));
     }
 
     public function test_inlineStrtr()
@@ -85,13 +87,13 @@ class CodeTest extends TestCase
 
     public function test_instanceOfOr()
     {
-        $this->assertSame('($__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 = $foo["bar"]) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 : new \Quatrevieux\Form\Validator\FieldError(message: \'default\', parameters: [], code: \'bb8ebf72-1310-4d65-bdb5-9192708543ee\', translator: NULL)', Code::instanceOfOr('$foo["bar"]', FieldError::class, new FieldError('default')));
+        $this->assertSame('($__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 = $foo["bar"]) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 : new \Quatrevieux\Form\Validator\FieldError(message: \'default\', parameters: [], code: \'bb8ebf72-1310-4d65-bdb5-9192708543ee\')', Code::instanceOfOr('$foo["bar"]', FieldError::class, new FieldError('default')));
     }
 
     public function test_isArrayOr()
     {
         $this->assertSame('(is_array($__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 = $foo["bar"]) ? $__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 : [])', Code::isArrayOr('$foo["bar"]', []));
-        $this->assertSame('(is_array($__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 = $foo["bar"]) ? $__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 : NULL)', Code::isArrayOr('$foo["bar"]', null));
+        $this->assertSame('(is_array($__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 = $foo["bar"]) ? $__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 : null)', Code::isArrayOr('$foo["bar"]', null));
     }
 
     public function test_expr()

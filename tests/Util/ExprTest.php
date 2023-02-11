@@ -34,7 +34,7 @@ class ExprTest extends TestCase
 
     public function test_isInstanceOfOr()
     {
-        $this->assertEquals('($__tmp_0e648d68d745be2623453551d81b2eeb = $foo) instanceof \Foo ? $__tmp_0e648d68d745be2623453551d81b2eeb : NULL', (new Expr('$foo'))->isInstanceOfOr('Foo', null));
+        $this->assertEquals('($__tmp_0e648d68d745be2623453551d81b2eeb = $foo) instanceof \Foo ? $__tmp_0e648d68d745be2623453551d81b2eeb : null', (new Expr('$foo'))->isInstanceOfOr('Foo', null));
     }
 
     public function test_chain()
