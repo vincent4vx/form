@@ -4,9 +4,15 @@ namespace Quatrevieux\Form\Validator\Constraint;
 
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\FieldError;
+use Ramsey\Uuid\Uuid;
 
 class ValidateArrayTest extends FormTestCase
 {
+    public function test_code()
+    {
+        $this->assertSame(ValidateArray::CODE, Uuid::uuid5(ConstraintInterface::CODE, 'ValidateArray')->toString());
+    }
+
     /**
      * @testWith [false]
      *           [true]

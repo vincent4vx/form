@@ -5,6 +5,7 @@ namespace Quatrevieux\Form\Validator\Constraint;
 use Quatrevieux\Form\FormInterface;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\FieldError;
+use Ramsey\Uuid\Uuid;
 
 class RequiredTest extends FormTestCase
 {
@@ -17,6 +18,11 @@ class RequiredTest extends FormTestCase
 
         $this->form = $this->runtimeForm(RequiredTestRequest::class);
         $this->generatedForm = $this->generatedForm(RequiredTestRequest::class);
+    }
+
+    public function test_code()
+    {
+        $this->assertSame(Required::CODE, Uuid::uuid5(ConstraintInterface::CODE, 'Required')->toString());
     }
 
     /**

@@ -6,6 +6,7 @@ use Quatrevieux\Form\FormInterface;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
+use Ramsey\Uuid\Uuid;
 
 class EqualsWithTest extends FormTestCase
 {
@@ -18,6 +19,11 @@ class EqualsWithTest extends FormTestCase
 
         $this->form = $this->runtimeForm(EqualsWithTestRequest::class);
         $this->generatedForm = $this->generatedForm(EqualsWithTestRequest::class);
+    }
+
+    public function test_code()
+    {
+        $this->assertSame(EqualsWith::CODE, Uuid::uuid5(ConstraintInterface::CODE, 'EqualsWith')->toString());
     }
 
     /**

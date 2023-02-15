@@ -34,6 +34,7 @@
         "symfony/form": "^6.1",
         "symfony/validator": "^6.1",
         "phpstan/phpstan": "^1.9",
-        "friendsofphp/php-cs-fixer": "^3.13"
+        "friendsofphp/php-cs-fixer": "^3.13",
+        "ramsey/uuid": "^4.7"
     }
 }

@@ -4,10 +4,16 @@ namespace Quatrevieux\Form\Validator\Constraint;
 
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\FieldError;
+use Ramsey\Uuid\Uuid;
 use RuntimeException;
 
 class ValidationMethodTest extends FormTestCase
 {
+    public function test_code()
+    {
+        $this->assertSame(ValidationMethod::CODE, Uuid::uuid5(ConstraintInterface::CODE, 'ValidationMethod')->toString());
+    }
+
     /**
      * @testWith [false]
      *           [true]

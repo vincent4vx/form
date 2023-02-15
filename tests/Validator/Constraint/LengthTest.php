@@ -7,6 +7,7 @@ use Quatrevieux\Form\FormInterface;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
+use Ramsey\Uuid\Uuid;
 
 class LengthTest extends FormTestCase
 {
@@ -19,6 +20,11 @@ class LengthTest extends FormTestCase
 
         $this->form = $this->runtimeForm(LengthTestRequest::class);
         $this->generatedForm = $this->generatedForm(LengthTestRequest::class);
+    }
+
+    public function test_code()
+    {
+        $this->assertSame(Length::CODE, Uuid::uuid5(ConstraintInterface::CODE, 'Length')->toString());
     }
 
     public function test_missing_min_and_max()
