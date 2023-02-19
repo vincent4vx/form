@@ -196,12 +196,15 @@ class ArrayShapeTest extends FormTestCase
         ]])->valid());
     }
 
-//    public function test_generated_code()
-//    {
-//        $constraint = new ArrayShape(value: 'bar');
-//
-//        $this->assertGeneratedValidator('is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) == \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should be equal to {{ value }}.\', [\'value\' => \'bar\'], \'10a69fac-d049-55d0-af88-121872ef9892\') : null', $constraint);
-//    }
+    public function test_generated_code()
+    {
+        $constraint = new ArrayShape([
+            'foo' => 'string',
+            'bar' => 'int',
+        ], allowExtraKeys: false);
+
+        $this->assertGeneratedValidator('($data->foo ?? null) !== null && !(is_array(($data->foo ?? null)) && ((array_key_exists(\'foo\', ($data->foo ?? null)) && is_string(($data->foo ?? null)[\'foo\']))) && ((array_key_exists(\'bar\', ($data->foo ?? null)) && is_int(($data->foo ?? null)[\'bar\']))) && array_diff_key(($data->foo ?? null), [\'foo\' => 1, \'bar\' => 1]) === []) ? new \Quatrevieux\Form\Validator\FieldError(\'This value does not match the expected array shape.\', [], \'d0909170-b496-5bb5-8cc6-efe839722a8c\') : null', $constraint);
+    }
 }
 
 class ArrayShapeTestRequest
