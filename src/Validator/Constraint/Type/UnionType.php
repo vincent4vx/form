@@ -24,7 +24,7 @@ final class UnionType implements TypeInterface
      */
     public function name(): string
     {
-        return implode('|', array_map(fn(TypeInterface $type) => $type->name(), $this->types));
+        return implode('|', array_map(fn (TypeInterface $type) => $type->name(), $this->types));
     }
 
     /**
@@ -46,6 +46,6 @@ final class UnionType implements TypeInterface
      */
     public function generateCheck(string $value): string
     {
-        return implode(' || ', array_map(fn(TypeInterface $type) => "({$type->generateCheck($value)})", $this->types));
+        return implode(' || ', array_map(fn (TypeInterface $type) => "({$type->generateCheck($value)})", $this->types));
     }
 }
