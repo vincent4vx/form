@@ -2,6 +2,12 @@
 
 namespace Quatrevieux\Form\Util;
 
+use InvalidArgumentException;
+
+use function explode;
+use function str_contains;
+use function strtr;
+
 /**
  * Fluent expression generator
  *
@@ -87,6 +93,81 @@ final class Expr implements PhpExpressionInterface
     }
 
     /**
+     * Wrap an expression, following the given format
+     *
+     * The placeholder '{}' will be replaced by the current expression.
+     * Other placeholders will be replaced by variadic arguments, using the argument index or name, wrapped around {} as placeholder.
+     *
+     * Example:
+     * - `Expr::this()->var->format('{} instanceof Foo ? {} : new Foo({})')` will generate `$this->var instanceof Foo ? $this->var : new Foo($this->var)`
+     * - `Code::expr('$foo')->format('is_array({}) ? ({obj})->perform({}) : {default}', obj: new Foo(), default: [])` will generate `is_array($foo) ? (new Foo())->perform($foo) : []`
+     *
+     * @param string $format Format to use. Must contain at least one placeholder '{}'.
+     * @param mixed ...$values Values to use as replacement. Named arguments are supported.
+     *
+     * @return self The new expression
+     *
+     * @see Expr::storeAndFormat() When the expression must be stored in a temporary variable
+     */
+    public function format(string $format, ...$values): self
+    {
+        if (!str_contains($format, '{}')) {
+            throw new InvalidArgumentException('Format must contain at least one placeholder "{}"');
+        }
+
+        $replacements = [
+            '{}' => $this->expr,
+        ];
+
+        foreach ($values as $key => $value) {
+            $replacements['{' . $key . '}'] = Code::value($value);
+        }
+
+        return new self(strtr($format, $replacements));
+    }
+
+    /**
+     * Store the given expression into a temporary variable, and wrap it in an expression, following the given format
+     *
+     * Unlike `Expr::format()`, the expression is only evaluated once.
+     *
+     * The first placeholder '{}' will be replaced by assignment of the current expression to a temporary variable.
+     * Following placeholders will be replaced by the temporary variable.
+     *
+     * Other placeholders will be replaced by variadic arguments, using the argument index or name, wrapped around {} as placeholder.
+     *
+     * > Note: Parentheses are added around the assignation if needed.
+     *
+     * Example:
+     * `Code::expr('$foo->heavyCalculation()')->storeAndFormat('is_array({}) ? ({obj})->perform({}) : {default}', obj: new Foo(), default: [])` will generate `is_array($__tmp_xxx = $foo->heavyCalculation()) ? (new Foo())->perform($__tmp_xxx) : []`
+     *
+     * @param string $format Format to use. Must contain at least one placeholder '{}'.
+     * @param mixed ...$values Values to use as replacement. Named arguments are supported.
+     *
+     * @return self The new expression
+     */
+    public function storeAndFormat(string $format, ...$values): self
+    {
+        $varName = self::varName($this->expr);
+        $parts = explode('{}', $format, 2);
+
+        if (!isset($parts[1])) {
+            throw new InvalidArgumentException('Format must contain at least one placeholder "{}"');
+        }
+
+        $store = '{} = ' . $this->expr;
+
+        // Wrap the expression in parentheses if needed
+        if (($parts[0][0] ?? '') !== '(' || ($parts[1][0] ?? '') !== ')') {
+            $store = '(' . $store . ')';
+        }
+
+        $expression = $parts[0] . $store . $parts[1];
+
+        return $varName->format($expression, ...$values);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function __toString(): string
@@ -102,5 +183,54 @@ final class Expr implements PhpExpressionInterface
     public static function this(): self
     {
         return new self('$this');
+    }
+
+    /**
+     * Generate the constructor call of the given class, and wrap it in an expression
+     *
+     * @param string $className Class name. Can be a fully qualified class name.
+     * @param list<mixed> $args Arguments to pass to the constructor.
+     *     All arguments will be converted to PHP expression using `Code::value()`.
+     *     If an associative array is given, the keys will be used as named argument.
+     *     Use {@see Code::raw()} to ignore the conversion.
+     *
+     * @return static The `new XXX()` PHP expression
+     *
+     * @see Code::new() for more details
+     */
+    public static function new(string $className, array $args = []): self
+    {
+        return new self(Code::new($className, $args));
+    }
+
+    /**
+     * Generate a variable name
+     * The generated var name will be unique for the given expression and hint
+     *
+     * @param string $expression Expression that should be stored into the given variable
+     * @param string $hint Hint for specify variable usage
+     *
+     * @return self
+     *
+     * @see Code::varName() for more details
+     */
+    public static function varName(string $expression, string $hint = 'tmp'): self
+    {
+        return new self(Code::varName($expression, $hint));
+    }
+
+    /**
+     * Convert a PHP value to a PHP expression
+     * This method is a shortcut for `Code::expr(Code::value($value))`
+     *
+     * @param mixed $value The value to convert. Use {@see Code::raw()} to ignore the conversion.
+     *
+     * @return self
+     *
+     * @see Code::value() for more details
+     */
+    public static function value(mixed $value): self
+    {
+        return new self(Code::value($value));
     }
 }

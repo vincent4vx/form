@@ -5,6 +5,7 @@ namespace Quatrevieux\Form\Validator\Constraint;
 use Attribute;
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
+use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\Validator\FieldError;
 
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
@@ -123,15 +124,17 @@ final class Choice extends SelfValidatedConstraint implements ConstraintValidato
      */
     private function generateSingleInArray(string $accessor): string
     {
+        $accessor = Code::expr($accessor);
+
         if ($this->choicesCanBeUsedAsKey()) {
-            $values = Code::value(array_combine($this->choices, $this->choices));
-            $inArray = "((is_int({$accessor}) || is_string({$accessor})) && (({$values}[{$accessor}] ?? null) === {$accessor}))";
+            $values = array_combine($this->choices, $this->choices);
+            $inArray = $accessor->format('((is_int({}) || is_string({})) && (({values}[{}] ?? null) === {}))', values: $values);
         } else {
-            $inArray = Call::in_array(Code::raw($accessor), $this->choices, true);
+            $inArray = Call::in_array($accessor, $this->choices, true);
         }
 
-        $debugValue = "is_scalar({$accessor}) || {$accessor} instanceof \\Stringable ? {$accessor} : print_r({$accessor}, true)";
-        $fieldError = Code::new(FieldError::class, [$this->message, ['value' => Code::raw($debugValue)], self::CODE]);
+        $debugValue = $accessor->format('is_scalar({}) || {} instanceof \Stringable ? {} : print_r({}, true)');
+        $fieldError = Code::new(FieldError::class, [$this->message, ['value' => $debugValue], self::CODE]);
 
         return "(!{$inArray} ? {$fieldError} : null)";
     }

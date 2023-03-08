@@ -15,6 +15,8 @@ use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 
+use Quatrevieux\Form\Util\Expr;
+
 use function is_scalar;
 
 /**
@@ -123,12 +125,12 @@ final class DateTimeTransformer implements FieldTransformerInterface, FieldTrans
      */
     public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $tmpVar = Code::varName($previousExpression, 'date');
+        $tmpVar = Expr::varName($previousExpression, 'date');
         $className = '\\' . $transformer->class;
         $createDate = Call::static($className)->createFromFormat(
             '!' . $transformer->format,
-            Code::raw($tmpVar),
-            $transformer->timezone ? Code::raw(Code::new(DateTimeZone::class, [$transformer->timezone])) : null
+            $tmpVar,
+            $transformer->timezone ? new DateTimeZone($transformer->timezone) : null
         );
         $createDate .= ' ?: throw ' . Code::new(InvalidArgumentException::class, ['The given value is not a valid date.']);
 
@@ -140,10 +142,10 @@ final class DateTimeTransformer implements FieldTransformerInterface, FieldTrans
      */
     public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $tmpVar = Code::varName($previousExpression, 'date');
+        $tmpVar = Expr::varName($previousExpression, 'date');
         $format = Code::value($transformer->format);
         $dateExpression = $transformer->timezone
-            ? Call::object("({$tmpVar} instanceof \DateTimeImmutable ? {$tmpVar} : clone {$tmpVar})")->setTimezone(Code::raw(Code::new(DateTimeZone::class, [$transformer->timezone])))
+            ? $tmpVar->format("({} instanceof \DateTimeImmutable ? {} : clone {})")->setTimezone(new DateTimeZone($transformer->timezone))
             : $tmpVar
         ;
 

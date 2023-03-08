@@ -109,7 +109,7 @@ final class FieldViewConfiguration implements FieldViewProviderConfigurationInte
         return static fn (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) => Code::new(FieldView::class, [
             $rootFieldNameAccessor ? Code::raw('"{' . $rootFieldNameAccessor. '}[' . $name . ']"') : $name,
             $configuration->defaultValue !== null ? Code::raw($valueAccessor . ' ?? ' . Code::value($configuration->defaultValue)) : Code::raw($valueAccessor),
-            Code::raw(Code::instanceOfOrNull($errorAccessor, FieldError::class)),
+            Code::expr($errorAccessor)->isInstanceOfOr(FieldError::class, null),
             $attributes
         ]);
     }

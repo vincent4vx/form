@@ -126,7 +126,7 @@ final class ArrayOfViewProvider implements FieldViewProviderInterface, FieldView
                                 ? Code::raw('"{' . $rootFieldNameAccessor . '}[' . $name . '][]"')
                                 : $name . '[]'
                         ),
-                        Code::raw('$errors instanceof \\' . FieldError::class . ' ? $errors : null'),
+                        Code::expr('$errors')->isInstanceOfOr(FieldError::class, null),
                     ]) . ';' .
                 '}'
             );

@@ -5,10 +5,9 @@ namespace Quatrevieux\Form\Validator\Constraint;
 use Attribute;
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
+use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\Validator\FieldError;
-
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
-
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
@@ -95,11 +94,11 @@ final class PasswordStrength extends SelfValidatedConstraint implements Constrai
     {
         return FieldErrorExpression::single(function (string $accessor) use ($constraint) {
             $passwordStrength = Call::static(self::class)->computeStrength(Code::raw('(string) ' . $accessor));
-            $passwordStrengthVar = Code::varName($passwordStrength);
+            $passwordStrengthVar = Expr::varName($passwordStrength);
             $fieldError = Code::new(FieldError::class, [
                 $constraint->message,
                 [
-                    'strength' => Code::raw($passwordStrengthVar),
+                    'strength' => $passwordStrengthVar,
                     'min_strength' => $constraint->min,
                 ],
                 self::CODE,

@@ -8,6 +8,7 @@ use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Transformer\TransformerException;
 use Quatrevieux\Form\Util\Code;
+use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\Validator\FieldError;
 use ReflectionEnum;
 use Stringable;
@@ -131,15 +132,15 @@ final class Enum implements FieldTransformerInterface, FieldTransformerGenerator
     public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $class = $transformer->class;
-        $varName = Code::varName($previousExpression, 'enum');
+        $varName = Expr::varName($previousExpression, 'enum');
         $onError = $transformer->errorOnInvalid
             ? 'throw ' . Code::new(TransformerException::class, [
                 'Invalid enum value',
-                Code::raw(Code::new(FieldError::class, [
+                Expr::new(FieldError::class, [
                     $transformer->errorMessage,
-                    ['value' => Code::raw("is_scalar({$varName}) || {$varName} instanceof \\Stringable ? {$varName} : print_r({$varName}, true)")],
+                    ['value' => $varName->format('is_scalar({}) || {} instanceof \Stringable ? {} : print_r({}, true)')],
                     self::CODE
-                ]))
+                ])
             ])
             : 'null'
         ;
@@ -170,11 +171,11 @@ final class Enum implements FieldTransformerInterface, FieldTransformerGenerator
     public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $class = $transformer->class;
-        $varName = Code::varName($previousExpression, 'enum');
+        $varName = Expr::varName($previousExpression, 'enum');
 
         $toHttp = $transformer->useName || !is_subclass_of($class, BackedEnum::class)
-            ? "{$varName}->name"
-            : "{$varName}->value"
+            ? $varName->name
+            : $varName->value
         ;
 
         return "(!({$varName} = {$previousExpression}) instanceof \\{$class} ? null : {$toHttp})";

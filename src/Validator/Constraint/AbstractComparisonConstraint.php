@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Validator\Constraint;
 
 use Quatrevieux\Form\Util\Code;
+use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
@@ -55,10 +56,10 @@ abstract class AbstractComparisonConstraint extends SelfValidatedConstraint impl
      */
     public function generate(ConstraintInterface $constraint, ValidatorGenerator $generator): FieldErrorExpressionInterface
     {
-        $expected = Code::value($constraint->value);
+        $expected = Expr::value($constraint->value);
         $error = Code::new(FieldError::class, [
             $constraint->message,
-            ['value' => Code::raw($expected)],
+            ['value' => $expected],
             static::CODE
         ]);
 

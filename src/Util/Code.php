@@ -2,6 +2,8 @@
 
 namespace Quatrevieux\Form\Util;
 
+use DateTimeZone;
+use Quatrevieux\Form\Validator\FieldError;
 use ReflectionClass;
 
 use stdClass;
@@ -17,6 +19,7 @@ use function is_int;
 use function is_object;
 use function is_string;
 use function md5;
+use function preg_match;
 use function str_replace;
 use function var_export;
 
@@ -25,6 +28,13 @@ use function var_export;
  */
 final class Code
 {
+    /**
+     * Map a class name to a custom instantiation expression generator
+     *
+     * @var array<class-string, callable(object): string>
+     */
+    private static ?array $customObjectExpressions = null;
+
     /**
      * Generate a variable name
      * The generated var name will be unique for the given expression and hint
@@ -256,6 +266,12 @@ final class Code
             return $fallback;
         }
 
+        // Check if the expression is a variable
+        if (preg_match('/^\$[a-z][a-z0-9_]*$/i', $expression)) {
+            return "{$expression} instanceof \\{$className} ? {$expression} : {$fallback}";
+        }
+
+        // If the expression is more complex, we need to generate a temporary variable
         $varName = self::varName($expression);
 
         return "({$varName} = {$expression}) instanceof \\{$className} ? {$varName} : {$fallback}";
@@ -333,12 +349,18 @@ final class Code
      */
     private static function dumpObject(object $value): string
     {
-        if ($value instanceof stdClass) {
-            return '(object) ' . self::value((array) $value);
-        }
+        // @phpstan-ignore-next-line
+        $custom = self::$customObjectExpressions ??= [
+            stdClass::class => fn (stdClass $value) => '(object) ' . self::dumpArray((array) $value),
+            UnitEnum::class => fn (UnitEnum $value) => '\\' . get_class($value) . '::' . $value->name,
+            DateTimeZone::class => fn (DateTimeZone $value) => self::new(DateTimeZone::class, [$value->getName()]),
+            FieldError::class => fn (FieldError $value) => self::new(FieldError::class, [$value->message, $value->parameters, $value->code]),
+        ];
 
-        if ($value instanceof UnitEnum) {
-            return '\\' . get_class($value) . '::' . $value->name;
+        foreach ($custom as $class => $callback) {
+            if ($value instanceof $class) {
+                return $callback($value);
+            }
         }
 
         return self::instantiate($value);

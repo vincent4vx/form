@@ -35,6 +35,7 @@ class CodeTest extends TestCase
         $this->assertSame("\Quatrevieux\Form\Transformer\Field\CastType::Int", Code::value(CastType::Int));
         $this->assertSame("[new \Quatrevieux\Form\Transformer\Field\Csv(separator: ';', enclosure: ''), new \Quatrevieux\Form\Transformer\Field\ArrayCast(elementType: \Quatrevieux\Form\Transformer\Field\CastType::Int, preserveKeys: true)]", Code::value([new Csv(separator: ';'), new ArrayCast(CastType::Int)]));
         $this->assertSame('$foo', Code::value(Code::raw('$foo')));
+        $this->assertSame('new \DateTimeZone(\'Europe/Paris\')', Code::value(new \DateTimeZone('Europe/Paris')));
     }
 
     public function test_instantiate()
@@ -87,7 +88,8 @@ class CodeTest extends TestCase
 
     public function test_instanceOfOr()
     {
-        $this->assertSame('($__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 = $foo["bar"]) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 : new \Quatrevieux\Form\Validator\FieldError(message: \'default\', parameters: [], code: \'bb8ebf72-1310-4d65-bdb5-9192708543ee\')', Code::instanceOfOr('$foo["bar"]', FieldError::class, new FieldError('default')));
+        $this->assertSame('($__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 = $foo["bar"]) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_ea2e30a06233e9cbfe2a6e6ed52fbd65 : new \Quatrevieux\Form\Validator\FieldError(\'default\', [], \'bb8ebf72-1310-4d65-bdb5-9192708543ee\')', Code::instanceOfOr('$foo["bar"]', FieldError::class, new FieldError('default')));
+        $this->assertSame('$foo instanceof \Quatrevieux\Form\Validator\FieldError ? $foo : new \Quatrevieux\Form\Validator\FieldError(\'default\', [], \'bb8ebf72-1310-4d65-bdb5-9192708543ee\')', Code::instanceOfOr('$foo', FieldError::class, new FieldError('default')));
     }
 
     public function test_isArrayOr()

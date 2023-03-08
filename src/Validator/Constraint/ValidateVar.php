@@ -90,13 +90,11 @@ final class ValidateVar extends SelfValidatedConstraint implements ConstraintVal
      */
     public function generate(ConstraintInterface $constraint, ValidatorGenerator $generator): FieldErrorExpressionInterface
     {
-        $error = Code::new(FieldError::class, [
-            $constraint->message,
-            [],
-            self::CODE,
-        ]);
-        $options = Code::value($constraint->options);
-
-        return FieldErrorExpression::single(fn (string $accessor) => "is_scalar({$accessor}) && filter_var({$accessor}, {$constraint->filter}, {$options}) === false ? {$error} : null");
+        return FieldErrorExpression::single(fn (string $accessor) => (string) Code::expr($accessor)->format(
+            'is_scalar({}) && filter_var({}, {filter}, {options}) === false ? {error} : null',
+            filter: $constraint->filter,
+            options: $constraint->options,
+            error: new FieldError($this->message, code: self::CODE),
+        ));
     }
 }

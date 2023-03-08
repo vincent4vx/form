@@ -5,6 +5,7 @@ namespace Quatrevieux\Form\View\Generator;
 use Closure;
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
+use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\View\Provider\FieldViewProviderConfigurationInterface;
 use Quatrevieux\Form\View\Provider\FieldViewProviderInterface;
 
@@ -27,7 +28,7 @@ final class GenericFieldViewProviderGenerator implements FieldViewProviderGenera
     public function generateFieldViewExpression(FieldViewProviderConfigurationInterface $configuration, string $name, array $attributes): Closure
     {
         $newConfiguration = Code::instantiate($configuration);
-        $varName = Code::varName($newConfiguration, 'view');
+        $varName = Expr::varName($newConfiguration, 'view');
         $configurationExpr = "({$varName} = {$newConfiguration})";
 
         if (!$configuration instanceof FieldViewProviderInterface) {
@@ -37,7 +38,7 @@ final class GenericFieldViewProviderGenerator implements FieldViewProviderGenera
         }
 
         return static fn (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor = null): string => Call::object($viewProvider)->view(
-            Code::raw($varName),
+            $varName,
             $rootFieldNameAccessor ? Code::raw('"{' . $rootFieldNameAccessor. '}[' . $name . ']"') : $name,
             Code::raw($valueAccessor),
             Code::raw($errorAccessor),

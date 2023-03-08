@@ -23,7 +23,7 @@ use function array_reverse;
 final class TransformEachImpl implements ConfigurableFieldTransformerInterface, FieldTransformerGeneratorInterface
 {
     public function __construct(
-        private RegistryInterface $registry,
+        private readonly RegistryInterface $registry,
     ) {
     }
 
@@ -104,7 +104,6 @@ final class TransformEachImpl implements ConfigurableFieldTransformerInterface, 
      */
     public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $varName = Code::varName($previousExpression);
         $expression = '$item';
 
         foreach ($transformer->transformers as $elementTransformer) {
@@ -112,23 +111,41 @@ final class TransformEachImpl implements ConfigurableFieldTransformerInterface, 
         }
 
         if (!$transformer->handleElementsErrors) {
-            return "({$varName} = {$previousExpression}) === null ? null : \array_map(fn (\$item) => {$expression}, (array) {$varName})";
+            return Code::expr($previousExpression)->storeAndFormat(
+                '{} === null ? null : \array_map(fn ($item) => {expression}, (array) {})',
+                expression: Code::raw($expression)
+            );
         }
 
-        $transformerException = '\\' . TransformerException::class;
         $fieldErrorFromException = Code::new('FieldError', [
             Code::raw('$e->getMessage()'),
             [],
             TransformationError::CODE,
             Code::raw('$translator'),
         ]);
-        $throwError = 'if ($errors) { throw ' . Code::new($transformerException, ['Some elements of the array are invalid', Code::raw('$errors')]) . '; }';
 
-        $expression = "try { \$transformed[\$key] = {$expression}; } catch ({$transformerException} \$e) { \$errors[\$key] = \$e->errors; } catch (\\Exception \$e) { \$errors[\$key] = {$fieldErrorFromException}; }";
-        $expression = "foreach (\$values as \$key => \$item) { {$expression} }";
-        $expression = "(function (\$values) use (\$translator) { \$errors = []; \$transformed = []; {$expression} {$throwError} return \$transformed; })";
+        $expression = 'function ($values) use ($translator) { ' .
+            '$errors = []; ' .
+            '$transformed = []; ' .
+            'foreach ($values as $key => $item) { ' .
+                'try { ' .
+                    '$transformed[$key] = ' . $expression . '; ' .
+                '} catch (\\' . TransformerException::class . ' $e) { ' .
+                    '$errors[$key] = $e->errors; ' .
+                '} catch (\Exception $e) { ' .
+                    '$errors[$key] = ' . $fieldErrorFromException . '; ' .
+                '} ' .
+            '} ' .
+            'if ($errors) { ' .
+                'throw ' . Code::new(TransformerException::class, ['Some elements of the array are invalid', Code::raw('$errors')]) . '; ' .
+            '} ' .
+            'return $transformed; ' .
+        '}';
 
-        return "({$varName} = {$previousExpression}) === null ? null : {$expression}((array) {$varName})";
+        return Code::expr($previousExpression)->storeAndFormat(
+            '{} === null ? null : ({expression})((array) {})',
+            expression: Code::raw($expression)
+        );
     }
 
     /**
@@ -136,14 +153,16 @@ final class TransformEachImpl implements ConfigurableFieldTransformerInterface, 
      */
     public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $varName = Code::varName($previousExpression);
         $expression = '$item';
 
         foreach (array_reverse($transformer->transformers) as $transformer) {
             $expression = $generator->generateTransformToHttp($transformer, $expression);
         }
 
-        return "({$varName} = {$previousExpression}) === null ? null : \array_map(fn (\$item) => {$expression}, (array) {$varName})";
+        return Code::expr($previousExpression)->storeAndFormat(
+            '{} === null ? null : \array_map(fn ($item) => {expression}, (array) {})',
+            expression: Code::raw($expression)
+        );
     }
 
     /**

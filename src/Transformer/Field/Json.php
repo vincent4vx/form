@@ -12,6 +12,7 @@ use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 
+use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\Validator\Constraint\ArrayShape;
 
 use function json_decode;
@@ -145,9 +146,9 @@ final class Json implements FieldTransformerInterface, FieldTransformerGenerator
      */
     public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $varName = Code::varName($previousExpression);
+        $varName = Expr::varName($previousExpression);
         $decode = Call::json_decode(
-            Code::raw($varName),
+            $varName,
             $transformer->assoc,
             $transformer->depth,
             $transformer->parseOptions,
@@ -165,8 +166,8 @@ final class Json implements FieldTransformerInterface, FieldTransformerGenerator
      */
     public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $varName = Code::varName($previousExpression);
-        $encode = Call::json_encode(Code::raw($varName), $transformer->encodeOptions);
+        $varName = Expr::varName($previousExpression);
+        $encode = Call::json_encode($varName, $transformer->encodeOptions);
 
         return "({$varName} = {$previousExpression}) === null ? null : {$encode}";
     }

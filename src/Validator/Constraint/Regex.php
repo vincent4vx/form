@@ -5,6 +5,7 @@ namespace Quatrevieux\Form\Validator\Constraint;
 use Attribute;
 use InvalidArgumentException;
 use Quatrevieux\Form\Util\Code;
+use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\Validator\FieldError;
 
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
@@ -65,12 +66,11 @@ final class Regex extends SelfValidatedConstraint implements FieldViewAttributes
      */
     public function generate(ConstraintInterface $constraint, ValidatorGenerator $generator): FieldErrorExpressionInterface
     {
-        return FieldErrorExpression::single(function (string $accessor) use ($constraint) {
-            $pattern = Code::value($constraint->getGrepPattern());
-            $error = Code::new(FieldError::class, [$constraint->message, [], self::CODE]);
-
-            return "is_scalar({$accessor}) && !preg_match({$pattern}, (string) {$accessor}) ? {$error} : null";
-        });
+        return FieldErrorExpression::single(fn (string $accessor) => (string) Code::expr($accessor)->format(
+            'is_scalar({}) && !preg_match({pattern}, (string) {}) ? {error} : null',
+            pattern: $constraint->getGrepPattern(),
+            error: new FieldError($constraint->message, code: self::CODE),
+        ));
     }
 
     /**

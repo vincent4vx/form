@@ -12,6 +12,8 @@ use Quatrevieux\Form\Transformer\TransformerException;
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 
+use Quatrevieux\Form\Util\Expr;
+
 use function is_array;
 use function is_object;
 
@@ -72,12 +74,12 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
      */
     public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $varName = Code::varName($previousExpression);
-        $dataMapper = Call::object('$this->registry->getDataMapperFactory()')->create($transformer->class);
-        $transformer = Call::object('$this->registry->getTransformerFactory()')->create($transformer->class);
-        $transformationResult = Call::object($transformer)->transformFromHttp(Code::raw($varName));
-        $transformationResultVarName = Code::varName($transformationResult);
-        $transformerException = Code::new(TransformerException::class, ['Embedded form has errors', Code::raw($transformationResultVarName . '->errors')]);
+        $varName = Expr::varName($previousExpression);
+        $dataMapper = Expr::this()->registry->getDataMapperFactory()->create($transformer->class);
+        $transformer = Expr::this()->registry->getTransformerFactory()->create($transformer->class);
+        $transformationResult = $transformer->transformFromHttp($varName);
+        $transformationResultVarName = Expr::varName($transformationResult);
+        $transformerException = Code::new(TransformerException::class, ['Embedded form has errors', $transformationResultVarName->errors]);
 
         return "is_array({$varName} = {$previousExpression}) ? {$dataMapper}->toDataObject(({$transformationResultVarName} = {$transformationResult})->errors ? throw {$transformerException} : {$transformationResultVarName}->values) : null";
     }
@@ -88,8 +90,8 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
     public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $varName = Code::varName($previousExpression);
-        $dataMapper = Call::object('$this->registry->getDataMapperFactory()')->create($transformer->class);
-        $transformer = Call::object('$this->registry->getTransformerFactory()')->create($transformer->class);
+        $dataMapper = Expr::this()->registry->getDataMapperFactory()->create($transformer->class);
+        $transformer = Expr::this()->registry->getTransformerFactory()->create($transformer->class);
 
         return "is_object({$varName} = {$previousExpression}) ? {$transformer}->transformToHttp({$dataMapper}->toArray({$varName})) : null";
     }

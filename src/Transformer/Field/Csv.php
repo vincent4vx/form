@@ -7,6 +7,7 @@ use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
+use Quatrevieux\Form\Util\Expr;
 
 /**
  * Implementation of RFC-4180 CSV format
@@ -65,11 +66,11 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
      */
     public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $expressionVarName = Code::varName($previousExpression);
-        $separator = Code::value($transformer->separator);
-        $enclosure = Code::value($transformer->enclosure);
-
-        return "(is_string($expressionVarName = $previousExpression) ? str_getcsv($expressionVarName, $separator, $enclosure, '') : null)";
+        return Code::expr($previousExpression)->storeAndFormat(
+            "(is_string({}) ? str_getcsv({}, {separator}, {enclosure}, '') : null)",
+            separator: $transformer->separator,
+            enclosure: $transformer->enclosure,
+        );
     }
 
     /**
@@ -77,12 +78,12 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
      */
     public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $expressionVarName = Code::varName($previousExpression);
+        $expressionVarName = Expr::varName($previousExpression);
 
         if ($transformer->enclosure) {
-            $expression = Call::static(self::class)->toCsv(Code::raw($expressionVarName), $transformer->separator, $transformer->enclosure);
+            $expression = Call::static(self::class)->toCsv($expressionVarName, $transformer->separator, $transformer->enclosure);
         } else {
-            $expression = Call::implode($transformer->separator, Code::raw($expressionVarName));
+            $expression = Call::implode($transformer->separator, $expressionVarName);
         }
 
         return "(is_array($expressionVarName = $previousExpression) ? $expression : null)";
