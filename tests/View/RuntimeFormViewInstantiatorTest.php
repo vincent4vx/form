@@ -12,7 +12,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 {
     public function test_empty()
     {
-        $instantiator = new RuntimeFormViewInstantiator($this->registry, [], [], []);
+        $instantiator = new RuntimeFormViewInstantiator($this->registry, SimpleRequest::class, [], [], [], []);
 
         $view = $instantiator->default();
 
@@ -27,10 +27,10 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
     public function test_with_fields()
     {
-        $instantiator = new RuntimeFormViewInstantiator($this->registry, [
+        $instantiator = new RuntimeFormViewInstantiator($this->registry, SimpleRequest::class, [
             'foo' => new FieldViewConfiguration(),
             'bar' => new FieldViewConfiguration(),
-        ], [], []);
+        ], [], [], []);
 
         $view = $instantiator->default();
 
@@ -59,10 +59,10 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
     public function test_with_fields_and_root()
     {
-        $instantiator = new RuntimeFormViewInstantiator($this->registry, [
+        $instantiator = new RuntimeFormViewInstantiator($this->registry, SimpleRequest::class, [
             'foo' => new FieldViewConfiguration(),
             'bar' => new FieldViewConfiguration(),
-        ], [], []);
+        ], [], [], []);
 
         $view = $instantiator->default('root[foo]');
 
@@ -74,13 +74,13 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
     public function test_with_fields_mapping()
     {
-        $instantiator = new RuntimeFormViewInstantiator($this->registry, [
+        $instantiator = new RuntimeFormViewInstantiator($this->registry, SimpleRequest::class, [
             'foo' => new FieldViewConfiguration(),
             'bar' => new FieldViewConfiguration(),
         ], [
             'foo' => 'my_foo',
             'bar' => 'my_bar',
-        ], []);
+        ], [], []);
 
         $view = $instantiator->default();
 
@@ -109,11 +109,11 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
     public function test_with_embedded_and_custom_config()
     {
-        $instantiator = new RuntimeFormViewInstantiator($this->registry, [
+        $instantiator = new RuntimeFormViewInstantiator($this->registry, SimpleRequest::class, [
             'foo' => new FieldViewConfiguration(id: 'my_foo', defaultValue: 'aaa'),
             'bar' => new FieldViewConfiguration(attributes: ['class' => 'my_class']),
             'embedded' => new Embedded(SimpleRequest::class),
-        ], [], []);
+        ], [], [], []);
 
         $view = $instantiator->default();
 
@@ -155,10 +155,10 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
     public function test_with_attributes()
     {
-        $instantiator = new RuntimeFormViewInstantiator($this->registry, [
+        $instantiator = new RuntimeFormViewInstantiator($this->registry, SimpleRequest::class, [
             'foo' => new FieldViewConfiguration(),
             'bar' => new FieldViewConfiguration(),
-        ], [], ['foo' => ['class' => 'my_class']]);
+        ], [], ['foo' => ['class' => 'my_class']], []);
 
         $view = $instantiator->default();
 

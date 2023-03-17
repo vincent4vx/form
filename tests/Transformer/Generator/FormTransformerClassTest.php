@@ -19,7 +19,7 @@ class FormTransformerClassTest extends FormTestCase
 use Quatrevieux\Form\Transformer\TransformationResult;
 use Quatrevieux\Form\Validator\FieldError;
 
-class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
+class ClassName extends Quatrevieux\Form\Transformer\AbstractGeneratedFormTransformer
 {
     function transformFromHttp(array $value): TransformationResult
     {
@@ -36,8 +36,16 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
+    public function transformFieldFromHttp(string $fieldName, mixed $value): mixed
     {
+        return match ($fieldName) {
+        };
+    }
+
+    public function transformFieldToHttp(string $fieldName, mixed $value): mixed
+    {
+        return match ($fieldName) {
+        };
     }
 }
 
@@ -61,7 +69,7 @@ PHP
 use Quatrevieux\Form\Transformer\TransformationResult;
 use Quatrevieux\Form\Validator\FieldError;
 
-class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
+class ClassName extends Quatrevieux\Form\Transformer\AbstractGeneratedFormTransformer
 {
     function transformFromHttp(array $value): TransformationResult
     {
@@ -82,8 +90,20 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
+    public function transformFieldFromHttp(string $fieldName, mixed $value): mixed
     {
+        return match ($fieldName) {
+            'foo' => $value,
+            'baz' => $value,
+        };
+    }
+
+    public function transformFieldToHttp(string $fieldName, mixed $value): mixed
+    {
+        return match ($fieldName) {
+            'foo' => $value,
+            'baz' => $value,
+        };
     }
 }
 
@@ -107,7 +127,7 @@ PHP
 use Quatrevieux\Form\Transformer\TransformationResult;
 use Quatrevieux\Form\Validator\FieldError;
 
-class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
+class ClassName extends Quatrevieux\Form\Transformer\AbstractGeneratedFormTransformer
 {
     function transformFromHttp(array $value): TransformationResult
     {
@@ -126,8 +146,18 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
+    public function transformFieldFromHttp(string $fieldName, mixed $value): mixed
     {
+        return match ($fieldName) {
+            'foo' => base64_decode((string) ($value)),
+        };
+    }
+
+    public function transformFieldToHttp(string $fieldName, mixed $value): mixed
+    {
+        return match ($fieldName) {
+            'foo' => base64_encode($value),
+        };
     }
 }
 
@@ -151,7 +181,7 @@ PHP
 use Quatrevieux\Form\Transformer\TransformationResult;
 use Quatrevieux\Form\Validator\FieldError;
 
-class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
+class ClassName extends Quatrevieux\Form\Transformer\AbstractGeneratedFormTransformer
 {
     function transformFromHttp(array $value): TransformationResult
     {
@@ -180,8 +210,18 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
+    public function transformFieldFromHttp(string $fieldName, mixed $value): mixed
     {
+        return match ($fieldName) {
+            'foo' => base64_decode((string) ($value)),
+        };
+    }
+
+    public function transformFieldToHttp(string $fieldName, mixed $value): mixed
+    {
+        return match ($fieldName) {
+            'foo' => base64_encode($value),
+        };
     }
 }
 
@@ -208,7 +248,7 @@ PHP
 use Quatrevieux\Form\Transformer\TransformationResult;
 use Quatrevieux\Form\Validator\FieldError;
 
-class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
+class ClassName extends Quatrevieux\Form\Transformer\AbstractGeneratedFormTransformer
 {
     function transformFromHttp(array $value): TransformationResult
     {
@@ -244,8 +284,20 @@ class ClassName implements Quatrevieux\Form\Transformer\FormTransformerInterface
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
+    public function transformFieldFromHttp(string $fieldName, mixed $value): mixed
     {
+        return match ($fieldName) {
+            'foo' => (string) ($value),
+            'bar' => base64_decode($value),
+        };
+    }
+
+    public function transformFieldToHttp(string $fieldName, mixed $value): mixed
+    {
+        return match ($fieldName) {
+            'foo' => $value,
+            'bar' => base64_encode($value),
+        };
     }
 }
 

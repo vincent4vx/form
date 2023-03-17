@@ -27,7 +27,7 @@ class GeneratedFormTransformerFactoryTest extends FormTestCase
 use Quatrevieux\Form\Transformer\TransformationResult;
 use Quatrevieux\Form\Validator\FieldError;
 
-class Quatrevieux_Form_Fixtures_SimpleRequestTransformerGeneratorTesting implements Quatrevieux\Form\Transformer\FormTransformerInterface
+class Quatrevieux_Form_Fixtures_SimpleRequestTransformerGeneratorTesting extends Quatrevieux\Form\Transformer\AbstractGeneratedFormTransformer
 {
     function transformFromHttp(array $value): TransformationResult
     {
@@ -48,8 +48,20 @@ class Quatrevieux_Form_Fixtures_SimpleRequestTransformerGeneratorTesting impleme
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
+    public function transformFieldFromHttp(string $fieldName, mixed $value): mixed
     {
+        return match ($fieldName) {
+            'foo' => (is_scalar($__tmp_7d0596c36891967f3bb9d994b4a97c19 = $value) || $__tmp_7d0596c36891967f3bb9d994b4a97c19 instanceof \Stringable ? (string) $__tmp_7d0596c36891967f3bb9d994b4a97c19 : null),
+            'bar' => (is_scalar($__tmp_7d0596c36891967f3bb9d994b4a97c19 = $value) || $__tmp_7d0596c36891967f3bb9d994b4a97c19 instanceof \Stringable ? (string) $__tmp_7d0596c36891967f3bb9d994b4a97c19 : null),
+        };
+    }
+
+    public function transformFieldToHttp(string $fieldName, mixed $value): mixed
+    {
+        return match ($fieldName) {
+            'foo' => $value,
+            'bar' => $value,
+        };
     }
 }
 
@@ -77,6 +89,11 @@ PHP
             'foo' => 'foo',
             'bar' => 'bar',
         ]));
+
+        $this->assertSame('foo', $transformer->fieldTransformer('foo')->transformFromHttp('foo'));
+        $this->assertSame('foo', $transformer->fieldTransformer('foo')->transformToHttp('foo'));
+        $this->assertSame('foo', $transformer->fieldTransformer('bar')->transformFromHttp('foo'));
+        $this->assertSame('foo', $transformer->fieldTransformer('bar')->transformToHttp('foo'));
     }
 
     public function test_create_with_transformers()
@@ -96,7 +113,7 @@ PHP
 use Quatrevieux\Form\Transformer\TransformationResult;
 use Quatrevieux\Form\Validator\FieldError;
 
-class Quatrevieux_Form_Fixtures_WithTransformerRequestTransformerGeneratorTesting implements Quatrevieux\Form\Transformer\FormTransformerInterface
+class Quatrevieux_Form_Fixtures_WithTransformerRequestTransformerGeneratorTesting extends Quatrevieux\Form\Transformer\AbstractGeneratedFormTransformer
 {
     function transformFromHttp(array $value): TransformationResult
     {
@@ -115,8 +132,18 @@ class Quatrevieux_Form_Fixtures_WithTransformerRequestTransformerGeneratorTestin
         ];
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
+    public function transformFieldFromHttp(string $fieldName, mixed $value): mixed
     {
+        return match ($fieldName) {
+            'list' => (($__tmp_34760304f8f15325b0a5dfbc9eb93d1a = (is_string($__tmp_7d0596c36891967f3bb9d994b4a97c19 = $value) ? str_getcsv($__tmp_7d0596c36891967f3bb9d994b4a97c19, ',', '"', '') : null)) !== null ? (array) $__tmp_34760304f8f15325b0a5dfbc9eb93d1a : null),
+        };
+    }
+
+    public function transformFieldToHttp(string $fieldName, mixed $value): mixed
+    {
+        return match ($fieldName) {
+            'list' => (is_array($__tmp_7d0596c36891967f3bb9d994b4a97c19 = $value) ? \Quatrevieux\Form\Transformer\Field\Csv::toCsv($__tmp_7d0596c36891967f3bb9d994b4a97c19, ',', '"') : null),
+        };
     }
 }
 
@@ -139,5 +166,8 @@ PHP
         ], $transformer->transformToHttp([
             'list' => ['foo', 'bar'],
         ]));
+
+        $this->assertSame(['foo', 'bar'], $transformer->fieldTransformer('list')->transformFromHttp('foo,bar'));
+        $this->assertSame('foo,bar', $transformer->fieldTransformer('list')->transformToHttp(['foo', 'bar']));
     }
 }

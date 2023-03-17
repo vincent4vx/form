@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Validator\Constraint;
 
 use Attribute;
+use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Util\Expr;
@@ -12,6 +13,8 @@ use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
+use Quatrevieux\Form\View\ChoiceView;
+use Quatrevieux\Form\View\Provider\FieldChoiceProviderInterface;
 use Stringable;
 
 use function in_array;
@@ -39,7 +42,7 @@ use function print_r;
  * @implements ConstraintValidatorGeneratorInterface<Choice>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Choice extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface
+final class Choice extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface, FieldChoiceProviderInterface
 {
     public const CODE = '41ac8b62-e143-5644-a3eb-0fbfff5a2064';
 
@@ -91,6 +94,21 @@ final class Choice extends SelfValidatedConstraint implements ConstraintValidato
         return FieldErrorExpression::undefined(function (string $accessor) use ($constraint): string {
             return "{$accessor} === null ? null : (is_array({$accessor}) ? {$constraint->generateAggregateInArray($accessor)} : {$constraint->generateSingleInArray($accessor)})";
         });
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function choices(mixed $currentValue, FieldTransformerInterface $transformer): array
+    {
+        $choices = [];
+
+        foreach ($this->choices as $choice) {
+            $current = $transformer->transformToHttp($choice);
+            $choices[] = new ChoiceView($current, null, $current == $currentValue);
+        }
+
+        return $choices;
     }
 
     /**

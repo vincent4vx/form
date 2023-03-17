@@ -7,7 +7,7 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
-use Quatrevieux\Form\RegistryInterface;
+use Quatrevieux\Form\Transformer\AbstractGeneratedFormTransformer;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Transformer\TransformationResult;
@@ -23,6 +23,8 @@ final class FormTransformerClass
     public readonly ClassType $class;
     public readonly Method $fromHttpMethod;
     public readonly Method $toHttpMethod;
+    public readonly Method $transformFieldFromHttpMethod;
+    public readonly Method $transformFieldToHttpMethod;
 
     /**
      * @var array<string, string>
@@ -62,16 +64,14 @@ final class FormTransformerClass
 
         $this->fromHttpMethod = Method::from([FormTransformerInterface::class, 'transformFromHttp'])->setComment(null);
         $this->toHttpMethod = Method::from([FormTransformerInterface::class, 'transformToHttp'])->setComment(null);
+        $this->transformFieldFromHttpMethod = Method::from([AbstractGeneratedFormTransformer::class, 'transformFieldFromHttp'])->setComment(null)->setAbstract(false);
+        $this->transformFieldToHttpMethod = Method::from([AbstractGeneratedFormTransformer::class, 'transformFieldToHttp'])->setComment(null)->setAbstract(false);
 
-        $this->class->addImplement(FormTransformerInterface::class);
+        $this->class->setExtends(AbstractGeneratedFormTransformer::class);
         $this->class->addMember($this->fromHttpMethod);
         $this->class->addMember($this->toHttpMethod);
-
-        $this->class->addMethod('__construct')
-            ->addPromotedParameter('registry')
-            ->setPrivate()
-            ->setType(RegistryInterface::class)
-        ;
+        $this->class->addMember($this->transformFieldFromHttpMethod);
+        $this->class->addMember($this->transformFieldToHttpMethod);
     }
 
     /**
@@ -123,6 +123,21 @@ final class FormTransformerClass
         $this->fromHttpMethod->addBody('$transformed = ' . $this->generateInlineFromHttpArray() . ';');
         $this->fromHttpMethod->addBody($this->generateUnsafeFromHttpTransformations());
         $this->fromHttpMethod->addBody('return new TransformationResult($transformed, $errors);');
+
+        $this->transformFieldFromHttpMethod->addBody('return match ($fieldName) {');
+
+        foreach ($this->fromHttpFieldsTransformationExpressions as $fieldName => $expressions) {
+            $fieldNameString = Code::value($fieldName);
+            $fieldExpression = '$value';
+
+            foreach ($expressions as $expression) {
+                $fieldExpression = $expression($fieldExpression);
+            }
+
+            $this->transformFieldFromHttpMethod->addBody('    ' . $fieldNameString . ' => ' . $fieldExpression . ',');
+        }
+
+        $this->transformFieldFromHttpMethod->addBody('};');
     }
 
     /**
@@ -130,24 +145,27 @@ final class FormTransformerClass
      */
     public function generateToHttp(): void
     {
-        $code = 'return [' . PHP_EOL;
+        $arrayItems = '';
+        $matches = '';
 
         foreach ($this->toHttpFieldsTransformationExpressions as $fieldName => $expressions) {
             $fieldNameString = Code::value($fieldName);
             $httpFieldString = Code::value($this->propertyNameToHttpFieldName[$fieldName] ?? $fieldName);
 
             $fieldExpression = '$value[' . $fieldNameString . '] ?? null';
+            $matchExpression = '$value';
 
             foreach (array_reverse($expressions) as $expression) {
                 $fieldExpression = $expression($fieldExpression);
+                $matchExpression = $expression($matchExpression);
             }
 
-            $code .= '    ' . $httpFieldString . ' => ' . $fieldExpression . ',' . PHP_EOL;
+            $arrayItems .= '    ' . $httpFieldString . ' => ' . $fieldExpression . ',' . PHP_EOL;
+            $matches .= '    ' . $fieldNameString . ' => ' . $matchExpression . ',' . PHP_EOL;
         }
 
-        $code .= '];';
-
-        $this->toHttpMethod->addBody($code);
+        $this->toHttpMethod->addBody("return [\n$arrayItems];");
+        $this->transformFieldToHttpMethod->addBody("return match (\$fieldName) {\n$matches};");
     }
 
     /**

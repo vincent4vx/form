@@ -17,7 +17,7 @@ class FormTest extends TestCase
             new RuntimeFormTransformer(new DefaultRegistry(), ['foo' => [], 'bar' => []], [], []),
             new PublicPropertyDataMapper(SimpleRequest::class),
             new RuntimeValidator(new DefaultRegistry(), []),
-            new RuntimeFormViewInstantiator(new DefaultRegistry(), [], [], []),
+            new RuntimeFormViewInstantiator(new DefaultRegistry(), SimpleRequest::class, [], [], [], []),
         );
 
         $submitted = $form->submit(['foo' => 'aaa', 'bar' => 'bbb']);

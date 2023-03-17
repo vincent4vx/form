@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\View;
 
 use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\HttpField;
+use Quatrevieux\Form\View\Provider\FieldChoiceProviderInterface;
 use Quatrevieux\Form\View\Provider\FieldViewAttributesProviderInterface;
 use Quatrevieux\Form\View\Provider\FieldViewConfiguration;
 use Quatrevieux\Form\View\Provider\FieldViewProviderConfigurationInterface;
@@ -29,6 +30,7 @@ final class RuntimeFormViewInstantiatorFactory implements FormViewInstantiatorFa
         $fieldsNameMapping = [];
         $providerConfigurations = [];
         $attributesByField = [];
+        $choicesProviderByField = [];
 
         foreach ((new ReflectionClass($dataClassName))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
             $fieldName = $property->getName();
@@ -42,13 +44,19 @@ final class RuntimeFormViewInstantiatorFactory implements FormViewInstantiatorFa
             if ($attributes = $this->attributes($property)) {
                 $attributesByField[$fieldName] = $attributes;
             }
+
+            if ($choicesProvider = $this->choicesProvider($property)) {
+                $choicesProviderByField[$fieldName] = $choicesProvider;
+            }
         }
 
         return new RuntimeFormViewInstantiator(
             $this->registry,
+            $dataClassName,
             $providerConfigurations,
             $fieldsNameMapping,
             $attributesByField,
+            $choicesProviderByField,
         );
     }
 
@@ -106,5 +114,14 @@ final class RuntimeFormViewInstantiatorFactory implements FormViewInstantiatorFa
         }
 
         return $attributes;
+    }
+
+    private function choicesProvider(ReflectionProperty $property): ?FieldChoiceProviderInterface
+    {
+        foreach ($property->getAttributes(FieldChoiceProviderInterface::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            return $attribute->newInstance();
+        }
+
+        return null;
     }
 }

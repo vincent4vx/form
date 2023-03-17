@@ -2,7 +2,9 @@
 
 namespace Quatrevieux\Form\Transformer;
 
+use OutOfBoundsException;
 use Quatrevieux\Form\DataMapper\DataMapperInterface;
+use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 
 /**
  * Base type for transform raw HTTP fields to array of data class properties values
@@ -31,4 +33,13 @@ interface FormTransformerInterface
      * @return mixed[] Normalized HTTP fields value
      */
     public function transformToHttp(array $value): array;
+
+    /**
+     * Get the transformer for the given field
+     *
+     * @param string $fieldName Field name
+     *
+     * @return FieldTransformerInterface
+     */
+    public function fieldTransformer(string $fieldName): FieldTransformerInterface;
 }

@@ -37,6 +37,8 @@ final class FieldView implements Stringable
          * @var array<string, scalar>
          */
         public array $attributes = [],
+
+        public ?array $choices = null,
     ) {
     }
 
@@ -97,6 +99,15 @@ final class FieldView implements Stringable
     public function type(string $type): self
     {
         $this->attributes['type'] = $type;
+        return $this;
+    }
+
+    /**
+     * @param array|null $choices
+     */
+    public function choices(?array $choices): self
+    {
+        $this->choices = $choices;
         return $this;
     }
 

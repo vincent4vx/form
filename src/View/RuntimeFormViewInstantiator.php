@@ -3,6 +3,9 @@
 namespace Quatrevieux\Form\View;
 
 use Quatrevieux\Form\RegistryInterface;
+use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
+use Quatrevieux\Form\Transformer\FormTransformerInterface;
+use Quatrevieux\Form\View\Provider\FieldChoiceProviderInterface;
 use Quatrevieux\Form\View\Provider\FieldViewProviderConfigurationInterface;
 
 /**
@@ -12,6 +15,8 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
 {
     public function __construct(
         private readonly RegistryInterface $registry,
+
+        public readonly string $dataClassName,
 
         /**
          * Map a field name to its view configuration
@@ -35,6 +40,11 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
          * @var array<string, array<string, scalar>>
          */
         public readonly array $attributesByField,
+
+        /**
+         * @var array<string, FieldChoiceProviderInterface>
+         */
+        public readonly array $choicesProviderByField,
     ) {
     }
 
@@ -53,18 +63,26 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
     {
         $fields = [];
         $registry = $this->registry;
+        $formTransformer = null;
 
         foreach ($this->providerConfigurations as $name => $configuration) {
             $fieldName = $this->fieldsNameMapping[$name] ?? $name;
             $fullFieldName = $rootField ? $rootField . '[' . $fieldName . ']' : $fieldName;
 
-            $fields[$name] = $configuration->getViewProvider($registry)->view(
+            $fields[$name] = $fieldView = $configuration->getViewProvider($registry)->view(
                 $configuration,
                 $fullFieldName,
                 $value[$fieldName] ?? null,
                 $errors[$name] ?? null,
                 $this->attributesByField[$name] ?? [],
             );
+
+            if (isset($this->choicesProviderByField[$name])) {
+                $formTransformer ??= $this->registry->getTransformerFactory()->create($this->dataClassName);
+                $fieldTransformer = $formTransformer->fieldTransformer($name);
+
+                $fieldView->choices = ($this->choicesProviderByField[$name]->choices($value[$fieldName] ?? null, $fieldTransformer));
+            }
         }
 
         return new FormView($fields, $value);
