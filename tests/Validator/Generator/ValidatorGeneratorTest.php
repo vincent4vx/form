@@ -51,8 +51,9 @@ class TestingValidatorGeneratorValidatorClass implements Quatrevieux\Form\Valida
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private readonly Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 

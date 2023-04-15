@@ -26,8 +26,9 @@ class TestingEmptyValidatorClass implements Quatrevieux\Form\Validator\Validator
         return $previousErrors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private readonly Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
@@ -63,8 +64,9 @@ class TestingWithConstraintCodeValidatorClass implements Quatrevieux\Form\Valida
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private readonly Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
@@ -101,8 +103,9 @@ class TestingWithConstraintCodeValidatorClassReturnTypeSingle implements Quatrev
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private readonly Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
@@ -139,8 +142,9 @@ class TestingWithConstraintCodeValidatorClassReturnTypeAggregate implements Quat
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private readonly Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 

@@ -30,8 +30,9 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
         return $rootField === null ? new \Quatrevieux\Form\View\FormView([], []) :  new \Quatrevieux\Form\View\FormView([], []);
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
@@ -66,8 +67,9 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
         return $rootField === null ? new \Quatrevieux\Form\View\FormView([], []) :  new \Quatrevieux\Form\View\FormView([], []);
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
         $this->foo = new Foo();
     }
 }
@@ -102,8 +104,9 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
         return $rootField === null ? new \Quatrevieux\Form\View\FormView(['foo' => create_field(null, null, null)], []) :  new \Quatrevieux\Form\View\FormView(['foo' => create_field(null, null, $rootField)], []);
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
@@ -138,8 +141,9 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
         return $rootField === null ? new \Quatrevieux\Form\View\FormView([create_field(null, null, "{}[0]"), create_field(null, null, "{}[1]")], []) :  new \Quatrevieux\Form\View\FormView([create_field(null, null, "{$rootField}[0]"), create_field(null, null, "{$rootField}[1]")], []);
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
