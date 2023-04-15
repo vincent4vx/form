@@ -6,9 +6,7 @@ use Attribute;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
-use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\Validator\FieldError;
-
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;
@@ -31,12 +29,21 @@ use function print_r;
  * The value is checked with strict comparison, so ensure that the value is correctly cast.
  * This constraint supports multiple choices (i.e. input value is an array).
  *
+ * You can define labels for the choices by using a string key in the choices array.
+ *
  * Usage:
  * <code>
  * class MyForm
  * {
  *     #[Choice(['foo', 'bar'])]
  *     public string $foo;
+ *
+ *     // Define labels for the choices
+ *     #[Choice([
+ *         'My first label' => 'foo',
+ *         'My other label' => 'bar',
+ *     ])]
+ *     public string $bar;
  * }
  * </code>
  *

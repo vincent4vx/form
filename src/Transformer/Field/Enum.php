@@ -10,6 +10,10 @@ use Quatrevieux\Form\Transformer\TransformerException;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\Validator\FieldError;
+use Quatrevieux\Form\View\ChoiceView;
+use Quatrevieux\Form\View\LabelInterface;
+use Quatrevieux\Form\View\Provider\FieldChoiceProviderInterface;
+
 use ReflectionEnum;
 use Stringable;
 use UnitEnum;
@@ -21,6 +25,8 @@ use function print_r;
 /**
  * Transform a value to its corresponding enum instance
  * It supports both UnitEnum and BackedEnum, and resolve the enum instance using the value or the name.
+ *
+ * To define labels for the choices, implements the interface {@see LabelInterface} on the enum class.
  *
  * Note: This transformer is case-sensitive
  *
@@ -47,7 +53,7 @@ use function print_r;
  * @implements FieldTransformerGeneratorInterface<Enum>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Enum implements FieldTransformerInterface, FieldTransformerGeneratorInterface
+final class Enum implements FieldTransformerInterface, FieldTransformerGeneratorInterface, FieldChoiceProviderInterface
 {
     public const CODE = '052417e1-3a0d-5cd0-afdf-486cfe606edf';
 
@@ -124,6 +130,27 @@ final class Enum implements FieldTransformerInterface, FieldTransformerGenerator
     public function canThrowError(): bool
     {
         return $this->errorOnInvalid;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function choices(mixed $currentValue, FieldTransformerInterface $transformer): array
+    {
+        $choices = [];
+
+        foreach ($this->class::cases() as $case) {
+            /** @var scalar $httpValue */
+            $httpValue = $transformer->transformToHttp($case);
+
+            $choices[] = new ChoiceView(
+                $httpValue,
+                $case instanceof LabelInterface ? $case : null,
+                $httpValue == $currentValue
+            );
+        }
+
+        return $choices;
     }
 
     /**
