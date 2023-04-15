@@ -24,7 +24,7 @@ final class ChoiceView
          * Choice label
          * The label will be translated if a translator is set
          */
-        public readonly ?string $label = null,
+        public readonly string|LabelInterface|null $label = null,
 
         /**
          * Is the selected choice ?
@@ -38,8 +38,6 @@ final class ChoiceView
      * Get the translated label
      * If no translator is set, the label is returned as is
      *
-     * @todo implements TranslatableInterface ?
-     *
      * @param string|null $locale Locale to translate the message to
      * @return string|null Translated label, or null if no label is defined
      */
@@ -49,7 +47,13 @@ final class ChoiceView
             return null;
         }
 
-        return $this->translator ? $this->translator->trans($this->label, [], null, $locale) : $this->label;
+        $translator = $this->translator;
+
+        if ($this->label instanceof LabelInterface) {
+            return $translator ? $this->label->translatedLabel($translator, $locale) : $this->label->label();
+        }
+
+        return $translator ? $translator->trans($this->label, [], null, $locale) : $this->label;
     }
 
     /**

@@ -6,7 +6,11 @@ use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
+use Quatrevieux\Form\View\LabelInterface;
+use Quatrevieux\Form\View\LabelTrait;
+use Quatrevieux\Form\View\SelectTemplate;
 use Ramsey\Uuid\Uuid;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EnumTest extends FormTestCase
 {
@@ -94,6 +98,36 @@ class EnumTest extends FormTestCase
         $this->assertSame('(!($__enum_4e6c78d168de10f915401b0dad567ede = $data["foo"]) instanceof \Quatrevieux\Form\Transformer\Field\WithStringEnum ? null : $__enum_4e6c78d168de10f915401b0dad567ede->value)', (new Enum(SimpleEnum::class))->generateTransformToHttp(new Enum(WithStringEnum::class), '$data["foo"]', $generator));
         $this->assertSame('(!($__enum_4e6c78d168de10f915401b0dad567ede = $data["foo"]) instanceof \Quatrevieux\Form\Transformer\Field\WithStringEnum ? null : $__enum_4e6c78d168de10f915401b0dad567ede->name)', (new Enum(SimpleEnum::class))->generateTransformToHttp(new Enum(WithStringEnum::class, useName: true), '$data["foo"]', $generator));
     }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_view(bool $generated)
+    {
+        $form = $generated ? $this->generatedForm(TestEnumTransformerRequest::class) : $this->runtimeForm(TestEnumTransformerRequest::class);
+
+        $this->assertEquals('<select name="simple" ><option value="Foo" >Foo</option><option value="Bar" >Bar</option><option value="Baz" >Baz</option></select>', $form->view()['simple']->render(SelectTemplate::Select));
+        $this->assertEquals('<select name="simple" ><option value="Foo" >Foo</option><option value="Bar" selected>Bar</option><option value="Baz" >Baz</option></select>', $form->submit(['simple' => 'Bar'])->view()['simple']->render(SelectTemplate::Select));
+        $this->assertEquals('<select name="withInt" ><option value="1" >1</option><option value="2" >2</option><option value="3" selected>3</option></select>', $form->submit(['withInt' => 3])->view()['withInt']->render(SelectTemplate::Select));
+        $this->assertEquals('<select name="withLabel" ><option value="1" >Foo (1)</option><option value="2" >Bar (2)</option><option value="3" selected>Baz (3)</option></select>', $form->submit(['withLabel' => 3])->view()['withLabel']->render(SelectTemplate::Select));
+    }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_view_translated(bool $generated)
+    {
+        $this->configureTranslator('fr', [
+            'Foo (1)' => 'Fou (1)',
+            'Bar (2)' => 'Barre (2)',
+            'Baz (3)' => 'Base (3)',
+        ]);
+        $form = $generated ? $this->generatedForm(TestEnumTransformerRequest::class) : $this->runtimeForm(TestEnumTransformerRequest::class);
+
+        $this->assertEquals('<select name="withLabel" ><option value="1" >Fou (1)</option><option value="2" >Barre (2)</option><option value="3" selected>Base (3)</option></select>', $form->submit(['withLabel' => 3])->view()['withLabel']->render(SelectTemplate::Select));
+    }
 }
 
 class TestEnumTransformerRequest
@@ -106,6 +140,9 @@ class TestEnumTransformerRequest
 
     #[Enum(WithIntEnum::class)]
     public ?WithIntEnum $withInt;
+
+    #[Enum(WithLabel::class)]
+    public ?WithLabel $withLabel;
 
     #[Enum(WithStringEnum::class, useName: true)]
     public ?WithStringEnum $useName;
@@ -136,4 +173,22 @@ enum WithIntEnum: int
     case Foo = 1;
     case Bar = 2;
     case Baz = 3;
+}
+
+enum WithLabel: int implements LabelInterface
+{
+    use LabelTrait;
+
+    case Foo = 1;
+    case Bar = 2;
+    case Baz = 3;
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Foo => 'Foo (1)',
+            self::Bar => 'Bar (2)',
+            self::Baz => 'Baz (3)',
+        };
+    }
 }
