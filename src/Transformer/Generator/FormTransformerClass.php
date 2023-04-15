@@ -124,20 +124,7 @@ final class FormTransformerClass
         $this->fromHttpMethod->addBody($this->generateUnsafeFromHttpTransformations());
         $this->fromHttpMethod->addBody('return new TransformationResult($transformed, $errors);');
 
-        $this->transformFieldFromHttpMethod->addBody('return match ($fieldName) {');
-
-        foreach ($this->fromHttpFieldsTransformationExpressions as $fieldName => $expressions) {
-            $fieldNameString = Code::value($fieldName);
-            $fieldExpression = '$value';
-
-            foreach ($expressions as $expression) {
-                $fieldExpression = $expression($fieldExpression);
-            }
-
-            $this->transformFieldFromHttpMethod->addBody('    ' . $fieldNameString . ' => ' . $fieldExpression . ',');
-        }
-
-        $this->transformFieldFromHttpMethod->addBody('};');
+        $this->transformFieldFromHttpMethod->setBody($this->generateTransformFieldFromHttpBody());
     }
 
     /**
@@ -145,27 +132,8 @@ final class FormTransformerClass
      */
     public function generateToHttp(): void
     {
-        $arrayItems = '';
-        $matches = '';
-
-        foreach ($this->toHttpFieldsTransformationExpressions as $fieldName => $expressions) {
-            $fieldNameString = Code::value($fieldName);
-            $httpFieldString = Code::value($this->propertyNameToHttpFieldName[$fieldName] ?? $fieldName);
-
-            $fieldExpression = '$value[' . $fieldNameString . '] ?? null';
-            $matchExpression = '$value';
-
-            foreach (array_reverse($expressions) as $expression) {
-                $fieldExpression = $expression($fieldExpression);
-                $matchExpression = $expression($matchExpression);
-            }
-
-            $arrayItems .= '    ' . $httpFieldString . ' => ' . $fieldExpression . ',' . PHP_EOL;
-            $matches .= '    ' . $fieldNameString . ' => ' . $matchExpression . ',' . PHP_EOL;
-        }
-
-        $this->toHttpMethod->addBody("return [\n$arrayItems];");
-        $this->transformFieldToHttpMethod->addBody("return match (\$fieldName) {\n$matches};");
+        $this->toHttpMethod->addBody($this->generateTransformToHttpBody());
+        $this->transformFieldToHttpMethod->addBody($this->generateTransformFieldToHttpBody());
     }
 
     /**
@@ -176,6 +144,62 @@ final class FormTransformerClass
     public function code(): string
     {
         return (new PsrPrinter())->printFile($this->file);
+    }
+
+    private function generateTransformFieldFromHttpBody(): string
+    {
+        $cases = '';
+
+        foreach ($this->fromHttpFieldsTransformationExpressions as $fieldName => $expressions) {
+            $fieldNameString = Code::value($fieldName);
+            $fieldExpression = '$value';
+
+            foreach ($expressions as $expression) {
+                $fieldExpression = $expression($fieldExpression);
+            }
+
+            $cases .= '    ' . $fieldNameString . ' => ' . $fieldExpression . ',' . PHP_EOL;
+        }
+
+        return "return match (\$fieldName) {\n$cases};";
+    }
+
+    private function generateTransformToHttpBody(): string
+    {
+        $arrayItems = '';
+
+        foreach ($this->toHttpFieldsTransformationExpressions as $fieldName => $expressions) {
+            $fieldNameString = Code::value($fieldName);
+            $httpFieldString = Code::value($this->propertyNameToHttpFieldName[$fieldName] ?? $fieldName);
+
+            $fieldExpression = '$value[' . $fieldNameString . '] ?? null';
+
+            foreach (array_reverse($expressions) as $expression) {
+                $fieldExpression = $expression($fieldExpression);
+            }
+
+            $arrayItems .= '    ' . $httpFieldString . ' => ' . $fieldExpression . ',' . PHP_EOL;
+        }
+
+        return "return [\n$arrayItems];";
+    }
+
+    private function generateTransformFieldToHttpBody(): string
+    {
+        $matches = '';
+
+        foreach ($this->toHttpFieldsTransformationExpressions as $fieldName => $expressions) {
+            $fieldNameString = Code::value($fieldName);
+            $matchExpression = '$value';
+
+            foreach (array_reverse($expressions) as $expression) {
+                $matchExpression = $expression($matchExpression);
+            }
+
+            $matches .= '    ' . $fieldNameString . ' => ' . $matchExpression . ',' . PHP_EOL;
+        }
+
+        return "return match (\$fieldName) {\n$matches};";
     }
 
     private function generateInlineFromHttpArray(): string

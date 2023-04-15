@@ -8,7 +8,7 @@ use function array_reverse;
 
 /**
  * Adapt list of transformers to a single {@see FieldTransformerInterface}
- * 
+ *
  * @internal
  */
 final class FieldTransformersAggregate implements FieldTransformerInterface
@@ -59,12 +59,8 @@ final class FieldTransformersAggregate implements FieldTransformerInterface
      */
     public function canThrowError(): bool
     {
-        foreach ($this->transformers as $transformer) {
-            if (!$transformer instanceof FieldTransformerInterface || $transformer->canThrowError()) {
-                return true;
-            }
-        }
-
-        return false;
+        // Do the same as code generation
+        // Currently, this value is not used
+        return true;
     }
 }

@@ -10,6 +10,7 @@ use Quatrevieux\Form\Fixtures\RequestWithDefaultValue;
 use Quatrevieux\Form\Fixtures\RequiredParametersRequest;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\Fixtures\TestConfig;
+use Quatrevieux\Form\Fixtures\WithChoiceRequest;
 use Quatrevieux\Form\Fixtures\WithExternalDependencyConstraintRequest;
 use Quatrevieux\Form\Fixtures\WithExternalDependencyTransformerRequest;
 use Quatrevieux\Form\Fixtures\WithFieldNameMapping;
@@ -19,6 +20,7 @@ use Quatrevieux\Form\Validator\Constraint\Length;
 use Quatrevieux\Form\Validator\Constraint\Required;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\View\FieldView;
+use Quatrevieux\Form\View\SelectTemplate;
 
 class FunctionalTest extends FormTestCase
 {
@@ -363,6 +365,23 @@ class FunctionalTest extends FormTestCase
         $this->assertTrue($submitted->valid());
         $this->assertSame(123, $submitted->value()->foo);
         $this->assertSame('abc', $submitted->value()->bar);
+    }
+
+    public function test_with_choice()
+    {
+        $form = $this->form(WithChoiceRequest::class);
+        $view = $form->view();
+
+        $this->assertEquals('<select name="value" ><option value="42" >The answer</option><option value="666" >The beast</option><option value="404" >Lost</option></select>', $view['value']->render(SelectTemplate::Select));
+
+        $submitted = $form->submit(['value' => '666']);
+        $this->assertTrue($submitted->valid());
+        $this->assertSame(666, $submitted->value()->value);
+        $this->assertEquals('<select name="value" ><option value="42" >The answer</option><option value="666" selected>The beast</option><option value="404" >Lost</option></select>', $submitted->view()['value']->render(SelectTemplate::Select));
+
+        $submitted = $form->submit(['value' => '-1']);
+        $this->assertFalse($submitted->valid());
+        $this->assertErrors(['value' => 'The value is not a valid choice.'], $submitted->errors());
     }
 
     public function form(string $dataClass): FormInterface

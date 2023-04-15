@@ -40,6 +40,43 @@ PHP,
         );
     }
 
+    public function test_with_property()
+    {
+        $class = new FormViewInstantiatorClass('GeneratedFormViewInstantiator');
+        $class->property('foo', 'new Foo()');
+
+        $class->generateDefault();
+        $class->generateSubmitted();
+
+        $this->assertSame(
+            <<<'PHP'
+<?php
+
+class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewInstantiatorInterface
+{
+    private $foo;
+
+    function submitted(array $value, array $errors, string $rootField = null): Quatrevieux\Form\View\FormView
+    {
+        return $rootField === null ? new \Quatrevieux\Form\View\FormView([], $value) :  new \Quatrevieux\Form\View\FormView([], $value);
+    }
+
+    function default(string $rootField = null): Quatrevieux\Form\View\FormView
+    {
+        return $rootField === null ? new \Quatrevieux\Form\View\FormView([], []) :  new \Quatrevieux\Form\View\FormView([], []);
+    }
+
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
+    {
+        $this->foo = new Foo();
+    }
+}
+
+PHP,
+            $class->code()
+        );
+    }
+
     public function test_single_field()
     {
         $class = new FormViewInstantiatorClass('GeneratedFormViewInstantiator');

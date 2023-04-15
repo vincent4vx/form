@@ -3,8 +3,6 @@
 namespace Quatrevieux\Form\View;
 
 use Quatrevieux\Form\RegistryInterface;
-use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
-use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\View\Provider\FieldChoiceProviderInterface;
 use Quatrevieux\Form\View\Provider\FieldViewProviderConfigurationInterface;
 
@@ -16,6 +14,9 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
     public function __construct(
         private readonly RegistryInterface $registry,
 
+        /**
+         * @var class-string
+         */
         public readonly string $dataClassName,
 
         /**
@@ -68,20 +69,26 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
         foreach ($this->providerConfigurations as $name => $configuration) {
             $fieldName = $this->fieldsNameMapping[$name] ?? $name;
             $fullFieldName = $rootField ? $rootField . '[' . $fieldName . ']' : $fieldName;
+            $fieldValue = $value[$fieldName] ?? null;
 
             $fields[$name] = $fieldView = $configuration->getViewProvider($registry)->view(
                 $configuration,
                 $fullFieldName,
-                $value[$fieldName] ?? null,
+                $fieldValue,
                 $errors[$name] ?? null,
                 $this->attributesByField[$name] ?? [],
             );
 
-            if (isset($this->choicesProviderByField[$name])) {
+            if (isset($this->choicesProviderByField[$name]) && $fieldView instanceof FieldView) {
                 $formTransformer ??= $this->registry->getTransformerFactory()->create($this->dataClassName);
                 $fieldTransformer = $formTransformer->fieldTransformer($name);
+                $translator = $this->registry->getTranslator();
 
-                $fieldView->choices = ($this->choicesProviderByField[$name]->choices($value[$fieldName] ?? null, $fieldTransformer));
+                $fieldView->choices = $this->choicesProviderByField[$name]->choices($fieldValue, $fieldTransformer);
+
+                foreach ($fieldView->choices as $choice) {
+                    $choice->setTranslator($translator);
+                }
             }
         }
 

@@ -3,10 +3,13 @@
 namespace Quatrevieux\Form\View;
 
 use Quatrevieux\Form\ContainerRegistry;
+use Quatrevieux\Form\DummyTranslator;
 use Quatrevieux\Form\Fixtures\FormWithCustomView;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
+use Quatrevieux\Form\Fixtures\WithChoiceRequest;
 use Quatrevieux\Form\Fixtures\WithFieldNameMapping;
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\Transformer\RuntimeFormTransformerFactory;
 use Quatrevieux\Form\Util\Functions;
 use Quatrevieux\Form\Validator\FieldError;
 
@@ -203,5 +206,72 @@ PHP,
             'count' => new FieldView('count', null, null, ['type' => 'number', 'id' => 'form_count', 'min' => 0, 'max' => 100]),
             'name' => new FieldView('name', 'example', null, ['type' => 'text', 'id' => 'form_name']),
         ], []), $instantiator->default());
+    }
+
+    public function test_generate_with_choice()
+    {
+        $registry = new ContainerRegistry($this->container);
+        $registry->setTransformerFactory(new RuntimeFormTransformerFactory($registry));
+        $factory = new GeneratedFormViewInstantiatorFactory(
+            registry: $registry,
+            savePathResolver: Functions::savePathResolver(self::GENERATED_DIR),
+            classNameResolver: Functions::classNameResolver('ViewGeneratorTesting'),
+        );
+
+        $instantiator = $factory->create(WithChoiceRequest::class);
+
+        $this->assertSame(<<<'PHP'
+<?php
+
+class Quatrevieux_Form_Fixtures_WithChoiceRequestViewGeneratorTesting implements Quatrevieux\Form\View\FormViewInstantiatorInterface
+{
+    private $transformer;
+
+    function submitted(array $value, array $errors, string $rootField = null): Quatrevieux\Form\View\FormView
+    {
+        return $rootField === null ? new \Quatrevieux\Form\View\FormView(['value' => (new \Quatrevieux\Form\View\FieldView('value', $value['value'] ?? null, ($__tmp_5c3b6fd1a41b45355826d3a33c0e6c6e = $errors['value'] ?? null) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_5c3b6fd1a41b45355826d3a33c0e6c6e : null, []))->choices((new \Quatrevieux\Form\Validator\Constraint\Choice(choices: ['The answer' => 42, 'The beast' => 666, 'Lost' => 404], message: 'The value is not a valid choice.'))->choices($value['value'] ?? null, $this->transformer->fieldTransformer('value')), $this->registry->getTranslator())], $value) :  new \Quatrevieux\Form\View\FormView(['value' => (new \Quatrevieux\Form\View\FieldView("{$rootField}[value]", $value['value'] ?? null, ($__tmp_5c3b6fd1a41b45355826d3a33c0e6c6e = $errors['value'] ?? null) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_5c3b6fd1a41b45355826d3a33c0e6c6e : null, []))->choices((new \Quatrevieux\Form\Validator\Constraint\Choice(choices: ['The answer' => 42, 'The beast' => 666, 'Lost' => 404], message: 'The value is not a valid choice.'))->choices($value['value'] ?? null, $this->transformer->fieldTransformer('value')), $this->registry->getTranslator())], $value);
+    }
+
+    function default(string $rootField = null): Quatrevieux\Form\View\FormView
+    {
+        return $rootField === null ? new \Quatrevieux\Form\View\FormView(['value' => (new \Quatrevieux\Form\View\FieldView('value', null, null, []))->choices((new \Quatrevieux\Form\Validator\Constraint\Choice(choices: ['The answer' => 42, 'The beast' => 666, 'Lost' => 404], message: 'The value is not a valid choice.'))->choices(null, $this->transformer->fieldTransformer('value')), $this->registry->getTranslator())], []) :  new \Quatrevieux\Form\View\FormView(['value' => (new \Quatrevieux\Form\View\FieldView("{$rootField}[value]", null, null, []))->choices((new \Quatrevieux\Form\Validator\Constraint\Choice(choices: ['The answer' => 42, 'The beast' => 666, 'Lost' => 404], message: 'The value is not a valid choice.'))->choices(null, $this->transformer->fieldTransformer('value')), $this->registry->getTranslator())], []);
+    }
+
+    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
+    {
+        $this->transformer = $this->registry->getTransformerFactory()->create('Quatrevieux\\Form\\Fixtures\\WithChoiceRequest');
+    }
+}
+
+PHP,
+            file_get_contents(self::GENERATED_DIR . '/Quatrevieux_Form_Fixtures_WithChoiceRequestViewGeneratorTesting.php')
+        );
+
+        $this->assertInstanceOf(FormViewInstantiatorInterface::class, $instantiator);
+        $this->assertInstanceOf('Quatrevieux_Form_Fixtures_WithChoiceRequestViewGeneratorTesting', $instantiator);
+
+        $this->assertEquals(new FormView([
+            'value' => (new FieldView('value', null, null, []))->choices([
+                new ChoiceView(42, 'The answer'),
+                new ChoiceView(666, 'The beast'),
+                new ChoiceView(404, 'Lost'),
+            ], DummyTranslator::instance()),
+        ], []), $instantiator->default());
+
+        $this->assertEquals(new FormView([
+            'value' => (new FieldView('parent[value]', null, null, []))->choices([
+                new ChoiceView(42, 'The answer'),
+                new ChoiceView(666, 'The beast'),
+                new ChoiceView(404, 'Lost'),
+            ], DummyTranslator::instance()),
+        ], []), $instantiator->default('parent'));
+
+        $this->assertEquals(new FormView([
+            'value' => (new FieldView('value', 666, null, []))->choices([
+                new ChoiceView(42, 'The answer'),
+                new ChoiceView(666, 'The beast', true),
+                new ChoiceView(404, 'Lost'),
+            ], DummyTranslator::instance()),
+        ], ['value' => 666]), $instantiator->submitted(['value' => 666], []));
     }
 }

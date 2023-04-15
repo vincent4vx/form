@@ -2,9 +2,12 @@
 
 namespace Quatrevieux\Form\View\Generator;
 
+use Closure;
 use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Util\Expr;
+use Quatrevieux\Form\View\FieldView;
+use Quatrevieux\Form\View\Provider\FieldChoiceProviderInterface;
 use Quatrevieux\Form\View\Provider\FieldViewProviderConfigurationInterface;
 use Quatrevieux\Form\View\RuntimeFormViewInstantiator;
 
@@ -61,12 +64,7 @@ final class FormViewInstantiatorGenerator
             $expression = $generator->generateFieldViewExpression($configuration, $httpField, $attributesByField[$field] ?? []);
 
             if ($choicesProvider = ($choicesProviderByField[$field] ?? null)) {
-                $newExpression = function (...$args) use($expression, $choicesProvider, $viewInstantiator, $field, $httpField) {
-                    $transformer = Expr::this()->transformer->fieldTransformer($field);
-                    return '(' . $expression(...$args) . ')->choices((' . Code::instantiate($choicesProvider) . ')->choices('.$args[0].', ' . $transformer . '))';
-                };
-
-                $expression = $newExpression;
+                $expression = $this->generateChoices($expression, $choicesProvider, $field);
             }
 
             $classHelper->declareFieldView(
@@ -80,5 +78,24 @@ final class FormViewInstantiatorGenerator
         $classHelper->generateDefault();
 
         return $classHelper->code();
+    }
+
+    /**
+     * Generate choices generation and call to {@see FieldView::choices()}
+     *
+     * @param Closure(string, string, ?string):string $baseExpression FieldView instantiation expression generator
+     * @return Closure(string, string, ?string):string The FieldView expression generator with choices
+     */
+    private function generateChoices(Closure $baseExpression, FieldChoiceProviderInterface $choicesProvider, string $fieldName): Closure
+    {
+        return function (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) use ($baseExpression, $choicesProvider, $fieldName) {
+            $transformer = Expr::this()->transformer->fieldTransformer($fieldName);
+            $translator = Expr::this()->registry->getTranslator();
+
+            $choices = Expr::value($choicesProvider)->choices(Code::raw($valueAccessor), $transformer);
+            $fieldViewExpr = Code::expr($baseExpression($valueAccessor, $errorAccessor, $rootFieldNameAccessor));
+
+            return $fieldViewExpr->choices($choices, $translator);
+        };
     }
 }

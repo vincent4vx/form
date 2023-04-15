@@ -22,7 +22,7 @@ abstract class AbstractGeneratedFormTransformer implements FormTransformerInterf
      */
     final public function fieldTransformer(string $fieldName): FieldTransformerInterface
     {
-        return new class($this, $fieldName) implements FieldTransformerInterface {
+        return new class ($this, $fieldName) implements FieldTransformerInterface {
             public function __construct(
                 private readonly AbstractGeneratedFormTransformer $transformer,
                 private readonly string $fieldName,

@@ -72,6 +72,7 @@ class CodeTest extends TestCase
     {
         $this->assertSame("\$foo->bar('arg1', 'arg2')", Code::callMethod('$foo', 'bar', ['arg1', 'arg2']));
         $this->assertSame("\$foo->bar(\$foo, '\$bar')", Code::callMethod('$foo', 'bar', [Code::raw('$foo'), '$bar']));
+        $this->assertSame("(new Foo())->bar(123)", Code::callMethod(Code::raw('new Foo()'), 'bar', [123]));
     }
 
     public function test_new()
