@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\View;
 
 use Quatrevieux\Form\Validator\FieldError;
 use Stringable;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Structure of a single field view
@@ -37,6 +38,13 @@ final class FieldView implements Stringable
          * @var array<string, scalar>
          */
         public array $attributes = [],
+
+        /**
+         * List of available choices
+         *
+         * @var list<ChoiceView>|null
+         */
+        public ?array $choices = null,
     ) {
     }
 
@@ -97,6 +105,27 @@ final class FieldView implements Stringable
     public function type(string $type): self
     {
         $this->attributes['type'] = $type;
+        return $this;
+    }
+
+    /**
+     * Define the field choices
+     *
+     * @param list<ChoiceView>|null $choices List of choices to set on the field.
+     * @param TranslatorInterface|null $translator Translator to set on each choice. If null, the translator will not be set.
+     *
+     * @return $this
+     */
+    public function choices(?array $choices, ?TranslatorInterface $translator = null): self
+    {
+        if ($choices && $translator) {
+            foreach ($choices as $choice) {
+                $choice->setTranslator($translator);
+            }
+        }
+
+        $this->choices = $choices;
+
         return $this;
     }
 

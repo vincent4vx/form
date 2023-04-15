@@ -44,8 +44,9 @@ class Quatrevieux_Form_Fixtures_SimpleRequestValidatorGeneratorTest implements Q
         return $previousErrors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private readonly Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
@@ -93,8 +94,9 @@ class Quatrevieux_Form_Fixtures_RequiredParametersRequestValidatorGeneratorTest 
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private readonly Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
@@ -158,8 +160,9 @@ class Quatrevieux_Form_Fixtures_WithExternalDependencyConstraintRequestValidator
         return $errors;
     }
 
-    public function __construct(private readonly Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private readonly Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 

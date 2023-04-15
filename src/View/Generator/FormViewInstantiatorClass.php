@@ -13,6 +13,8 @@ use Quatrevieux\Form\Util\PhpExpressionInterface;
 use Quatrevieux\Form\View\FormView;
 use Quatrevieux\Form\View\FormViewInstantiatorInterface;
 
+use function implode;
+
 /**
  * Class generator helper for generates {@see FormViewInstantiatorInterface} class
  */
@@ -22,6 +24,7 @@ final class FormViewInstantiatorClass
     public readonly ClassType $class;
     public readonly Method $submittedMethod;
     public readonly Method $defaultMethod;
+    public readonly Method $constructor;
 
     /**
      * @var array<array-key, Closure(string, string, ?string):string>
@@ -48,7 +51,8 @@ final class FormViewInstantiatorClass
         $this->class->addMember($this->submittedMethod);
         $this->class->addMember($this->defaultMethod);
 
-        $this->class->addMethod('__construct')
+        $this->constructor = $this->class->addMethod('__construct');
+        $this->constructor
             ->addPromotedParameter('registry')
             ->setPrivate()
             ->setType(RegistryInterface::class)
@@ -68,6 +72,19 @@ final class FormViewInstantiatorClass
     {
         $this->fieldViewExpressions[$field] = $fieldViewExpression;
         $this->propertyNameToHttpFieldName[$field] = $httpField;
+    }
+
+    /**
+     * Add a line of code which will be added on top of instantiator methods
+     * Can be used to declare common variables
+     *
+     * @param string $name The property name
+     * @param string $expression The expression to initialize the property
+     */
+    public function property(string $name, string $expression): void
+    {
+        $this->class->addProperty($name)->setPrivate();
+        $this->constructor->addBody("\$this->{$name} = {$expression};");
     }
 
     /**

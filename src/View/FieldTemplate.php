@@ -59,7 +59,7 @@ enum FieldTemplate: string
      * @param array<string, scalar> $attributes
      * @return string
      */
-    private static function renderAttributes(array $attributes): string
+    public static function renderAttributes(array $attributes): string
     {
         $attributesString = '';
 

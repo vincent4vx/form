@@ -2,8 +2,10 @@
 
 namespace Quatrevieux\Form\View\Generator;
 
+use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\RegistryInterface;
+use Quatrevieux\Form\Validator\Constraint\Choice;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\View\FieldView;
 use Quatrevieux\Form\View\FormView;
@@ -34,23 +36,24 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
         return $rootField === null ? new \Quatrevieux\Form\View\FormView([], []) :  new \Quatrevieux\Form\View\FormView([], []);
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
 PHP,
-            $generator->generate('GeneratedFormViewInstantiator', new RuntimeFormViewInstantiator($this->registry, [], [], []))
+            $generator->generate('GeneratedFormViewInstantiator', new RuntimeFormViewInstantiator($this->registry, SimpleRequest::class, [], [], [], []))
         );
     }
 
     public function test_simple()
     {
         $generator = new FormViewInstantiatorGenerator($this->registry);
-        $instantiator = new RuntimeFormViewInstantiator($this->registry, [
+        $instantiator = new RuntimeFormViewInstantiator($this->registry, SimpleRequest::class, [
             'foo' => new FieldViewConfiguration(),
             'bar' => new FieldViewConfiguration(),
-        ], [], []);
+        ], [], [], []);
 
         $this->assertSame(
             <<<'PHP'
@@ -68,8 +71,9 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
         return $rootField === null ? new \Quatrevieux\Form\View\FormView(['foo' => new \Quatrevieux\Form\View\FieldView('foo', null, null, []), 'bar' => new \Quatrevieux\Form\View\FieldView('bar', null, null, [])], []) :  new \Quatrevieux\Form\View\FormView(['foo' => new \Quatrevieux\Form\View\FieldView("{$rootField}[foo]", null, null, []), 'bar' => new \Quatrevieux\Form\View\FieldView("{$rootField}[bar]", null, null, [])], []);
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
@@ -82,6 +86,7 @@ PHP,
     {
         $generator = new FormViewInstantiatorGenerator($this->registry);
         $instantiator = new RuntimeFormViewInstantiator($this->registry,
+            SimpleRequest::class,
             [
                 'foo' => new FieldViewConfiguration(),
                 'bar' => new FieldViewConfiguration(),
@@ -89,7 +94,8 @@ PHP,
             [
                 'foo' => 'oof'
             ],
-            []
+            [],
+            [],
         );
 
         $this->assertSame(
@@ -108,8 +114,9 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
         return $rootField === null ? new \Quatrevieux\Form\View\FormView(['foo' => new \Quatrevieux\Form\View\FieldView('oof', null, null, []), 'bar' => new \Quatrevieux\Form\View\FieldView('bar', null, null, [])], []) :  new \Quatrevieux\Form\View\FormView(['foo' => new \Quatrevieux\Form\View\FieldView("{$rootField}[oof]", null, null, []), 'bar' => new \Quatrevieux\Form\View\FieldView("{$rootField}[bar]", null, null, [])], []);
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
@@ -122,6 +129,7 @@ PHP,
     {
         $generator = new FormViewInstantiatorGenerator($this->registry);
         $instantiator = new RuntimeFormViewInstantiator($this->registry,
+            SimpleRequest::class,
             [
                 'foo' => new FieldViewConfiguration(),
                 'bar' => new FieldViewConfiguration(),
@@ -130,7 +138,8 @@ PHP,
             [
                 'foo' => ['class' => 'input'],
                 'bar' => ['required' => true],
-            ]
+            ],
+            [],
         );
 
         $this->assertSame(
@@ -149,8 +158,9 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
         return $rootField === null ? new \Quatrevieux\Form\View\FormView(['foo' => new \Quatrevieux\Form\View\FieldView('foo', null, null, ['class' => 'input']), 'bar' => new \Quatrevieux\Form\View\FieldView('bar', null, null, ['required' => true])], []) :  new \Quatrevieux\Form\View\FormView(['foo' => new \Quatrevieux\Form\View\FieldView("{$rootField}[foo]", null, null, ['class' => 'input']), 'bar' => new \Quatrevieux\Form\View\FieldView("{$rootField}[bar]", null, null, ['required' => true])], []);
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
@@ -163,11 +173,13 @@ PHP,
     {
         $generator = new FormViewInstantiatorGenerator($this->registry);
         $instantiator = new RuntimeFormViewInstantiator($this->registry,
+            SimpleRequest::class,
             [
                 'foo' => new ViewProviderWithoutGenerator('azerty'),
             ],
             [],
-            []
+            [],
+            [],
         );
 
         $this->assertSame(
@@ -186,8 +198,49 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
         return $rootField === null ? new \Quatrevieux\Form\View\FormView(['foo' => ($__view_885795100a2aeaa406bf3833fd45a7ea = new \Quatrevieux\Form\View\Generator\ViewProviderWithoutGenerator(foo: 'azerty'))->view($__view_885795100a2aeaa406bf3833fd45a7ea, 'foo', null, null, [])], []) :  new \Quatrevieux\Form\View\FormView(['foo' => ($__view_885795100a2aeaa406bf3833fd45a7ea = new \Quatrevieux\Form\View\Generator\ViewProviderWithoutGenerator(foo: 'azerty'))->view($__view_885795100a2aeaa406bf3833fd45a7ea, "{$rootField}[foo]", null, null, [])], []);
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
+    }
+}
+
+PHP,
+            $generator->generate('GeneratedFormViewInstantiator', $instantiator)
+        );
+    }
+
+    public function test_with_choice()
     {
+        $generator = new FormViewInstantiatorGenerator($this->registry);
+        $instantiator = new RuntimeFormViewInstantiator($this->registry, SimpleRequest::class, [
+            'foo' => new FieldViewConfiguration(),
+            'bar' => new FieldViewConfiguration(),
+        ], [], [], [
+            'bar' => new Choice([12, 24, 48]),
+        ]);
+
+        $this->assertSame(
+            <<<'PHP'
+<?php
+
+class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewInstantiatorInterface
+{
+    private $transformer;
+
+    function submitted(array $value, array $errors, string $rootField = null): Quatrevieux\Form\View\FormView
+    {
+        return $rootField === null ? new \Quatrevieux\Form\View\FormView(['foo' => new \Quatrevieux\Form\View\FieldView('foo', $value['foo'] ?? null, ($__tmp_6f4afa00801630e2315251561e35e48c = $errors['foo'] ?? null) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_6f4afa00801630e2315251561e35e48c : null, []), 'bar' => (new \Quatrevieux\Form\View\FieldView('bar', $value['bar'] ?? null, ($__tmp_2b71b0f6b364f62d6344a8beead6aeb4 = $errors['bar'] ?? null) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_2b71b0f6b364f62d6344a8beead6aeb4 : null, []))->choices((new \Quatrevieux\Form\Validator\Constraint\Choice(choices: [12, 24, 48], message: 'The value is not a valid choice.'))->choices($value['bar'] ?? null, $this->transformer->fieldTransformer('bar')), $this->registry->getTranslator())], $value) :  new \Quatrevieux\Form\View\FormView(['foo' => new \Quatrevieux\Form\View\FieldView("{$rootField}[foo]", $value['foo'] ?? null, ($__tmp_6f4afa00801630e2315251561e35e48c = $errors['foo'] ?? null) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_6f4afa00801630e2315251561e35e48c : null, []), 'bar' => (new \Quatrevieux\Form\View\FieldView("{$rootField}[bar]", $value['bar'] ?? null, ($__tmp_2b71b0f6b364f62d6344a8beead6aeb4 = $errors['bar'] ?? null) instanceof \Quatrevieux\Form\Validator\FieldError ? $__tmp_2b71b0f6b364f62d6344a8beead6aeb4 : null, []))->choices((new \Quatrevieux\Form\Validator\Constraint\Choice(choices: [12, 24, 48], message: 'The value is not a valid choice.'))->choices($value['bar'] ?? null, $this->transformer->fieldTransformer('bar')), $this->registry->getTranslator())], $value);
+    }
+
+    function default(string $rootField = null): Quatrevieux\Form\View\FormView
+    {
+        return $rootField === null ? new \Quatrevieux\Form\View\FormView(['foo' => new \Quatrevieux\Form\View\FieldView('foo', null, null, []), 'bar' => (new \Quatrevieux\Form\View\FieldView('bar', null, null, []))->choices((new \Quatrevieux\Form\Validator\Constraint\Choice(choices: [12, 24, 48], message: 'The value is not a valid choice.'))->choices(null, $this->transformer->fieldTransformer('bar')), $this->registry->getTranslator())], []) :  new \Quatrevieux\Form\View\FormView(['foo' => new \Quatrevieux\Form\View\FieldView("{$rootField}[foo]", null, null, []), 'bar' => (new \Quatrevieux\Form\View\FieldView("{$rootField}[bar]", null, null, []))->choices((new \Quatrevieux\Form\Validator\Constraint\Choice(choices: [12, 24, 48], message: 'The value is not a valid choice.'))->choices(null, $this->transformer->fieldTransformer('bar')), $this->registry->getTranslator())], []);
+    }
+
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
+        $this->transformer = $this->registry->getTransformerFactory()->create('Quatrevieux\\Form\\Fixtures\\SimpleRequest');
     }
 }
 

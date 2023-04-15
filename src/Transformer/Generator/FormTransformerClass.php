@@ -7,7 +7,7 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
-use Quatrevieux\Form\RegistryInterface;
+use Quatrevieux\Form\Transformer\AbstractGeneratedFormTransformer;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Transformer\FormTransformerInterface;
 use Quatrevieux\Form\Transformer\TransformationResult;
@@ -23,6 +23,8 @@ final class FormTransformerClass
     public readonly ClassType $class;
     public readonly Method $fromHttpMethod;
     public readonly Method $toHttpMethod;
+    public readonly Method $transformFieldFromHttpMethod;
+    public readonly Method $transformFieldToHttpMethod;
 
     /**
      * @var array<string, string>
@@ -62,16 +64,14 @@ final class FormTransformerClass
 
         $this->fromHttpMethod = Method::from([FormTransformerInterface::class, 'transformFromHttp'])->setComment(null);
         $this->toHttpMethod = Method::from([FormTransformerInterface::class, 'transformToHttp'])->setComment(null);
+        $this->transformFieldFromHttpMethod = Method::from([AbstractGeneratedFormTransformer::class, 'transformFieldFromHttp'])->setComment(null)->setAbstract(false);
+        $this->transformFieldToHttpMethod = Method::from([AbstractGeneratedFormTransformer::class, 'transformFieldToHttp'])->setComment(null)->setAbstract(false);
 
-        $this->class->addImplement(FormTransformerInterface::class);
+        $this->class->setExtends(AbstractGeneratedFormTransformer::class);
         $this->class->addMember($this->fromHttpMethod);
         $this->class->addMember($this->toHttpMethod);
-
-        $this->class->addMethod('__construct')
-            ->addPromotedParameter('registry')
-            ->setPrivate()
-            ->setType(RegistryInterface::class)
-        ;
+        $this->class->addMember($this->transformFieldFromHttpMethod);
+        $this->class->addMember($this->transformFieldToHttpMethod);
     }
 
     /**
@@ -123,6 +123,8 @@ final class FormTransformerClass
         $this->fromHttpMethod->addBody('$transformed = ' . $this->generateInlineFromHttpArray() . ';');
         $this->fromHttpMethod->addBody($this->generateUnsafeFromHttpTransformations());
         $this->fromHttpMethod->addBody('return new TransformationResult($transformed, $errors);');
+
+        $this->transformFieldFromHttpMethod->setBody($this->generateTransformFieldFromHttpBody());
     }
 
     /**
@@ -130,7 +132,41 @@ final class FormTransformerClass
      */
     public function generateToHttp(): void
     {
-        $code = 'return [' . PHP_EOL;
+        $this->toHttpMethod->addBody($this->generateTransformToHttpBody());
+        $this->transformFieldToHttpMethod->addBody($this->generateTransformFieldToHttpBody());
+    }
+
+    /**
+     * Dump PHP code of the class
+     *
+     * @return string
+     */
+    public function code(): string
+    {
+        return (new PsrPrinter())->printFile($this->file);
+    }
+
+    private function generateTransformFieldFromHttpBody(): string
+    {
+        $cases = '';
+
+        foreach ($this->fromHttpFieldsTransformationExpressions as $fieldName => $expressions) {
+            $fieldNameString = Code::value($fieldName);
+            $fieldExpression = '$value';
+
+            foreach ($expressions as $expression) {
+                $fieldExpression = $expression($fieldExpression);
+            }
+
+            $cases .= '    ' . $fieldNameString . ' => ' . $fieldExpression . ',' . PHP_EOL;
+        }
+
+        return "return match (\$fieldName) {\n$cases};";
+    }
+
+    private function generateTransformToHttpBody(): string
+    {
+        $arrayItems = '';
 
         foreach ($this->toHttpFieldsTransformationExpressions as $fieldName => $expressions) {
             $fieldNameString = Code::value($fieldName);
@@ -142,22 +178,28 @@ final class FormTransformerClass
                 $fieldExpression = $expression($fieldExpression);
             }
 
-            $code .= '    ' . $httpFieldString . ' => ' . $fieldExpression . ',' . PHP_EOL;
+            $arrayItems .= '    ' . $httpFieldString . ' => ' . $fieldExpression . ',' . PHP_EOL;
         }
 
-        $code .= '];';
-
-        $this->toHttpMethod->addBody($code);
+        return "return [\n$arrayItems];";
     }
 
-    /**
-     * Dump PHP code of the class
-     *
-     * @return string
-     */
-    public function code(): string
+    private function generateTransformFieldToHttpBody(): string
     {
-        return (new PsrPrinter())->printFile($this->file);
+        $matches = '';
+
+        foreach ($this->toHttpFieldsTransformationExpressions as $fieldName => $expressions) {
+            $fieldNameString = Code::value($fieldName);
+            $matchExpression = '$value';
+
+            foreach (array_reverse($expressions) as $expression) {
+                $matchExpression = $expression($matchExpression);
+            }
+
+            $matches .= '    ' . $fieldNameString . ' => ' . $matchExpression . ',' . PHP_EOL;
+        }
+
+        return "return match (\$fieldName) {\n$matches};";
     }
 
     private function generateInlineFromHttpArray(): string

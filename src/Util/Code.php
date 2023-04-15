@@ -21,6 +21,7 @@ use function is_string;
 use function md5;
 use function preg_match;
 use function str_replace;
+use function str_starts_with;
 use function var_export;
 
 /**
@@ -202,6 +203,10 @@ final class Code
      */
     public static function callMethod(string $object, string $method, array $arguments = []): string
     {
+        if (str_starts_with($object, 'new ')) {
+            $object = '(' . $object . ')';
+        }
+
         return self::call($object . '->' . $method, $arguments);
     }
 

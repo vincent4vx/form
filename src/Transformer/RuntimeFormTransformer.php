@@ -3,9 +3,11 @@
 namespace Quatrevieux\Form\Transformer;
 
 use Exception;
+use OutOfBoundsException;
 use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
+use Quatrevieux\Form\Transformer\Field\FieldTransformersAggregate;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Validator\FieldError;
 
@@ -57,8 +59,7 @@ final class RuntimeFormTransformer implements FormTransformerInterface
             $originalValue = $value[$httpFieldName] ?? null;
 
             try {
-                $fieldValue = $this->callFromHttpTransformer($originalValue, $transformers);
-                $normalized[$fieldName] = $fieldValue;
+                $normalized[$fieldName] = (new FieldTransformersAggregate($transformers, $this->registry))->transformFromHttp($originalValue);
             } catch (Exception $e) {
                 $errorHandlingConfigurator = $this->fieldsTransformationErrors[$fieldName] ?? null;
 
@@ -82,15 +83,7 @@ final class RuntimeFormTransformer implements FormTransformerInterface
 
         foreach ($this->fieldsTransformers as $fieldName => $transformers) {
             $fieldValue = $value[$fieldName] ?? null;
-
-            /** @var FieldTransformerInterface|DelegatedFieldTransformerInterface $transformer */
-            foreach (array_reverse($transformers) as $transformer) {
-                if ($transformer instanceof DelegatedFieldTransformerInterface) {
-                    $fieldValue = $transformer->getTransformer($this->registry)->transformToHttp($transformer, $fieldValue);
-                } else {
-                    $fieldValue = $transformer->transformToHttp($fieldValue);
-                }
-            }
+            $fieldValue = (new FieldTransformersAggregate($transformers, $this->registry))->transformToHttp($fieldValue);
 
             $httpFieldName = $this->fieldsNameMapping[$fieldName] ?? $fieldName;
             $normalized[$httpFieldName] = $fieldValue;
@@ -100,21 +93,13 @@ final class RuntimeFormTransformer implements FormTransformerInterface
     }
 
     /**
-     * @param mixed $fieldValue
-     * @param list<FieldTransformerInterface|DelegatedFieldTransformerInterface> $transformers
-     * @return mixed
+     * {@inheritdoc}
      */
-    private function callFromHttpTransformer(mixed $fieldValue, array $transformers): mixed
+    public function fieldTransformer(string $fieldName): FieldTransformerInterface
     {
-        foreach ($transformers as $transformer) {
-            if ($transformer instanceof DelegatedFieldTransformerInterface) {
-                $fieldValue = $transformer->getTransformer($this->registry)->transformFromHttp($transformer, $fieldValue);
-            } else {
-                $fieldValue = $transformer->transformFromHttp($fieldValue);
-            }
-        }
+        $transformers = $this->fieldsTransformers[$fieldName] ?? throw new OutOfBoundsException("Field $fieldName is not defined");
 
-        return $fieldValue;
+        return new FieldTransformersAggregate($transformers, $this->registry);
     }
 
     /**

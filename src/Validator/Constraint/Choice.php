@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Validator\Constraint;
 
 use Attribute;
+use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Util\Expr;
@@ -12,8 +13,11 @@ use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;
+use Quatrevieux\Form\View\ChoiceView;
+use Quatrevieux\Form\View\Provider\FieldChoiceProviderInterface;
 use Stringable;
 
+use function array_values;
 use function in_array;
 use function is_array;
 use function is_int;
@@ -39,15 +43,16 @@ use function print_r;
  * @implements ConstraintValidatorGeneratorInterface<Choice>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Choice extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface
+final class Choice extends SelfValidatedConstraint implements ConstraintValidatorGeneratorInterface, FieldChoiceProviderInterface
 {
     public const CODE = '41ac8b62-e143-5644-a3eb-0fbfff5a2064';
 
     public function __construct(
         /**
          * List of available choices.
+         * Use a string key to define a label for the choice.
          *
-         * @var list<mixed>
+         * @var mixed[]
          */
         public readonly array $choices,
 
@@ -94,6 +99,22 @@ final class Choice extends SelfValidatedConstraint implements ConstraintValidato
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function choices(mixed $currentValue, FieldTransformerInterface $transformer): array
+    {
+        $choices = [];
+
+        foreach ($this->choices as $label => $choice) {
+            /** @var scalar $current */
+            $current = $transformer->transformToHttp($choice);
+            $choices[] = new ChoiceView($current, is_string($label) ? $label : null, $current == $currentValue);
+        }
+
+        return $choices;
+    }
+
+    /**
      * Validate if the given value is in the choices.
      *
      * @param mixed $value
@@ -125,12 +146,13 @@ final class Choice extends SelfValidatedConstraint implements ConstraintValidato
     private function generateSingleInArray(string $accessor): string
     {
         $accessor = Code::expr($accessor);
+        $choices = array_values($this->choices);
 
-        if ($this->choicesCanBeUsedAsKey()) {
-            $values = array_combine($this->choices, $this->choices);
+        if ($this->choicesCanBeUsedAsKey($choices)) {
+            $values = array_combine($choices, $choices);
             $inArray = $accessor->format('((is_int({}) || is_string({})) && (({values}[{}] ?? null) === {}))', values: $values);
         } else {
-            $inArray = Call::in_array($accessor, $this->choices, true);
+            $inArray = Call::in_array($accessor, $choices, true);
         }
 
         $debugValue = $accessor->format('is_scalar({}) || {} instanceof \Stringable ? {} : print_r({}, true)');
@@ -148,11 +170,13 @@ final class Choice extends SelfValidatedConstraint implements ConstraintValidato
      */
     private function generateAggregateInArray(string $accessor): string
     {
-        if ($this->choicesCanBeUsedAsKey()) {
-            $choices = Code::value(array_combine($this->choices, $this->choices));
+        $choices = array_values($this->choices);
+
+        if ($this->choicesCanBeUsedAsKey($choices)) {
+            $choices = Code::value(array_combine($choices, $choices));
             $inArray = '((is_int($value) || is_string($value)) && (($choices[$value] ?? null) === $value))';
         } else {
-            $choices = Code::value($this->choices);
+            $choices = Code::value($choices);
             $inArray = 'in_array($value, $choices, true)';
         }
 
@@ -179,13 +203,14 @@ final class Choice extends SelfValidatedConstraint implements ConstraintValidato
      * Check if all choices can be used as key (i.e. are string or int).
      * This is used to optimize the generated code.
      *
+     * @param mixed[] $choices
      * @return bool
      *
-     * @phpstan-assert-if-true list<string|int> $this->choices
+     * @phpstan-assert-if-true array<string|int> $choices
      */
-    private function choicesCanBeUsedAsKey(): bool
+    private function choicesCanBeUsedAsKey(array $choices): bool
     {
-        foreach ($this->choices as $choice) {
+        foreach ($choices as $choice) {
             if (!is_string($choice) && !is_int($choice)) {
                 return false;
             }

@@ -22,10 +22,12 @@ class RuntimeFormViewInstantiatorFactoryTest extends FormTestCase
 
         $this->assertEquals(new RuntimeFormViewInstantiator(
             $this->registry,
+            SimpleRequest::class,
             [
                 'foo' => new FieldViewConfiguration(),
                 'bar' => new FieldViewConfiguration(),
             ],
+            [],
             [],
             [],
         ), $instantiator);
@@ -39,6 +41,7 @@ class RuntimeFormViewInstantiatorFactoryTest extends FormTestCase
 
         $this->assertEquals(new RuntimeFormViewInstantiator(
             $this->registry,
+            WithFieldNameMapping::class,
             [
                 'myComplexName' => new FieldViewConfiguration(),
                 'otherField' => new FieldViewConfiguration(),
@@ -47,6 +50,7 @@ class RuntimeFormViewInstantiatorFactoryTest extends FormTestCase
                 'myComplexName' => 'my_complex_name',
                 'otherField' => 'other',
             ],
+            [],
             [],
         ), $instantiator);
     }
@@ -59,10 +63,12 @@ class RuntimeFormViewInstantiatorFactoryTest extends FormTestCase
 
         $this->assertEquals(new RuntimeFormViewInstantiator(
             $this->registry,
+            FormWithCustomView::class,
             [
                 'count' => new FieldViewConfiguration(type: 'number', id: 'form_count', attributes: ['min' => 0, 'max' => 100]),
                 'name' => new FieldViewConfiguration(type: 'text', id: 'form_name', defaultValue: 'example'),
             ],
+            [],
             [],
             [],
         ), $instantiator);
@@ -76,11 +82,13 @@ class RuntimeFormViewInstantiatorFactoryTest extends FormTestCase
 
         $this->assertEquals(new RuntimeFormViewInstantiator(
             $this->registry,
+            WithEmbedded::class,
             [
                 'foo' => new FieldViewConfiguration(),
                 'bar' => new FieldViewConfiguration(),
                 'embedded' => new Embedded(EmbeddedForm::class),
             ],
+            [],
             [],
             [],
         ), $instantiator);
@@ -94,6 +102,7 @@ class RuntimeFormViewInstantiatorFactoryTest extends FormTestCase
 
         $this->assertEquals(new RuntimeFormViewInstantiator(
             $this->registry,
+            RequiredParametersRequest::class,
             [
                 'foo' => new FieldViewConfiguration(),
                 'bar' => new FieldViewConfiguration(),
@@ -103,6 +112,7 @@ class RuntimeFormViewInstantiatorFactoryTest extends FormTestCase
                 'foo' => ['required' => true],
                 'bar' => ['required' => true, 'minlength' => 3],
             ],
+            [],
         ), $instantiator);
     }
 }

@@ -14,6 +14,7 @@ use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\Csv;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
+use Quatrevieux\Form\Transformer\Field\FieldTransformersAggregate;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 use Quatrevieux\Form\Validator\FieldError;
 
@@ -271,6 +272,43 @@ class RuntimeFormTransformerTest extends FormTestCase
 
         $this->assertEquals(new TransformationResult(['foo' => 'bar'], []), $transformer->transformFromHttp(['foo' => base64_encode('bar')]));
         $this->assertEquals(['foo' => base64_encode('bar')], $transformer->transformToHttp(['foo' => 'bar']));
+    }
+
+    public function test_fieldTransformer()
+    {
+        $transformer = new RuntimeFormTransformer(
+            $registry = new DefaultRegistry(),
+            $transformers = [
+                'foo' => [new Csv(), new Cast(CastType::Array)],
+                'bar' => [new Cast(CastType::Int)],
+            ],
+            $mapping = [
+                'foo' => '__foo',
+            ],
+            $errorConfig = [
+                'bar' => new TransformationError(message: 'bar error'),
+            ],
+        );
+
+        $this->assertInstanceOf(FieldTransformersAggregate::class, $transformer->fieldTransformer('foo'));
+        $this->assertInstanceOf(FieldTransformersAggregate::class, $transformer->fieldTransformer('bar'));
+
+        $this->assertEquals(new FieldTransformersAggregate($transformers['foo'], $registry), $transformer->fieldTransformer('foo'));
+        $this->assertEquals(new FieldTransformersAggregate($transformers['bar'], $registry), $transformer->fieldTransformer('bar'));
+
+        $this->assertSame(['foo', 'bar'], $transformer->fieldTransformer('foo')->transformFromHttp('foo,bar'));
+        $this->assertSame('foo,bar', $transformer->fieldTransformer('foo')->transformToHttp(['foo', 'bar']));
+        $this->assertSame(42, $transformer->fieldTransformer('bar')->transformFromHttp('42'));
+        $this->assertSame(42, $transformer->fieldTransformer('bar')->transformToHttp(42));
+    }
+
+    public function test_fieldTransformer_not_found()
+    {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('Field foo is not defined');
+
+        $transformer = new RuntimeFormTransformer(new DefaultRegistry(), [], [], []);
+        $transformer->fieldTransformer('foo');
     }
 }
 

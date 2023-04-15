@@ -30,8 +30,47 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
         return $rootField === null ? new \Quatrevieux\Form\View\FormView([], []) :  new \Quatrevieux\Form\View\FormView([], []);
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
+    }
+}
+
+PHP,
+            $class->code()
+        );
+    }
+
+    public function test_with_property()
     {
+        $class = new FormViewInstantiatorClass('GeneratedFormViewInstantiator');
+        $class->property('foo', 'new Foo()');
+
+        $class->generateDefault();
+        $class->generateSubmitted();
+
+        $this->assertSame(
+            <<<'PHP'
+<?php
+
+class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewInstantiatorInterface
+{
+    private $foo;
+
+    function submitted(array $value, array $errors, string $rootField = null): Quatrevieux\Form\View\FormView
+    {
+        return $rootField === null ? new \Quatrevieux\Form\View\FormView([], $value) :  new \Quatrevieux\Form\View\FormView([], $value);
+    }
+
+    function default(string $rootField = null): Quatrevieux\Form\View\FormView
+    {
+        return $rootField === null ? new \Quatrevieux\Form\View\FormView([], []) :  new \Quatrevieux\Form\View\FormView([], []);
+    }
+
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
+        $this->foo = new Foo();
     }
 }
 
@@ -65,8 +104,9 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
         return $rootField === null ? new \Quatrevieux\Form\View\FormView(['foo' => create_field(null, null, null)], []) :  new \Quatrevieux\Form\View\FormView(['foo' => create_field(null, null, $rootField)], []);
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
@@ -101,8 +141,9 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
         return $rootField === null ? new \Quatrevieux\Form\View\FormView([create_field(null, null, "{}[0]"), create_field(null, null, "{}[1]")], []) :  new \Quatrevieux\Form\View\FormView([create_field(null, null, "{$rootField}[0]"), create_field(null, null, "{$rootField}[1]")], []);
     }
 
-    public function __construct(private Quatrevieux\Form\RegistryInterface $registry)
-    {
+    public function __construct(
+        private Quatrevieux\Form\RegistryInterface $registry,
+    ) {
     }
 }
 
