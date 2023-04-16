@@ -26,6 +26,23 @@ use function is_scalar;
  *
  * Note: the http value will be cast to string before comparison.
  *
+ * Usage:
+ * <code>
+ * final class MyForm
+ * {
+ *     #[Checkbox]
+ *     public bool $isAccepted;
+ *
+ *     // You can also define a custom http value
+ *     #[Checkbox(httpValue: 'yes')]
+ *     public bool $withCustomHttpValue;
+ *
+ *     // You can use validator to ensure the field is checked (or any other validation)
+ *     #[Checkbox, IsIdenticalTo(true, message: 'You must check this box')]
+ *     public bool $mustBeChecked;
+ * }
+ * </code>
+ *
  * @implements FieldViewProviderInterface<Checkbox>
  * @implements FieldViewProviderGeneratorInterface<Checkbox>
  * @implements FieldTransformerGeneratorInterface<Checkbox>
