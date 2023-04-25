@@ -71,6 +71,8 @@ class CsrfTest extends FormTestCase
 
         $this->assertTrue($form->submit(['csrf' => $tokenValue])->valid());
         $this->assertTrue($this->storage->hasToken('foo'));
+
+        $this->assertNotEquals('invalid', $form->submit(['csrf' => 'invalid'])->view()['csrf']->value);
     }
 
     /**
@@ -93,6 +95,7 @@ class CsrfTest extends FormTestCase
         $this->assertFalse($this->storage->hasToken('foo'));
 
         $this->assertNotEquals($form->view()['csrf']->value, $form->view()['csrf']->value);
+        $this->assertNotEquals('invalid', $form->submit(['csrf' => 'invalid'])->view()['csrf']->value);
     }
 
     public function test_generate_validator()
@@ -113,8 +116,8 @@ class CsrfTest extends FormTestCase
         $generator = new FormTransformerGenerator($this->registry);
 
         $this->assertSame('empty(($__tmp_44e18f0f3b2a419fae74cbbaef66f40e = $data->foo ?? null)) || !is_scalar($__tmp_44e18f0f3b2a419fae74cbbaef66f40e) ? \'__empty__\' : (string) $__tmp_44e18f0f3b2a419fae74cbbaef66f40e', $manager->generateTransformFromHttp(new Csrf(id: 'foo'), '$data->foo ?? null', $generator));
-        $this->assertSame('$this->registry->getFieldTransformer(\'Quatrevieux\\\Form\\\Component\\\Csrf\\\CsrfManager\')->getToken(\'foo\')', $manager->generateTransformToHttp(new Csrf(id: 'foo'), '$data->foo ?? null', $generator));
-        $this->assertSame('$this->registry->getFieldTransformer(\'Quatrevieux\\\Form\\\Component\\\Csrf\\\CsrfManager\')->getRefreshedToken(\'foo\')', $manager->generateTransformToHttp(new Csrf(id: 'foo', refresh: true), '$data->foo ?? null', $generator));
+        $this->assertSame('$data->foo ?? null', $manager->generateTransformToHttp(new Csrf(id: 'foo'), '$data->foo ?? null', $generator));
+        $this->assertSame('$data->foo ?? null', $manager->generateTransformToHttp(new Csrf(id: 'foo', refresh: true), '$data->foo ?? null', $generator));
     }
 }
 

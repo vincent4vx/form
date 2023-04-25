@@ -68,12 +68,9 @@ final class CsrfManager implements ConfigurableFieldTransformerInterface, FieldV
     /**
      * {@inheritdoc}
      */
-    public function transformToHttp(DelegatedFieldTransformerInterface $configuration, mixed $value): string
+    public function transformToHttp(DelegatedFieldTransformerInterface $configuration, mixed $value): mixed
     {
-        return $configuration->refresh
-            ? $this->tokenManager->refreshToken($configuration->id)->getValue()
-            : $this->tokenManager->getToken($configuration->id)->getValue()
-        ;
+        return $value; // No transformation : token generation is performed during view instantiation
     }
 
     /**
@@ -82,7 +79,12 @@ final class CsrfManager implements ConfigurableFieldTransformerInterface, FieldV
     public function view(FieldViewProviderConfigurationInterface $configuration, string $name, mixed $value, array|FieldError|null $error, array $attributes): FieldView
     {
         $attributes['type'] ??= 'hidden';
-        $value ??= $this->transformToHttp($configuration, null);
+
+        // Force usage of actual token value
+        $value = $configuration->refresh
+            ? $this->tokenManager->refreshToken($configuration->id)->getValue()
+            : $this->tokenManager->getToken($configuration->id)->getValue()
+        ;
 
         return new FieldView(
             $name,
@@ -131,22 +133,6 @@ final class CsrfManager implements ConfigurableFieldTransformerInterface, FieldV
     }
 
     /**
-     * @internal
-     */
-    public function getToken(string $tokenId): string
-    {
-        return $this->tokenManager->getToken($tokenId)->getValue();
-    }
-
-    /**
-     * @internal
-     */
-    public function getRefreshedToken(string $tokenId): string
-    {
-        return $this->tokenManager->refreshToken($tokenId)->getValue();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
@@ -159,11 +145,6 @@ final class CsrfManager implements ConfigurableFieldTransformerInterface, FieldV
      */
     public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
-        $manager = Expr::this()->registry->getFieldTransformer(self::class);
-
-        return $transformer->refresh
-            ? $manager->getRefreshedToken($transformer->id)
-            : $manager->getToken($transformer->id)
-        ;
+        return $previousExpression;
     }
 }
