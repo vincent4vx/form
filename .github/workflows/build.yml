@@ -61,9 +61,6 @@ jobs:
           php-version: 8.1
           extensions: json
           ini-values: date.timezone=Europe/Paris
-      #
-      #    - name: Install Infection
-      #      run: composer global require infection/infection
 
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
@@ -85,8 +82,38 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
-#
-#    - name: Run Infection
-#      run: |
-#        git fetch --depth=1 origin $GITHUB_BASE_REF
-#        ~/.composer/vendor/bin/infection --logger-github --git-diff-filter=AM
+
+  mutation_testing:
+    name: Mutation Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Timezone
+        uses: szenius/set-timezone@v1.0
+        with:
+          timezoneLinux: "Europe/Paris"
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          extensions: json
+          ini-values: date.timezone=Europe/Paris
+
+      - name: Install Infection
+        run: |
+          wget https://github.com/infection/infection/releases/download/0.26.15/infection.phar
+          wget https://github.com/infection/infection/releases/download/0.26.15/infection.phar.asc
+          gpg --recv-keys C6D76C329EBADE2FB9C458CFC5095986493B4AA0
+          gpg --with-fingerprint --verify infection.phar.asc infection.phar
+          chmod +x infection.phar
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run Infection
+        run: |
+          git fetch --depth=1 origin $GITHUB_BASE_REF
+          ./infection.phar --logger-github --git-diff-filter=AM
