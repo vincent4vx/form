@@ -72,9 +72,11 @@ PHP
 
     public function test_create_should_load_and_instantiate_generated_instantiator()
     {
-        $this->factory->create(SimpleRequest::class);
-        $this->assertInstanceOf(DataMapperInterface::class, $this->factory->create(SimpleRequest::class));
-        $this->assertSame(SimpleRequest::class, $this->factory->create(SimpleRequest::class)->className());
-        $this->assertInstanceOf('TestSimpleRequestDataMapper', $this->factory->create(SimpleRequest::class));
+        $this->factory->create(OtherRequest::class);
+        $this->assertInstanceOf(DataMapperInterface::class, $this->factory->create(OtherRequest::class));
+        $this->assertSame(OtherRequest::class, $this->factory->create(OtherRequest::class)->className());
+        $this->assertInstanceOf('TestOtherRequestDataMapper', $this->factory->create(OtherRequest::class));
     }
 }
+
+class OtherRequest extends SimpleRequest {}

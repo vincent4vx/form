@@ -396,8 +396,8 @@ class TestingTransformerWithDelegatedTransformerAndGenerator extends Quatrevieux
 PHP
         , $code);
 
-        $this->assertGeneratedClass($code, 'TestingTransformerWithDelegatedTransformer', FormTransformerInterface::class);
-        $transformer = new \TestingTransformerWithDelegatedTransformer(new ContainerRegistry($this->container));
+        $this->assertGeneratedClass($code, 'TestingTransformerWithDelegatedTransformerAndGenerator', FormTransformerInterface::class);
+        $transformer = new \TestingTransformerWithDelegatedTransformerAndGenerator(new ContainerRegistry($this->container));
 
         $this->assertSame(['foo' => 'zbarz'], $transformer->transformFromHttp(['foo' => 'bar'])->values);
         $this->assertEmpty($transformer->transformFromHttp(['foo' => 'bar'])->errors);
