@@ -4,4 +4,5 @@ composer.lock
 vendor/
 .php-cs-fixer.cache
 infection.*
+!infection.json5
 *.log
