@@ -70,6 +70,11 @@ class ArrayCastTest extends FormTestCase
         $this->assertSame('(($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) !== null ? (array) $__tmp_4e6c78d168de10f915401b0dad567ede : null)', (new ArrayCast(CastType::Int))->generateTransformToHttp(new ArrayCast(CastType::Int), '$data["foo"]', $generator));
         $this->assertSame('(($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) !== null ? (array) $__tmp_4e6c78d168de10f915401b0dad567ede : null)', (new ArrayCast(CastType::Int))->generateTransformToHttp(new ArrayCast(CastType::Int, false), '$data["foo"]', $generator));
     }
+
+    public function test_canThrowError()
+    {
+        $this->assertFalse((new ArrayCast(CastType::Int))->canThrowError());
+    }
 }
 
 class ArrayCastTestRequest

@@ -52,6 +52,13 @@ class TrimTest extends FormTestCase
 
         $this->assertSame('$data["foo"] ?? null', $transformer->generateTransformToHttp($transformer, '$data["foo"] ?? null', $generator));
     }
+
+    public function test_canThrowError()
+    {
+        $transformer = new Trim();
+
+        $this->assertFalse($transformer->canThrowError());
+    }
 }
 
 class TrimTestRequest

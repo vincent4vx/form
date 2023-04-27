@@ -92,8 +92,10 @@ PHP
 
         $this->assertSame('foo', $transformer->fieldTransformer('foo')->transformFromHttp('foo'));
         $this->assertSame('foo', $transformer->fieldTransformer('foo')->transformToHttp('foo'));
+        $this->assertTrue($transformer->fieldTransformer('foo')->canThrowError());
         $this->assertSame('foo', $transformer->fieldTransformer('bar')->transformFromHttp('foo'));
         $this->assertSame('foo', $transformer->fieldTransformer('bar')->transformToHttp('foo'));
+        $this->assertTrue($transformer->fieldTransformer('bar')->canThrowError());
     }
 
     public function test_create_with_transformers()

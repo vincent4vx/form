@@ -2,10 +2,13 @@
 
 namespace Quatrevieux\Form\Component;
 
+use Attribute;
 use Quatrevieux\Form\Embedded\Embedded;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Validator\Constraint\IdenticalTo;
+use Quatrevieux\Form\View\Provider\FieldViewAttributesProviderInterface;
+use Quatrevieux\Form\View\Provider\FieldViewConfiguration;
 
 class CheckboxTest extends FormTestCase
 {
@@ -25,6 +28,7 @@ class CheckboxTest extends FormTestCase
 
         $this->assertTrue($form->submit(['field' => '1'])->value()->field);
         $this->assertTrue($form->submit(['customValue' => 'on'])->value()->customValue);
+        $this->assertTrue($form->submit(['field' => 1])->value()->field);
     }
 
     /**
@@ -62,6 +66,7 @@ class CheckboxTest extends FormTestCase
 
         $this->assertEquals('<input name="field" value="1" type="checkbox" />', (string) $form->view()['field']);
         $this->assertEquals('<input name="customValue" value="on" type="checkbox" />', (string) $form->view()['customValue']);
+        $this->assertEquals('<input name="customView" value="1" type="submit" />', (string) $form->view()['customView']);
 
         $req = new CheckboxTestingRequest();
         $req->field = true;
@@ -150,6 +155,20 @@ class CheckboxTest extends FormTestCase
     }
 }
 
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class FieldViewType implements FieldViewAttributesProviderInterface
+{
+    public function __construct(
+        public readonly string $type
+    ) {
+    }
+
+    public function getAttributes(): array
+    {
+        return ['type' => $this->type];
+    }
+}
+
 class CheckboxTestingRequest
 {
     #[Checkbox]
@@ -160,6 +179,9 @@ class CheckboxTestingRequest
 
     #[Checkbox, IdenticalTo(true, message: 'You should check this checkbox')]
     public bool $mustBeChecked;
+
+    #[Checkbox, FieldViewType('submit')]
+    public ?bool $customView;
 }
 
 class ParentTestingRequest

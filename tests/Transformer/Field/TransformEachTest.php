@@ -4,6 +4,7 @@ namespace Quatrevieux\Form\Transformer\Field;
 
 use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Util\Code;
@@ -27,6 +28,20 @@ class TransformEachTest extends FormTestCase
         $this->assertSame([['foo' => 'bar'], ['firstName' => 'John', 'lastName' => 'Doe']], $form->submit(['values' => ['eyJmb28iOiJiYXIifQ==', 'eyJmaXJzdE5hbWUiOiJKb2huIiwibGFzdE5hbWUiOiJEb2UifQ==']])->value()->values);
 
         $this->assertErrors(['values' => 'Syntax error'], $form->submit(['values' => 'aW52YWxpZA=='])->errors());
+    }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_transformFromHttp_with_delegated_transformer(bool $generated)
+    {
+        $form = $generated ? $this->generatedForm(TransformEachTesting::class) : $this->runtimeForm(TransformEachTesting::class);
+
+        $this->assertNull($form->submit([])->value()->withDelegatedTransformer);
+        $this->assertSame([], $form->submit(['withDelegatedTransformer' => []])->value()->withDelegatedTransformer);
+        $this->assertSame([4], $form->submit(['withDelegatedTransformer' => 2])->value()->withDelegatedTransformer);
+        $this->assertSame([3, 4, 5], $form->submit(['withDelegatedTransformer' => [1, 2, 3]])->value()->withDelegatedTransformer);
     }
 
     /**
@@ -60,6 +75,27 @@ class TransformEachTest extends FormTestCase
         $this->assertSame(['a' => 'eyJmb28iOiJiYXIifQ=='], $form->import(new TransformEachTesting(['a' => ['foo' => 'bar']]))->httpValue()['values']);
     }
 
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_transformToHttp_with_delegated(bool $generated)
+    {
+        $form = $generated ? $this->generatedForm(TransformEachTesting::class) : $this->runtimeForm(TransformEachTesting::class);
+
+        $request = new TransformEachTesting();
+        $this->assertNull($form->import($request)->httpValue()['withDelegatedTransformer']);
+
+        $request->withDelegatedTransformer = [];
+        $this->assertSame([], $form->import($request)->httpValue()['withDelegatedTransformer']);
+
+        $request->withDelegatedTransformer = [1, 2, 3];
+        $this->assertSame([-1, 0, 1], $form->import($request)->httpValue()['withDelegatedTransformer']);
+
+        $request->withDelegatedTransformer = 3;
+        $this->assertSame([1], $form->import($request)->httpValue()['withDelegatedTransformer']);
+    }
+
     public function test_generate()
     {
         $transformer = new TransformEach([
@@ -91,6 +127,9 @@ class TransformEachTesting
 
     #[TransformEach([new JsonTransformer()], handleElementsErrors: true)]
     public ?array $withErrorHandling;
+
+    #[TransformEach([new DelegatedTransformer()])]
+    public mixed $withDelegatedTransformer;
 
     /**
      * @param array|null $values
@@ -148,5 +187,26 @@ class JsonTransformer implements FieldTransformerInterface
     public function canThrowError(): bool
     {
         return true;
+    }
+}
+
+class DelegatedTransformer implements DelegatedFieldTransformerInterface
+{
+    public function getTransformer(RegistryInterface $registry): ConfigurableFieldTransformerInterface
+    {
+        return new DelegatedTransformerImpl();
+    }
+}
+
+class DelegatedTransformerImpl implements ConfigurableFieldTransformerInterface
+{
+    public function transformFromHttp(DelegatedFieldTransformerInterface $configuration, mixed $value): mixed
+    {
+        return $value + 2;
+    }
+
+    public function transformToHttp(DelegatedFieldTransformerInterface $configuration, mixed $value): mixed
+    {
+        return $value - 2;
     }
 }
