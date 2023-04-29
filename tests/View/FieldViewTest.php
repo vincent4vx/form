@@ -45,6 +45,14 @@ class FieldViewTest extends TestCase
         $this->assertSame('<input name="name" value="my value" required type="text" placeholder="my placeholder" />', (string) $view->is('required')->type('text')->attr('placeholder', 'my placeholder'));
     }
 
+    public function test_class()
+    {
+        $view = new FieldView('name', 'my value', null);
+
+        $this->assertSame('<input name="name" value="my value" class="foo" />', (string) $view->class('foo'));
+        $this->assertSame('<input name="name" value="my value" class="foo bar" />', (string) $view->class('bar'));
+    }
+
     public function test_choices()
     {
         $view = new FieldView('name', 'my value', null, []);

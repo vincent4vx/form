@@ -17,6 +17,7 @@ class ArrayTypeTest extends TestCase
         $this->assertFalse($type->check(['foo' => '1', 'bar' => 1, 'baz' => 1]));
         $this->assertFalse($type->check(['foo' => '1']));
         $this->assertFalse($type->check(['foo' => '1', 'bar' => '1']));
+        $this->assertFalse($type->check('foo'));
 
         $this->assertSame('array', $type->name());
         $this->assertSame('is_array($value) && ((array_key_exists(\'foo\', $value) && is_string($value[\'foo\']))) && ((array_key_exists(\'bar\', $value) && is_int($value[\'bar\']))) && array_diff_key($value, [\'foo\' => 1, \'bar\' => 1]) === []', $type->generateCheck('$value'));
@@ -33,6 +34,7 @@ class ArrayTypeTest extends TestCase
         $this->assertTrue($type->check(['foo' => '1', 'bar' => 1, 'baz' => 1]));
         $this->assertFalse($type->check(['foo' => '1']));
         $this->assertFalse($type->check(['foo' => '1', 'bar' => '1']));
+        $this->assertFalse($type->check('foo'));
 
         $this->assertSame('array', $type->name());
         $this->assertSame('is_array($value) && ((array_key_exists(\'foo\', $value) && is_string($value[\'foo\']))) && ((array_key_exists(\'bar\', $value) && is_int($value[\'bar\'])))', $type->generateCheck('$value'));

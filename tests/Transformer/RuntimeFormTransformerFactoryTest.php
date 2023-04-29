@@ -15,6 +15,7 @@ use Quatrevieux\Form\Transformer\Field\Cast;
 use Quatrevieux\Form\Transformer\Field\CastType;
 use Quatrevieux\Form\Transformer\Field\Csv;
 use Quatrevieux\Form\Transformer\Field\DefaultValue;
+use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\TransformationError;
 
 class RuntimeFormTransformerFactoryTest extends FormTestCase
@@ -47,6 +48,19 @@ class RuntimeFormTransformerFactoryTest extends FormTestCase
         $this->assertEquals([
             'foo' => [new Cast(CastType::String)],
             'bar' => [new Cast(CastType::String)],
+        ], $transformer->fieldsTransformers);
+    }
+
+    public function test_create_with_explicit_cast()
+    {
+        $factory = new RuntimeFormTransformerFactory(new ContainerRegistry($this->container));
+
+        $transformer = $factory->create(ExplicitCastRequest::class);
+
+        $this->assertEquals([], $transformer->fieldsNameMapping);
+        $this->assertEquals([], $transformer->fieldsTransformationErrors);
+        $this->assertEquals([
+            'foo' => [new Cast(CastType::Int), new AddTwoTransformer()],
         ], $transformer->fieldsTransformers);
     }
 
@@ -118,4 +132,46 @@ class RuntimeFormTransformerFactoryTest extends FormTestCase
             'bar' => [new Cast(CastType::String), new DefaultValue('???')],
         ], $transformer->fieldsTransformers);
     }
+
+    public function test_create_with_explicit_default()
+    {
+        $factory = new RuntimeFormTransformerFactory(new ContainerRegistry($this->container));
+
+        $transformer = $factory->create(ExplicitDefaultValue::class);
+
+        $this->assertEquals([
+            'foo' => [new DefaultValue(42), new Cast(CastType::Int)],
+        ], $transformer->fieldsTransformers);
+    }
+}
+
+#[\Attribute]
+class AddTwoTransformer implements FieldTransformerInterface
+{
+    public function transformFromHttp(mixed $value): mixed
+    {
+        return $value + 2;
+    }
+
+    public function transformToHttp(mixed $value): mixed
+    {
+        return $value - 2;
+    }
+
+    public function canThrowError(): bool
+    {
+        return false;
+    }
+}
+
+class ExplicitCastRequest
+{
+    #[Cast(CastType::Int), AddTwoTransformer]
+    public int $foo;
+}
+
+class ExplicitDefaultValue
+{
+    #[DefaultValue(42), Cast(CastType::Int)]
+    public int $foo = 0;
 }

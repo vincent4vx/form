@@ -47,6 +47,7 @@ class EnumTest extends FormTestCase
         $this->assertError('The value Oof is not a valid choice.', $form->submit(['simple' => 'Oof'])->errors()['simple']);
         $this->assertError("The value Array\n(\n)\n is not a valid choice.", $form->submit(['simple' => []])->errors()['simple']);
         $this->assertError('The value Foo is not a valid choice.', $form->submit(['withString' => 'Foo'])->errors()['withString']);
+        $this->assertError('The value invalid is not a valid choice.', $form->submit(['withString' => new class { public function __toString() { return 'invalid'; }}])->errors()['withString']);
         $this->assertError('custom message', $form->submit(['customMessage' => 'Oof'])->errors()['customMessage']);
         $this->assertError(<<<'ERR'
         The value Quatrevieux\Form\Transformer\Field\WithStringEnum Enum:string

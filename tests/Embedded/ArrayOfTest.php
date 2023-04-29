@@ -36,6 +36,20 @@ class ArrayOfTest extends FormTestCase
         $this->assertSame(66, $value->items[1]->value);
         $this->assertNull($value->failling);
 
+        $value = $form->submit([
+            'items' => [
+                (object) ['name' => 'foo', 'value' => '42'],
+                (object) ['name' => 'bar', 'value' => '66'],
+            ],
+        ])->value();
+
+        $this->assertCount(2, $value->items);
+        $this->assertSame('foo', $value->items[0]->name);
+        $this->assertSame(42, $value->items[0]->value);
+        $this->assertSame('bar', $value->items[1]->name);
+        $this->assertSame(66, $value->items[1]->value);
+        $this->assertNull($value->failling);
+
         $container = new ArrayContainer();
         $container->items = [];
         $container->items[] = new ArrayItem();
@@ -195,6 +209,43 @@ class ArrayOfTest extends FormTestCase
 
         $this->assertEmpty($view->fields['items']->fields);
         $this->assertEquals('This value is required', (string) $view['items']->error);
+    }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_view_with_object(bool $generated)
+    {
+        $form = $generated ? $this->generatedForm(ArrayContainer::class) : $this->runtimeForm(ArrayContainer::class);
+
+        $view = $form->submit([
+            'items' => [
+                (object) ['name' => 'foo', 'value' => '42'],
+                (object) ['name' => 'bar', 'value' => '66'],
+            ],
+        ])->view();
+
+        $this->assertEquals(new FormView(
+            fields: [
+                'name' => new FieldView('items[][name]', null, null, ['required' => true, 'minlength' => 3]),
+                'value' => new FieldView('items[][value]', null, null, ['required' => true]),
+            ]
+        ), $view['items']->template);
+
+        $this->assertEquals([
+            'items' => [
+                (object) ['name' => 'foo', 'value' => '42'],
+                (object) ['name' => 'bar', 'value' => '66'],
+            ],
+        ], $view->value);
+
+        $this->assertCount(2, $view->fields);
+
+        $this->assertEquals('<input name="items[0][name]" value="foo" required minlength="3" />', (string) $view->fields['items'][0]->fields['name']);
+        $this->assertEquals('<input name="items[0][value]" value="42" required />', (string) $view->fields['items'][0]->fields['value']);
+        $this->assertEquals('<input name="items[1][name]" value="bar" required minlength="3" />', (string) $view->fields['items'][1]->fields['name']);
+        $this->assertEquals('<input name="items[1][value]" value="66" required />', (string) $view->fields['items'][1]->fields['value']);
     }
 
     public function test_generate_view()

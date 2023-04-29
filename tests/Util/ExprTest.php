@@ -88,4 +88,12 @@ class ExprTest extends TestCase
 
         Expr::this()->var->format('invalid');
     }
+
+    public function test_storeAndFormat_missing_placeholder()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Format must contain at least one placeholder "{}"');
+
+        Expr::this()->var->storeAndFormat('invalid');
+    }
 }

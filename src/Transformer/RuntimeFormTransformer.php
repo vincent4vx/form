@@ -116,8 +116,8 @@ final class RuntimeFormTransformer implements FormTransformerInterface
         }
 
         return new FieldError(
-            message: $errorHandlingConfigurator?->message ?? $exception->getMessage(),
-            code: $errorHandlingConfigurator?->code ?? TransformationError::CODE,
+            message: $errorHandlingConfigurator->message ?? $exception->getMessage(),
+            code: $errorHandlingConfigurator->code ?? TransformationError::CODE,
             translator: $this->registry->getTranslator(),
         );
     }

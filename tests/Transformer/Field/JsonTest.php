@@ -72,6 +72,22 @@ class JsonTest extends FormTestCase
         $generator = new FormTransformerGenerator(new DefaultRegistry());
         $this->assertSame('($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) === null ? null : json_encode($__tmp_4e6c78d168de10f915401b0dad567ede, 448)', (new Json())->generateTransformToHttp(new Json(encodeOptions: JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), '$data["foo"]', $generator));
     }
+
+    public function test_canThrowError()
+    {
+        $this->assertTrue((new Json())->canThrowError());
+    }
+
+    public function test_default_options()
+    {
+        $json = new Json();
+        (function() use ($json) {
+            $this->assertTrue($json->assoc);
+            $this->assertSame(512, $json->depth);
+            $this->assertSame(0, $json->encodeOptions);
+            $this->assertSame(0, $json->parseOptions);
+        })->bindTo($this, Json::class)();
+    }
 }
 
 class TestJsonTransformerRequest

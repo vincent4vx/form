@@ -43,6 +43,11 @@ class DateTimeTransformerTest extends FormTestCase
 
         $this->assertEquals(new \DateTime('2023-01-25 15:00:00'), $form->submit(['withClass' => '2023-01-25T15:00'])->value()->withClass);
         $this->assertInstanceOf(\DateTime::class, $form->submit(['withClass' => '2023-01-25T15:00'])->value()->withClass);
+
+        $date = new \DateTimeImmutable('2023-01-25 15:00:00');
+        $this->assertSame($date, $form->submit(['simple' => $date])->value()->simple);
+
+        $this->assertEquals(new DateTimeImmutable('1970-01-02T10:17:36'), $form->submit(['withTimestamp' => 123456])->value()->withTimestamp);
     }
 
     /**
@@ -59,6 +64,9 @@ class DateTimeTransformerTest extends FormTestCase
         $this->assertSame('2023-01-25T15:00', $form->import(DateTimeTransformerTestRequest::withClass(new DateTime('2023-01-25 15:00:00')))->httpValue()['withClass']);
         $this->assertSame('2023-01-25T20:00', $form->import(DateTimeTransformerTestRequest::withTimezone(new DateTimeImmutable('2023-01-25 15:00:00')))->httpValue()['withTimezone']);
         $this->assertSame('25/01/2023', $form->import(DateTimeTransformerTestRequest::withFormat(new DateTimeImmutable('2023-01-25 15:00:00')))->httpValue()['withFormat']);
+
+        $date = new DateTimeImmutable('2023-01-25 15:00:00');
+        $this->assertSame($date, $form->import(DateTimeTransformerTestRequest::simple($date))->value()->simple);
 
         $request = DateTimeTransformerTestRequest::withTimezone($date = new \DateTime('2023-01-25 15:00:00'));
         $before = clone $date;
@@ -94,6 +102,9 @@ class DateTimeTransformerTestRequest
 
     #[DateTimeTransformer(format: 'd/m/Y')]
     public ?DateTimeInterface $withFormat;
+
+    #[DateTimeTransformer(format: 'U')]
+    public ?DateTimeInterface $withTimestamp;
 
     #[DateTimeTransformer(class: \DateTime::class)]
     public ?DateTimeInterface $withClass;

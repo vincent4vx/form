@@ -64,6 +64,8 @@ class CsrfTest extends FormTestCase
         $this->assertFalse($form->submit([])->valid());
         $this->assertErrors(['csrf' => new FieldError('Invalid CSRF token', [], Csrf::CODE)], $form->submit([])->errors());
         $this->assertErrors(['csrf' => new FieldError('Invalid CSRF token', [], Csrf::CODE)], $form->submit(['csrf' => 'invalid'])->errors());
+        $this->assertErrors(['csrf' => new FieldError('Invalid CSRF token', [], Csrf::CODE)], $form->submit(['csrf' => []])->errors());
+        $this->assertErrors(['csrf' => new FieldError('Invalid CSRF token', [], Csrf::CODE)], $form->submit(['csrf' => ['foo']])->errors());
 
         $view = $form->view();
         $tokenValue = $view['csrf']->value;
@@ -73,6 +75,23 @@ class CsrfTest extends FormTestCase
         $this->assertTrue($this->storage->hasToken('foo'));
 
         $this->assertNotEquals('invalid', $form->submit(['csrf' => 'invalid'])->view()['csrf']->value);
+    }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_functional_simple_view_should_not_refresh_token(bool $generated)
+    {
+        $form = $generated ? $this->generatedForm(CsrfTestRequest::class) : $this->runtimeForm(CsrfTestRequest::class);
+
+        $view = $form->view();
+        $tokenValue = $view['csrf']->value;
+
+        $this->assertTrue($form->submit(['csrf' => $tokenValue])->valid());
+
+        $form->view(); // Regenerate view
+        $this->assertTrue($form->submit(['csrf' => $tokenValue])->valid());
     }
 
     /**
@@ -96,6 +115,23 @@ class CsrfTest extends FormTestCase
 
         $this->assertNotEquals($form->view()['csrf']->value, $form->view()['csrf']->value);
         $this->assertNotEquals('invalid', $form->submit(['csrf' => 'invalid'])->view()['csrf']->value);
+    }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function test_functional_refresh_view_should_not_refresh(bool $generated)
+    {
+        $form = $generated ? $this->generatedForm(CsrfTestRequestRefresh::class) : $this->runtimeForm(CsrfTestRequestRefresh::class);
+
+        $view = $form->view();
+        $tokenValue = $view['csrf']->value;
+
+        $this->assertTrue($form->submit(['csrf' => $tokenValue])->valid());
+
+        $form->view(); // Regenerate view
+        $this->assertFalse($form->submit(['csrf' => $tokenValue])->valid());
     }
 
     public function test_generate_validator()
