@@ -153,6 +153,11 @@ class CheckboxTest extends FormTestCase
         $this->assertNull($view['customValue']->error);
         $this->assertNull($view['mustBeChecked']->error);
     }
+
+    public function test_canThrowError()
+    {
+        $this->assertFalse((new Checkbox())->canThrowError());
+    }
 }
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
