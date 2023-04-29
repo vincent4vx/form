@@ -35,6 +35,10 @@
         "symfony/validator": "^6.1",
         "phpstan/phpstan": "^1.9",
         "friendsofphp/php-cs-fixer": "^3.13",
-        "ramsey/uuid": "^4.7"
+        "ramsey/uuid": "^4.7",
+        "symfony/security-csrf": "^6.2"
+    },
+    "suggest": {
+        "symfony/security-csrf": "For use Csrf component"
     }
 }
