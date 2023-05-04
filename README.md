@@ -9,7 +9,7 @@ This library provides a way to validate form input data and populate an object w
 It uses code generation to improve performance, and provides a runtime fallback for development.
 
 The philosophy of the library is :
-- Use PHP structures to define your forms, instead of building them using a DSL like a builder or a YAML file.
+- Use PHP structures to define your forms, instead of building them using a DSL, like a builder or a YAML file.
 - The declared structure is the only actually used structure for validation and hydration. No obscure internal structure will be used, nor duplication of the data.
 - Components are mostly immutable, allowing caching form instances.
 - Heavily use of code generation to improve performance.
@@ -121,6 +121,227 @@ if ($submitted->valid()) {
     }
 }
 ```
+
+### Custom validator
+
+The library provides a set of built-in validators, as you can see [here](#validation), but you in a real-world application, 
+you will probably need to create your own validators.
+
+There is multiple ways to create a custom validator, depending on your needs (and time constraints).
+
+#### The quick and dirty way
+
+The easiest way to create a custom validator is to create a validation method in your form class, and annotate the property with the [`ValidationMethod`](#validationmethod) constraint:
+
+```php
+use Quatrevieux\Form\Validator\Constraint\ValidationMethod;
+
+class MyForm
+{
+    #[ValidationMethod('validateFoo')]
+    public string $foo;
+    
+    public function validateFoo(string $value): ?string
+    {
+        // Do your validation here
+        if (...) {
+            // Return an error message if the value is invalid (it will be translated using the translator)
+            // Note: the return value may also be a boolean (use message defined in the constraint) or a FieldError object
+            // See the documentation for more information
+            return 'Foo is invalid'; 
+        }
+
+        return null;
+    }
+}
+```
+
+But this method has some drawbacks:
+- Polluting your form class with validation methods
+- Type safety of parameters is not enforced, nor the method name is checked at compile time
+- Reusability is possible, but need to declare a class with static methods for each validation method
+- Dependency injection is not possible
+
+So, only use this method for proof of concept or disposable code.
+
+#### Dirty, but with dependency injection
+
+If you need to inject dependencies in your validation method, you can use the [`ValidateBy`](#validateby) constraint with the validator class name,
+and implements the [`ConstraintValidatorInterface`](src/Validator/Constraint/ConstraintValidatorInterface.php):
+
+```php
+use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
+use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
+use Quatrevieux\Form\Validator\Constraint\ValidateBy;
+
+class MyForm
+{
+    #[ValidateBy(MyValidator::class)]
+    public string $foo;
+}
+
+// Declare your validator class
+class MyValidator implements ConstraintValidatorInterface
+{
+    public function __construct(
+        // Inject your dependencies here
+        private readonly MyFooService $service,
+    ) {
+    }
+
+    public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
+    {
+        // $constraint is the ValidateBy constraint, which can be used to access the parameters
+        // $value is the value of the field
+        // $data is the form object (MyForm in this case)
+
+        if (!$this->service->isValid($value)) {
+            // No sugar here, you have to create the FieldError object yourself
+            // Note: it will be automatically translated using the translator
+            return new FieldError('Foo is invalid');
+        }
+
+        return null;
+    }
+}
+```
+
+This method fixes most of the drawbacks of the previous method, but it's still cannot enforce type safety of parameters.
+So, it's reasonable to use this method if the validation does not require any parameter.
+
+#### The clean way
+
+Depending on your needs, there is two ways to create a clean validator:
+- When dependency injection is not required, you can create a class that extends the [`SelfValidatedConstraint`](src/Validator/Constraint/SelfValidatedConstraint.php) class.
+  It will implement both the [`ConstraintInterface`](src/Validator/Constraint/ConstraintInterface.php) and the [`ConstraintValidatorInterface`](src/Validator/Constraint/ConstraintValidatorInterface.php).
+  So all you have to do is to declare parameters, and implement the `validate()` method.
+- When dependency injection is required, you need to create two classes :
+  - One that implements the [`ConstraintInterface`](src/Validator/Constraint/ConstraintInterface.php), which will be used to declare parameters 
+  - And another one the  [`ConstraintValidatorInterface`](src/Validator/Constraint/ConstraintValidatorInterface.php), which will be used to validate the data
+
+##### SelfValidatedConstraint
+
+```php
+use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
+use Quatrevieux\Form\Validator\Constraint\SelfValidatedConstraint;
+use Quatrevieux\Form\Validator\FieldError;
+use Attribute;
+
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class MyConstraint extends SelfValidatedConstraint
+{
+    // It's recommended to declare an unique code for your constraint
+    public const CODE = 'c6241cc4-c7f5-4951-96b5-bf3e69f9ed15';
+
+    public function __construct(
+        // Declare your parameters here
+        public readonly string $foo,
+        // It's recommended to declare a message parameter, which will be used as the default error message
+        // Placeholders can be used to display parameters values
+        public readonly string $message = 'Foo is invalid : {{ foo }}',
+    ) {
+    }
+
+    public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
+    {
+        // $constraint is same as $this
+        // $value is the value of the field
+        // $data is the form object (MyForm in this case)
+
+        if (...) {
+            return new FieldError($constraint->message, ['foo' => $constraint->foo], self::CODE);
+        }
+
+        return null;
+    }
+}
+```
+
+##### ConstraintInterface and ConstraintValidatorInterface
+
+```php
+use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
+use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
+use Quatrevieux\Form\Validator\FieldError;
+use Quatrevieux\Form\RegistryInterface;
+use Attribute;
+
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class MyConstraint implements ConstraintInterface
+{
+    // It's recommended to declare an unique code for your constraint
+    public const CODE = 'c6241cc4-c7f5-4951-96b5-bf3e69f9ed15';
+
+    public function __construct(
+        // Declare your parameters here
+        public readonly string $foo,
+        // It's recommended to declare a message parameter, which will be used as the default error message
+        // Placeholders can be used to display parameters values
+        public readonly string $message = 'Foo is invalid : {{ foo }}',
+    ) {
+    }
+    
+    public function getValidator(RegistryInterface $registry): ConstraintValidatorInterface
+    {
+        // Resolve the validator from the registry
+        return $registry->getConstraintValidator(MyConstraintValidator::class);
+    }
+}
+
+class MyConstraintValidator implements ConstraintValidatorInterface
+{
+    public function __construct(
+        // Inject your dependencies here
+        private readonly MyFooService $service,
+    ) {
+    }
+
+    public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
+    {
+        // $constraint is the MyConstraint constraint, which can be used to access the parameters
+        // $value is the value of the field
+        // $data is the form object (MyForm in this case)
+
+        if (!$this->service->isValid($value, $constraint->foo)) {
+            return new FieldError($constraint->message, ['foo' => $constraint->foo], MyConstraint::CODE);
+        }
+
+        return null;
+    }
+}
+```
+
+#### Code generation
+
+By default, code generation is also performed on custom constraints by inlining the instantiation of the constraint class.
+For example, the property:
+
+```php
+#[MyConstraint('bar')]
+public ?string $foo;
+```
+
+Will be compiled in code like this:
+
+```php
+if (($error = ($fooConstraint = new MyConstraint('bar'))->getValidator($this->registry)->validate($fooConstraint, $data->foo ?? null, $data)) !== null) {
+    $errors['foo'] = $error;
+}
+```
+
+Which provides decent performance, but it's not optimal. 
+So, you may want to generate the validation code yourself on simple constraints heavily used in your forms.
+
+To do so, you can implement the [`ConstraintValidatorGeneratorInterface`](src/Validator/Generator/ConstraintValidatorGeneratorInterface.php) 
+on the validator class (or constraint class in case of a self validated constraint).
+
+See library [source code](src/Validator/Constraint) for examples.
+
+## API
+
+### Validation
+
+TODO :)
 
 ## Internal working
 
