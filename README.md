@@ -129,6 +129,8 @@ you will probably need to create your own validators.
 
 There is multiple ways to create a custom validator, depending on your needs (and time constraints).
 
+> Note: don't forget to handle optional fields in your custom validators, as they may be null.
+
 #### The quick and dirty way
 
 The easiest way to create a custom validator is to create a validation method in your form class, and annotate the property with the [`ValidationMethod`](#validationmethod) constraint:
@@ -337,11 +339,212 @@ on the validator class (or constraint class in case of a self validated constrai
 
 See library [source code](src/Validator/Constraint) for examples.
 
+### Custom transformers
+
+Unlike validators, no quick and dirty way is provided to create custom transformers.
+So, two ways are available to create a custom transformer:
+- When dependency injection is not required, you can create a class that implements the [`FieldTransformerInterface`](src/Transformer/Field/FieldTransformerInterface.php) interface.
+- When dependency injection is required, you need to create two classes :
+  - One that implements the [`DelegatedFieldTransformerInterface`](src/Transformer/Field/DelegatedFieldTransformerInterface.php) interface, providing transformer parameters
+  - And another one the [`ConfigurableFieldTransformerInterface`](src/Transformer/Field/ConfigurableFieldTransformerInterface.php) interface, providing the transformer logic
+
+#### FieldTransformerInterface
+
+This is the simplest way to create a custom transformer, but it doesn't allow dependency injection.
+You simply have to:
+- Create a class that implements the [`FieldTransformerInterface`](src/Transformer/Field/FieldTransformerInterface.php) interface,
+- Implements the `transformFromHttp()` for HTTP to form object transformation
+- Implements the `transformToHttp()` for form object to HTTP transformation (if needed)
+- Declare it as an attribute on the form property.
+
+```php
+use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
+use Attribute;
+
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class MyTransformer implements FieldTransformerInterface
+{
+    public function __construct(
+        // Declare your parameters here
+        private readonly string $foo,
+    ) {
+    }
+
+    public function transformFromHttp(mixed $value): mixed
+    {
+        // $value is the HTTP value
+        // The value will be null if the field is not present in the HTTP request
+
+        // Transform the value here
+        return $value;
+    }
+
+    public function transformToHttp(mixed $value): mixed
+    {
+        // $value is the form object value
+
+        // Transform the value here
+        return $value;
+    }
+
+    public function canThrowError(): bool
+    {
+        // Return true if the transformer can throw an error
+        // If true, the transformer will be wrapped in a try/catch block to mark the field as invalid
+        return false;
+    }
+}
+
+class MyForm
+{
+    #[MyTransformer('bar')]
+    public ?string $foo;
+}
+```
+
+#### DelegatedFieldTransformerInterface
+
+When you need some dependencies on your transformation logic, you should use the [`DelegatedFieldTransformerInterface`](src/Transformer/Field/DelegatedFieldTransformerInterface.php) interface.
+The transformation logic (and dependencies) will be provided by a class implementing the [`ConfigurableFieldTransformerInterface`](src/Transformer/Field/ConfigurableFieldTransformerInterface.php) interface.
+
+```php
+use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
+use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
+use Quatrevieux\Form\RegistryInterface;
+use Attribute;
+
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class MyTransformer implements DelegatedFieldTransformerInterface
+{
+    public function __construct(
+        // Declare your parameters here
+        public readonly string $foo,
+    ) {
+    }
+
+    public function getTransformer(RegistryInterface $registry): ConfigurableFieldTransformerInterface
+    {
+        // Resolve the transformer from the registry
+        return $registry->getFieldTransformer(MyTransformerImpl::class);
+    }
+}
+
+class MyTransformerImpl implements ConfigurableFieldTransformerInterface
+{
+    public function __construct(
+        // Declare your dependencies here
+        private readonly MyFooService $service,
+    ) {
+    }
+
+    public function transformFromHttp(DelegatedFieldTransformerInterface $configuration, mixed $value): mixed
+    {
+        // $configuration is the MyTransformer attribute instance
+        // $value is the HTTP value
+        // The value will be null if the field is not present in the HTTP request
+
+        // Transform the value here
+        return $value;
+    }
+
+    public function transformToHttp(DelegatedFieldTransformerInterface $configuration, mixed $value): mixed
+    {
+        // $configuration is the MyTransformer attribute instance
+        // $value is the form object value
+
+        // Transform the value here
+        return $value;
+    }
+}
+```
+
+#### Code generation
+
+The code generation is mostly the same as for validators, so you can refer to the [validators section](#code-generation) for more information.
+
+To do so, you can implement the [`FieldTransformerGeneratorInterface`](src/Transformer/Generator/FieldTransformerGeneratorInterface.php)
+on the transformer implementation class (i.e. class which implements `FieldTransformerInterface` or `ConfigurableFieldTransformerInterface`, but not `DelegatedFieldTransformerInterface`).
+
+See library [source code](src/Transformer/Field) for examples.
+
 ## API
 
 ### Validation
 
-TODO :)
+#### [`ArrayShape`](src/Validator/Constraint/ArrayShape.php)
+
+The `ArrayShape` class is a PHP attribute that can be used to validate if the current field is an array and if it has the expected keys and values types. It implements the `ConstraintValidatorGeneratorInterface` interface.
+
+##### Example
+
+```php
+class MyForm
+{
+    #[ArrayShape([
+        'firstName' => 'string',
+        'lastName' => 'string',
+        // Use ? to mark the field as optional
+        'age?' => 'int',
+        // You can declare a sub array shape
+        'address' => [
+            'street' => 'string',
+            'city' => 'string',
+            'zipCode' => 'string|int', // You can use multiple types
+        ],
+    ])]
+    public array $person;
+
+    // You can define array as dynamic list
+    #[ArrayShape(key: 'int', value: 'int|float')]
+    public array $listOfNumbers;
+
+    // You can disable extra keys
+    #[ArrayShape(['foo' => 'string', 'bar' => 'int'], allowExtraKeys: false)]
+    public array $fixed;
+}
+```
+
+##### Constructor Parameters
+
+The `ArrayShape` class constructor takes the following parameters:
+
+| Parameter        | Description                                                                                                                                                                                                                                                                                                                        |
+|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `shape`          | Define array fields and their types. The key is the field name. If the field is optional, add a question mark `?` at the end of the name. The value is the type of the field. The type can be a string, following PHP's disjunctive normal form, a `TypeInterface` instance, or an array which will be converted to an array type. |
+| `key`            | The key type for extra keys. The type can be a string, following PHP's disjunctive normal form, a `TypeInterface` instance. Note: this option is ignored for all keys that are defined in the shape.                                                                                                                               |
+| `value`          | The value type. The type can be a string, following PHP's disjunctive normal form, a `TypeInterface` instance, or an array which will be converted to an array type. Note: this option is ignored for all values that are defined in the shape.                                                                                    |
+| `allowExtraKeys` | Allow extra keys which are not defined in the shape. All these keys will be validated with the key type and the value type.                                                                                                                                                                                                        |
+| `message`        | The error message to display.                                                                                                                                                                                                                                                                                                      |
+
+#### [`Choice`](src/Validator/Constraint/Choice.php)
+
+Check if the value is in the given choices.
+
+The value is checked with strict comparison, so ensure that the value is correctly cast. This constraint supports multiple choices (i.e. input value is an array). You can define labels for the choices by using a string key in the choices array.
+
+##### Example
+
+```php
+class MyForm
+{
+    #[Choice(['foo', 'bar'])]
+    public string $foo;
+
+    // Define labels for the choices
+    #[Choice([
+        'My first label' => 'foo',
+        'My other label' => 'bar',
+    ])]
+    public string $bar;
+}
+```
+
+##### Constructor Parameters
+
+| Parameter | Description                                                                   |
+|-----------|-------------------------------------------------------------------------------|
+| `choices` | List of available choices. Use a string key to define a label for the choice. |
+| `message` | Error message. Use {{ value }} as placeholder for the invalid value.          |
 
 ## Internal working
 
