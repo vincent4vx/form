@@ -557,7 +557,7 @@ Source: [src/Validator/Constraint/EqualsWith.php](src/Validator/Constraint/Equal
 Check if the current field value is equals to other field value.
 
 **Example:**
-```
+```php
 class MyForm
 {
     #[EqualsWith('password', message: 'Passwords must be equals')]
@@ -583,7 +583,7 @@ Check that the field value is equal to the given value. This comparison use the 
 Numeric and string values are supported. To ensure that the comparison is done in the same type, add a typehint to the field and use the same type on the constraint's value.
 
 **Example:**
-```
+```php
 class MyForm
 {
     #[EqualTo(10)]
@@ -611,7 +611,7 @@ Check that the field value is greater than the given value.
 Numeric and string values are supported. To ensure that the comparison is done in the same type, add a typehint to the field and use the same type on the constraint's value.
 
 **Example:**
-```
+```php
 class MyForm
 {
     #[GreaterThan(10)]
