@@ -5,7 +5,6 @@ namespace Quatrevieux\Form\Validator\Constraint;
 use Attribute;
 use InvalidArgumentException;
 use Quatrevieux\Form\Util\Code;
-use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\Validator\FieldError;
 
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
@@ -26,7 +25,27 @@ use function strtoupper;
 use function substr;
 
 /**
+ * Check if the field value match the given regular expression
+ * Use the PCRE syntax (https://www.php.net/manual/en/pcre.pattern.php)
+ *
+ * Note: HTML5 "pattern" attribute will be generated if possible (only supports case-insensitive flag)
+ *
+ * Usage:
+ * <code>
+ * class MyForm
+ * {
+ *     #[Regex('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$')]
+ *     public ?string $uuid;
+ *
+ *     // Use flags parameter to pass the flags (here, case insensitive)
+ *     #[Regex('^[a-z]+$', flags: 'i')]
+ *     public string $foo;
+ * }
+ * </code>
+ *
  * @implements ConstraintValidatorGeneratorInterface<Regex>
+ *
+ * @see preg_match() Used to validate the value
  */
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 final class Regex extends SelfValidatedConstraint implements FieldViewAttributesProviderInterface, ConstraintValidatorGeneratorInterface
@@ -34,8 +53,26 @@ final class Regex extends SelfValidatedConstraint implements FieldViewAttributes
     public const CODE = '4ba73c60-bba8-58cc-a92b-7f572ecaaf1f';
 
     public function __construct(
+        /**
+         * Regular expression pattern, following the PCRE syntax
+         *
+         * Unlike the PHP preg_match() function, the pattern must not be enclosed by delimiters
+         * and flags must be passed as a separate argument
+         */
         public readonly string $pattern,
+
+        /**
+         * Regular expression flags / pattern modifiers
+         *
+         * Note: Usage of flags other than i (case-insensitive) will disable HTML5 "pattern" attribute generation
+         *
+         * @see https://www.php.net/manual/en/reference.pcre.pattern.modifiers.php
+         */
         public readonly string $flags = '',
+
+        /**
+         * Error message to display if the value does not match the pattern
+         */
         public readonly string $message = 'This value is not valid.',
     ) {
         if (@preg_match($this->getGrepPattern(), '') === false) {

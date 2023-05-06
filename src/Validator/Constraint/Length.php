@@ -16,6 +16,28 @@ use Quatrevieux\Form\View\Provider\FieldViewAttributesProviderInterface;
  * Validate the length of a string field
  * If the field is not a string, this validator will be ignored
  *
+ * Usage:
+ * <code>
+ * class MyForm
+ * {
+ *     // Only check the minimum length
+ *     #[Length(min: 2)]
+ *     public string $foo;
+ *
+ *     // Only check the maximum length
+ *     #[Length(max: 32)]
+ *     public string $bar;
+ *
+ *     // For a fixed length
+ *     #[Length(min: 12, max: 12)]
+ *     public string $baz;
+ *
+ *     // Check the length is between 2 and 32 (included)
+ *     #[Length(min: 2, max: 32)]
+ *     public string $qux;
+ * }
+ * </code>
+ *
  * @implements ConstraintValidatorGeneratorInterface<Length>
  */
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]

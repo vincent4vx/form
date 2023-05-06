@@ -471,11 +471,13 @@ See library [source code](src/Transformer/Field) for examples.
 
 ### Validation
 
-#### [`ArrayShape`](src/Validator/Constraint/ArrayShape.php)
+#### ArrayShape
 
-The `ArrayShape` class is a PHP attribute that can be used to validate if the current field is an array and if it has the expected keys and values types. It implements the `ConstraintValidatorGeneratorInterface` interface.
+Source: [src/Validator/Constraint/ArrayShape.php](src/Validator/Constraint/ArrayShape.php)
 
-##### Example
+The `ArrayShape` class is a PHP attribute that can be used to validate if the current field is an array and if it has the expected keys and values types.
+
+**Example:**
 
 ```php
 class MyForm
@@ -504,7 +506,7 @@ class MyForm
 }
 ```
 
-##### Constructor Parameters
+**Constructor:**
 
 The `ArrayShape` class constructor takes the following parameters:
 
@@ -516,13 +518,15 @@ The `ArrayShape` class constructor takes the following parameters:
 | `allowExtraKeys` | Allow extra keys which are not defined in the shape. All these keys will be validated with the key type and the value type.                                                                                                                                                                                                        |
 | `message`        | The error message to display.                                                                                                                                                                                                                                                                                                      |
 
-#### [`Choice`](src/Validator/Constraint/Choice.php)
+#### Choice
+
+Source: [src/Validator/Constraint/Choice.php](src/Validator/Constraint/Choice.php)
 
 Check if the value is in the given choices.
 
 The value is checked with strict comparison, so ensure that the value is correctly cast. This constraint supports multiple choices (i.e. input value is an array). You can define labels for the choices by using a string key in the choices array.
 
-##### Example
+**Example:**
 
 ```php
 class MyForm
@@ -539,12 +543,618 @@ class MyForm
 }
 ```
 
-##### Constructor Parameters
+**Constructor:**
 
 | Parameter | Description                                                                   |
 |-----------|-------------------------------------------------------------------------------|
 | `choices` | List of available choices. Use a string key to define a label for the choice. |
 | `message` | Error message. Use {{ value }} as placeholder for the invalid value.          |
+
+#### EqualsWith
+
+Source: [src/Validator/Constraint/EqualsWith.php](src/Validator/Constraint/EqualsWith.php)
+
+Check if the current field value is equals to other field value.
+
+**Example:**
+```
+class MyForm
+{
+    #[EqualsWith('password', message: 'Passwords must be equals')]
+    public string $passwordConfirm;
+    public string $password;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                                                                                                     |
+|-----------|-----------------------------------------------------------------------------------------------------------------|
+| `field`   | The other field name. Must be defined on the same data object.                                                  |
+| `message` | Error message displayed if values are different. Use `{{ field }}` placeholder to display the other field name. |
+| `strict`  | If true, use a strict comparison (i.e. ===), so type and value will be compared.                                |
+
+#### EqualTo
+
+Source: [src/Validator/Constraint/EqualTo.php](src/Validator/Constraint/EqualTo.php)
+
+Check that the field value is equal to the given value. This comparison use the simple comparison operator (==) and not the strict one (===).
+
+Numeric and string values are supported. To ensure that the comparison is done in the same type, add a typehint to the field and use the same type on the constraint's value.
+
+**Example:**
+```
+class MyForm
+{
+    #[EqualTo(10)]
+    public int $foo;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                                                                                                                                  |
+|-----------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| `value`   | The value to compare against.                                                                                                                |
+| `message` | The error message displayed if the field value is not equal to the given value. Use `{{ value }}` placeholder to display the compared value. | 
+
+**See also:**
+- [IdenticalTo](#identicalto) for a strict comparison
+- [NotEqualTo](#notequalto) for the opposite constraint
+
+#### GreaterThan
+
+Source: [src/Validator/Constraint/GreaterThan.php](src/Validator/Constraint/GreaterThan.php)
+
+Check that the field value is greater than the given value.
+
+Numeric and string values are supported. To ensure that the comparison is done in the same type, add a typehint to the field and use the same type on the constraint's value.
+
+**Example:**
+```
+class MyForm
+{
+    #[GreaterThan(10)]
+    public int $foo;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                                                                                                                                      |
+|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `value`   | The value to compare against.                                                                                                                    |
+| `message` | The error message displayed if the field value is not greater than the given value. Use `{{ value }}` placeholder to display the compared value. | 
+
+**See also:**
+- [GreaterThanOrEqual](#greaterthanorequal) for a greater or equal comparison
+- [LessThanOrEqual](#lessthanorequal) for the opposite constraint
+
+#### GreaterThanOrEqual
+
+Source: [src/Validator/Constraint/GreaterThanOrEqual.php](src/Validator/Constraint/GreaterThanOrEqual.php)
+
+Check that the field value is greater than or equal to the given value. Numeric and string values are supported. To ensure that the comparison is done in the same type, add a typehint to the field and use the same type on the constraint's value.
+
+**Example:**
+
+```php
+class MyForm
+{
+    #[GreaterThanOrEqual(10)]
+    public int $foo;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                   |
+|-----------|-------------------------------|
+| `value`   | The value to compare against. |
+| `message` | The error message to display. |
+
+**See also:**
+- [GreaterThan](#greaterthan) for a greater without equal comparison.
+- [LessThan](#lessthan) for the opposite constraint.
+
+#### IdenticalTo
+
+Source: [src/Validator/Constraint/IdenticalTo.php](src/Validator/Constraint/IdenticalTo.php)
+
+Check that the field value is the same as the given value. This comparison uses the strict comparison operator (===).
+
+Numeric and string values are supported. The value type must be the same as the field type, and the field value must be cast using type hint or [Cast](src/Validator/Transformer/Cast.php) transformer.
+
+**Example:**
+
+```php
+class MyForm
+{
+    #[IdenticalTo(10)]
+    public int $foo;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                                   |
+|-----------|-----------------------------------------------|
+| `value`   | The value to compare against.                 |
+| `message` | The error message to use if validation fails. |
+
+**See also:**
+
+- [EqualTo](#equalto) for a simple comparison
+- [NotIdenticalTo](#notidenticalto) for the opposite constraint
+
+#### Length
+
+Source: [src/Validator/Constraint/Length.php](src/Validator/Constraint/Length.php)
+
+Validate the length of a string field. If the field is not a string, this validator will be ignored.
+
+This constraint allows you to check the length of a string field. You can define the minimum and maximum length, and customize the error message.
+
+**Example:**
+
+```php
+class MyForm
+{
+    // Only check the minimum length
+    #[Length(min: 2)]
+    public string $foo;
+
+    // Only check the maximum length
+    #[Length(max: 32)]
+    public string $bar;
+
+    // For a fixed length
+    #[Length(min: 12, max: 12)]
+    public string $baz;
+
+    // Check the length is between 2 and 32 (included)
+    #[Length(min: 2, max: 32)]
+    public string $qux;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                                                                                                                                                                                                                                                                                                                                                                                                       |
+|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `min`     | Minimum length (included). If null, no minimum length will be checked.                                                                                                                                                                                                                                                                                                                                            |
+| `max`     | Maximum length (included). If null, no maximum length will be checked.                                                                                                                                                                                                                                                                                                                                            |
+| `message` | Error message displayed if the length is not between `min` and `max`. Use `{{ min }}` and `{{ max }}` placeholders to display the min and max parameters (if defined). If null, the default message will be used depending on defined parameters: `Length::MIN_MESSAGE` if only `min` is defined, `Length::MAX_MESSAGE` if only `max` is defined, `Length::INTERVAL_MESSAGE` if both `min` and `max` are defined. |
+
+#### LessThan
+
+Source: [src/Validator/Constraint/LessThan.php](src/Validator/Constraint/LessThan.php)
+
+The `LessThan` constraint checks if the field value is less than the given value. The comparison uses the strict comparison operator `<` to ensure that the comparison is done in the same type.
+
+**Example:**
+```php
+class MyForm
+{
+    #[LessThan(10)]
+    public int $foo;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                                                                                                   |
+|-----------|---------------------------------------------------------------------------------------------------------------|
+| `value`   | The value to compare to the field value.                                                                      |
+| `message` | The error message to display if the comparison fails. Default: `'The value should be less than {{ value }}.'` |
+
+**See also:**
+- [LessThanOrEqual](#lessthanorequal) for a less than or equal comparison.
+- [GreaterThanOrEqual](#greaterthanorequal) for the opposite constraint.
+
+#### LessThanOrEqual
+
+Source: [src/Validator/Constraint/LessThanOrEqual.php](src/Validator/Constraint/LessThanOrEqual.php)
+
+Check that the field value is less than or equal to the given value
+
+Numeric and string values are supported. To ensure that the comparison is done in the same type, add a typehint to the field and use the same type on the constraint's value.
+
+**Example:**
+
+```php
+class MyForm
+{
+    #[LessThanOrEqual(10)]
+    public int $foo;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                                                |
+|-----------|------------------------------------------------------------|
+| `value`   | The maximum value allowed for the field                    |
+| `message` | The error message if the value is greater than the maximum |
+
+**See also:**
+
+- [LessThan](#lessthan) for a less without equal comparison
+- [GreaterThan](#greaterthan) for the opposite constraint
+
+#### NotEqualTo
+
+Source: [src/Validator/Constraint/NotEqualTo.php](src/Validator/Constraint/NotEqualTo.php)
+
+Check that the field value is equal to the given value. This comparison uses the simple comparison operator `!=` and not the strict one `!==`.
+
+Numeric and string values are supported. To ensure that the comparison is done in the same type, add a typehint to the field and use the same type on the constraint's value.
+
+**Example:**
+
+```php
+class MyForm
+{
+    #[NotEqualTo(10)]
+    public int $foo;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                   |
+|-----------|-------------------------------|
+| `value`   | The value to compare against. |
+| `message` | The validation message.       |
+
+**See also:**
+
+- [NotIdenticalTo](#notidenticalto) for a strict comparison.
+- [EqualTo](#equalto) for the opposite constraint.
+
+#### NotIdenticalTo
+
+Source: [src/Validator/Constraint/NotIdenticalTo.php](src/Validator/Constraint/NotIdenticalTo.php)
+
+Check that the field value is equal to the given value. This comparison uses the strict comparison operator `!==`. Numeric and string values are supported. The value type must be the same as the field type, and the field value must be cast using typehint or `Cast` transformer.
+
+**Example:**
+```php
+class MyForm
+{
+    #[NotIdenticalTo(10)]
+    public int $foo;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                   |
+|-----------|-------------------------------|
+| `value`   | The value to compare against. |
+| `message` | The error message to display. |
+
+**See also:**
+- [NotEqualTo](#notequalto) for a simple comparison
+- [IdenticalTo](#identicalto) for the opposite constraint
+
+#### PasswordStrength
+
+Source: [src/Validator/Constraint/PasswordStrength.php](src/Validator/Constraint/PasswordStrength.php)
+
+Check the strength of a password field. The strength is a logarithmic value representing an approximation of the number of possible combinations.
+
+This algorithm takes into account:
+- The presence of lowercase letters
+- The presence of uppercase letters
+- The presence of digits
+- The presence of special characters
+- The length of the password
+
+This check does not force the user to use a specific set of characters while still providing a good level of security. 
+The strength should be chosen according to the password hashing algorithm used: slower algorithms make brute force attacks slower so a lower strength is acceptable. 
+The recommended strength is 51, which takes around one month to brute force at one billion attempts per second.
+
+**Example:**
+
+```php
+class User
+{
+    #[PasswordStrength(min:51, message:"Your password is too weak")]
+    private $password;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                                                                                                                                                            |
+|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `min`     | The minimum strength of the password. If the strength is lower than this value, the validation will fail.                                                              |
+| `message` | The error message to display if the password is too weak. Use placeholders `{{ strength }}` and `{{ min_strength }}` to display the strength and the minimum strength. |
+
+#### Regex
+
+Source: [src/Validator/Constraint/Regex.php](src/Validator/Constraint/Regex.php)
+
+Check if the field value matches the given regular expression using PCRE syntax. 
+Generates an HTML5 "pattern" attribute if possible.
+
+**Example:**
+
+```php
+class MyForm
+{
+    #[Regex('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$')]
+    public ?string $uuid;
+
+    #[Regex('^[a-z]+$', flags: 'i')]
+    public string $foo;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                                                                                                                                                                                    |
+|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `pattern` | Regular expression pattern, following the PCRE syntax. Unlike the PHP `preg_match()` function, the pattern must not be enclosed by delimiters and flags must be passed as a separate argument. |
+| `flags`   | Regular expression flags/pattern modifiers. Usage of flags other than `i` (case-insensitive) will disable HTML5 "pattern" attribute generation.                                                |
+| `message` | Error message to display if the value does not match the pattern.                                                                                                                              |
+
+#### Required
+
+Source: [src/Validator/Constraint/Required.php](src/Validator/Constraint/Required.php)
+
+This constraint marks a field as required. The field will be considered valid if it is not null and not an empty string or array. 
+Any other value will be considered valid, like `0`, `false`, etc.
+
+> Note: this constraint is not required if the field is typed as non-nullable.
+
+**Example:**
+
+```php
+class MyForm
+{
+    // Explicitly mark the field as required because it is nullable
+    #[Required]
+    public $foo;
+
+    // The field is required because it is not nullable
+    public string $bar;
+
+    // You can define a custom error message to override the default one
+    #[Required('This field is required')]
+    public string $baz;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                                                                                      |
+|-----------|--------------------------------------------------------------------------------------------------|
+| `message` | The error message to be shown if the value is not valid. Defaults to `'This value is required'`. |
+
+#### UploadedFile
+
+Source: [src/Validator/Constraint/UploadedFile.php](src/Validator/Constraint/UploadedFile.php)
+
+Check if the uploaded file is valid.
+Use PSR-7 `UploadedFileInterface`, so [`psr/http-message`](https://packagist.org/packages/psr/http-message) package is required to use this constraint.
+
+**Example:**
+
+```php
+class MyForm
+{
+    // Constraint for simply check that the file is successfully uploaded
+    #[UploadedFile]
+    public UploadedFileInterface $file;
+     // You can also define a file size limit
+    #[UploadedFile(maxSize: 1024 * 1024)]
+    public UploadedFileInterface $withLimit;
+     // You can also define the file type using mime type filter, or file extension filter
+    // Note: this is not a security feature, you should always check the actual file type on the server side
+    #[UploadedFile(
+        allowedMimeTypes: ['image/*', 'application/pdf'], // wildcard is allowed for subtype
+        allowedExtensions: ['jpg', 'png', 'pdf'] // you can specify the file extension (without the dot)
+    )]
+    public UploadedFileInterface $withMimeTypes;
+}
+
+// Create and submit the form
+// Here, $request is a PSR-7 ServerRequestInterface
+$form = $factory->create(MyForm::class);
+$submitted = $form->submit($request->getParsedBody() + $request->getUploadedFiles());
+```
+
+**Constructor:**
+
+| Parameter           | Description                                                                      |
+|---------------------|----------------------------------------------------------------------------------|
+| `maxSize`           | Maximum file size in bytes. If defined, files with unknown size will be rejected |
+| `allowedMimeTypes`  | List of allowed mime types. You can use wildcards on subtype, like "image/*"     |
+| `allowedExtensions` | List of allowed file extensions. The dot must not be included                    |
+
+#### ValidateArray
+
+Source: [`src/Validator/Constraint/ValidateArray.php`](src/Validator/Constraint/ValidateArray.php)
+
+Constraint for array validation. Will apply validation to each element of the array.
+
+**Example:**
+
+```php
+class MyRequest
+{
+    #[ValidateArray(constraints: [
+        new Length(min: 3, max: 10),
+        new Regex(pattern: '/^[a-z]+$/'),
+    ])]
+    public ?array $values;
+}
+```
+
+**Constructor:**
+
+| Parameter         | Description                                                                                                                                                                                                                                               |
+|-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `constraints`     | List of constraints to apply to each element of the array.                                                                                                                                                                                                |
+| `message`         | Global error message to show if at least one element of the array is invalid. This message will be used only if `ValidateArray::$aggregateErrors` is true. Use `{{ item_errors }}` as a placeholder for the list of item errors.                          |
+| `itemMessage`     | Error message format for each item error. Use as placeholders: `{{ key }}` for the item array key. If the array is not associative, the key will be the item index. Be aware that the key value is not escaped. `{{ error }}` for the item error message. |
+| `aggregateErrors` | Aggregate all item errors in a single `FieldError`. The error message will be the `ValidateArray::$message` with the item errors concatenated. If this option is false, the validation will return a `FieldError` for each invalid item.                  |
+
+#### ValidateBy
+
+Source: [src/Validator/Constraint/ValidateBy.php](src/Validator/Constraint/ValidateBy.php)
+
+This is a generic constraint used to validate a field value using a custom validator instance. 
+This class allows you to specify the validator class to use and an array of options to pass to the validator. 
+It is important to note that it is preferable to use a custom constraint class instead of using the options array.
+
+**Example:**
+
+```php
+class MyForm
+{
+   #[ValidateBy(MyValidator::class, ['checksum' => 15])]
+   public string $foo;
+}
+
+class MyValidator implements ConstraintValidatorInterface
+{
+    public function __construct(private ChecksumAlgorithmInterface $algo) {}
+
+    public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
+    {
+        if ($this->algo->checksum($value) !== $constraint->options['checksum']) {
+            return new FieldError('Invalid checksum');
+        }
+
+        return null;
+    }
+}
+```
+
+**Constructor:**
+
+| Parameter        | Description                                                                    |
+|------------------|--------------------------------------------------------------------------------|
+| `validatorClass` | Validator class to use. Must be registered in the ConstraintValidatorRegistry. |
+| `options`        | Array of options to pass to the validator.                                     |
+
+**See also:**
+- [Custom validator](#dirty-but-with-dependency-injection) describes how to create a custom validator
+  Here's an example of how you could convert the docblock for the `ValidateVar` class to a readme section:
+
+#### ValidateVar
+
+Source: [src/Validator/Constraint/ValidateVar.php](src/Validator/Constraint/ValidateVar.php)
+
+Validate field value using `filter_var()` with `FILTER_VALIDATE_*` constant.
+
+**Example:**
+
+```php
+class MyRequest
+{
+    #[ValidateVar(ValidateVar::EMAIL)]
+    public ?string $email;
+
+    #[ValidateVar(ValidateVar::DOMAIN, options: FILTER_FLAG_HOSTNAME)] // You can add flags as an int
+    public ?string $domain;
+
+    #[ValidateVar(ValidateVar::INT, options: ['options' => ['min_range' => 0, 'max_range' => 100]])] // You can add options as an array
+    public ?float $int;
+}
+```
+
+**Constructor:**
+
+| Parameter | Description                                                                                                                    |
+|-----------|--------------------------------------------------------------------------------------------------------------------------------|
+| `filter`  | The id of the validation filter to apply. Should be one of the constants of this class or `FILTER_VALIDATE_*`.                 |
+| `options` | Filter options or flags. To use flags with options, use an array with the key `"flags"`, and options with the key `"options"`. |
+| `message` | The error message.                                                                                                             |
+
+#### ValidationMethod
+
+Source: [src/Validator/Constraint/ValidationMethod.php](src/Validator/Constraint/ValidationMethod.php)
+
+Validate a field value using a method call.
+
+This method can be a static method on a given class or an instance method declared on the data object. The method will be called with the following arguments:
+- the field value
+- the data object (on the instance method, this parameter is same as $this)
+- extra parameters, as variadic arguments
+
+The method can return one of the following:
+- `null`: the field is valid
+- `true`: the field is valid
+- a string: the field is invalid, the string is the error message
+- a `FieldError` instance: the field is invalid
+- `false`: the field is invalid, the error message is the default one
+
+**Example:**
+
+```php
+class MyForm
+{
+    // Calling validateFoo() on this instance
+    #[ValidateMethod(method: 'validateFoo', parameters: [15], message: 'Invalid checksum')]
+    public string $foo;
+
+    // Calling Functions::validateFoo()
+    #[ValidateMethod(class: Functions::class, method: 'validateFoo', parameters: [15], message: 'Invalid checksum')]
+    public string $foo;
+
+    // Return a boolean, so the default error message is used
+    public function validateFoo(string $value, object $data, int $checksum)
+    {
+        return crc32($value) % 32 === $checksum;
+    }
+
+    // Return a string, so the string is used as error message
+    public function validateFoo(string $value, object $data, int $checksum)
+    {
+        if (crc32($value) % 32 !== $checksum) {
+            return 'Invalid checksum';
+        }
+
+        return null;
+    }
+
+    // Return a FieldError instance
+    public function validateFoo(string $value, object $data, int $checksum)
+    {
+        if (crc32($value) % 32 !== $checksum) {
+            return new FieldError('Invalid checksum');
+        }
+
+        return null;
+    }
+}
+
+class Functions
+{
+    // You can also use a static method
+    public static function validateFoo(string $value, object $data, int $checksum): bool
+    {
+        return crc32($value) % 32 === $checksum;
+    }
+}
+```
+
+**Constructor:**
+
+| Parameter    | Description                                                          |
+|--------------|----------------------------------------------------------------------|
+| `method`     | Method name to call                                                  |
+| `class`      | Class name to call the method on                                     |
+| `parameters` | Extra parameters to pass to the method                               |
+| `message`    | Default error message to use if the method returns false             |
+| `code`       | Error code to use if the method returns false or a message as string |
+
+**See also:**
+- [Custom validators](#the-quick-and-dirty-way) describes how to create a custom validator
 
 ## Internal working
 
