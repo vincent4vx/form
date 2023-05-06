@@ -1722,6 +1722,27 @@ if (!$submitted->valid()) {
 return $this->process($submitted->value());
 ```
 
+## Performance
+
+See [GitHub actions](https://github.com/vincent4vx/form/actions/workflows/bench.yml) for the latest benchmark results.
+
+A benchmark comparison has been made, using phpbench, between this library and Symfony forms, and vanilla PHP.
+
+| Subject                                     | Memory   | Time      | Relative |
+|---------------------------------------------|----------|-----------|----------|
+| Vanilla                                     | 1.482mb  | 0.495μs   | 0.19x    | 
+| Vanilla with errors                         | 1.482mb  | 0.509μs   | 0.19x    |
+| No code generation, cache form instances    | 1.791mb  | 5.538μs   | 2.12x    |
+| No code generation, cache, with errors      | 1.482mb  | 6.742μs   | 2.58x    | 
+| No code generation, no cache                | 1.791mb  | 20.468μs  | 7.84x    |
+| No code generation, no cache, with errors   | 1.482mb  | 22.006μs  | 8.42x    |
+| With code generation and cache              | 1.689mb  | 2.613μs   | 1.00x    |
+| With code generation, cache, with errors    | 1.482mb  | 4.077μs   | 1.56x    |
+| With code generation, no cache              | 4.673mb  | 13.161μs  | 5.04x    |
+| With code generation, no cache, with errors | 4.651mb  | 12.392μs  | 4.74x    |
+| Symfony                                     | 56.034mb | 450.770μs | 172.44x  |
+| Symfony with errors                         | 58.391mb | 454.488μs | 173.98x  |
+
 ## License
 
 This library is licensed under the [MIT license](LICENSE).
