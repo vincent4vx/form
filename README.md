@@ -1156,6 +1156,325 @@ class Functions
 **See also:**
 - [Custom validators](#the-quick-and-dirty-way) describes how to create a custom validator
 
+### Transformation
+
+#### ArrayCast
+
+Source: [src/Transformer/Field/ArrayCast.php](src/Transformer/Field/ArrayCast.php)
+
+Cast values of an array
+
+The performed cast is a fail-safe operation :
+- if the value cannot be cast, `null` will be returned
+- in case of numeric type, invalid string will return 0 (or 0.0 on float)
+
+Transformation to HTTP value will simply cast non-null value to array.
+
+**Example:**
+
+```php
+class MyForm
+{
+    #[ArrayCast(CastType::Int)]
+    public array $foo;
+    
+    // Ignore original keys : the result will be a list of floats
+    #[ArrayCast(CastType::Float, preserveKeys: false)]
+    public array $bar;
+}
+```
+
+**Constructor:**
+
+| Parameter      | Description                                                                 |
+|----------------|-----------------------------------------------------------------------------|
+| `elementType`  | The type to cast to. Should be one of the constants of the `CastType` item. |
+| `preserveKeys` | Whether to preserve the original keys of the array.                         |
+
+#### Cast
+
+Source: [src/Transformer/Field/Cast.php](src/Transformer/Field/Cast.php)
+
+Cast HTTP value to target type
+
+This transformer is automatically added on typed properties
+The performed cast is a fail-safe operation :
+- if the value cannot be cast, `null` will be returned
+- in case of numeric type, invalid string will return 0 (or 0.0 on float)
+
+Transformation to HTTP value will simply assume the value is already a normalized value
+
+**Example:**
+
+```php
+class MyForm
+{
+    #[Cast(CastType::Int)]
+    public $foo;
+    
+    // By default, the cast is performed on the property type, so it's not needed here
+    public float $bar;
+}
+```
+
+#### Csv
+
+Source: [src/Transformer/Field/Csv.php](src/Transformer/Field/Csv.php)
+
+Transform a CSV string to an array.
+This transformer use an implementation of [RFC 4180](https://www.rfc-editor.org/rfc/rfc4180), so it supports quoted values.
+
+**Example:**
+
+```php
+class MyForm
+{
+    // Will transform "foo,bar,baz" to ["foo", "bar", "baz"]
+    #[Csv]
+    public array $foo;
+
+    // You can specify separator
+    #[Csv(separator: ';')]
+    public array $bar;
+
+    // You can use ArrayCast to cast values
+    #[Csv, ArrayCast(CastType::INT)]
+    public array $baz;
+}
+```
+
+**Constructor:**
+
+| Parameter   | Description                                                              |
+|-------------|--------------------------------------------------------------------------|
+| `separator` | The separator to use to split the CSV string. Defaults to a comma (`,`). |
+| `enclosure` | The enclosure to use to quote values. Defaults to a none.                |
+
+#### DateTimeTransformer
+
+Source: [src/Transformer/Field/DateTimeTransformer.php](src/Transformer/Field/DateTimeTransformer.php)
+
+Transform a date from a string to a `DateTimeInterface` object.
+
+**Example:**
+
+```php
+class MyForm
+{
+    // Parse an HTML5 datetime-local input
+    #[DateTimeTransformer]
+    public ?DateTimeInterface $date;
+
+    // Use a custom format, class, and timezone
+    #[DateTimeTransformer(class: DateTime::class, format: 'd/m/Y', timezone: 'Europe/Paris')]
+    public ?DateTime $date;
+}
+```
+
+**Constructor:**
+
+| Parameter  | Description                                                                                 |
+|------------|---------------------------------------------------------------------------------------------|
+| `format`   | The format to use to parse the date. Defaults to `Y-m-d\TH:i:sP`.                           |
+| `timezone` | The timezone to use to parse the date. By default keep the current timezone.                |
+| `class`    | The class to use to create the `DateTimeInterface` object. Defaults to `DateTimeImmutable`. |
+
+#### DefaultValue
+
+Source: [src/Transformer/Field/DefaultValue.php](src/Transformer/Field/DefaultValue.php)
+
+Defines a default value for a field.
+
+The default value is used when the field is not submitted.
+This transformer will be automatically added to the field if the default value is not null.
+You can define this transformer explicitly to ignore the default behavior.
+
+> Note: Be careful of the transformer order. If this attribute is defined before other transformers, the value should be an HTTP (i.e. not transformed) value.
+> If this attribute is defined after other transformers, the value should be a PHP (i.e. transformed) value.
+
+**Example:**
+
+```php
+class MyForm
+{
+    public int $implicit = 42; // Implicitly define the default value. Will be applied after all other transformers.
+
+    #[DefaultValue(12.3)] // Explicitly define the default value. Default property value will be ignored.
+    public float $explicit = 0.0;
+
+    #[DefaultValue('foo,bar')] // When defined before other transformers, the value should be an HTTP value.
+    #[Csv]
+    public array $values;
+}
+```
+
+#### Enum
+
+Source: [src/Transformer/Field/Enum.php](src/Transformer/Field/Enum.php)
+
+Transform a value to its corresponding enum instance.
+It supports both `UnitEnum` and `BackedEnum`, and resolve the enum instance using the value or the name.
+
+To define labels for the choices, implements the interface `LabelInterface` on the enum class.
+
+> Note: This transformer is case-sensitive
+
+**Example:**
+
+```php
+class MyForm
+{
+    // If MyEnum is a UnitEnum, the name will be used to get the enum instance
+    // Else, the value will be used
+    // If the value is not found, the field will be considered as invalid
+    #[Enum(MyEnum::class)]
+    public ?MyEnum $myEnum;
+
+    // Use the name instead of the value on BackedEnum
+    #[Enum(MyEnum::class, useName: true)]
+    public ?MyEnum $byName;
+
+    // If the value is not found, the field will be set to null without error
+    #[Enum(MyEnum::class, errorOnInvalid: false)]
+    public ?MyEnum $noError;
+}
+```
+
+**Constructor:**
+
+| Parameter        | Description                                                                                                                                                  |
+|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `class`          | The enum class to use.                                                                                                                                       |
+| `useName`        | Always use the name to get the enum instance. This option is only used for `BackedEnum`.  Defaults to `false`.                                               |
+| `errorOnInvalid` | If true, the field will be considered invalid if the value is not a valid choice. If false, the field will be set to null without error. Defaults to `true`. |
+| `errorMessage`   | The error message to use if the value is not found. Use `{{ value }}` as placeholder for the input value.                                                    |
+
+#### Json
+
+Source: [src/Transformer/Field/Json.php](src/Transformer/Field/Json.php)
+
+Parse JSON string to PHP value.
+
+> Note: Transformation will fail if the JSON is invalid. Use `TransformationError` to change this behavior.
+
+**Example:**
+
+```php
+class MyRequest
+{
+    #[Json] // By default, JSON objects will be returned as associative arrays.
+    public ?array $myArray;
+
+    #[Json(assoc: false, depth: 5)] // JSON objects will be returned as stdClass, and limit the depth to 5.
+    public ?object $myObject;
+
+    #[Json(encodeOptions: JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)] // Change the display of the JSON.
+    public mixed $pretty;
+    
+    // Use ArrayShape to validate the JSON structure
+    #[Json, ArrayShape(['foo' => 'string', 'bar' => 'int'])] 
+    public array $withShape;
+}
+```
+
+**Constructor:**
+
+| Parameter       | Description                                                                       |
+|-----------------|-----------------------------------------------------------------------------------|
+| `assoc`         | If true, JSON objects will be returned as associative arrays. Defaults to `true`. |
+| `depth`         | User specified recursion depth. Defaults to `512`.                                |
+| `parseOptions`  | Flags passed to `json_decode()`, used when transforming from HTTP.                |
+| `encodeOptions` | Flags passed to `json_encode()`, used when transforming to HTTP.                  |
+
+**See also:**
+- [ArrayShape](#arrayshape) to validate the JSON structure.
+
+#### TransformEach
+
+Source: [src/Transformer/Field/TransformEach.php](src/Transformer/Field/TransformEach.php)
+
+Apply transformers on each element of an array.
+If the input value is not and array, it will be transformed as an array before applying the transformers.
+
+**Example:**
+
+```php
+class MyForm
+{
+    #[TransformEach([
+        new Trim(),
+        new Csv(separator: ';'),
+    ])]
+    public ?array $tags = null;
+}
+```
+
+**Constructor:**
+
+| Parameter              | Description                                                                                                                                                                       |
+|------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `transformers`         | The list of transformers to apply on each element of the array.                                                                                                                   |
+| `handleElementsErrors` | If true, transformation process will continue even if a sub-transformer fails, and errors will be aggregated and reported on the field as array, for more precise error handling. |
+
+#### Trim
+
+Source: [src/Transformer/Field/Trim.php](src/Transformer/Field/Trim.php)
+
+Trim the input value.
+
+This transformer will remove all spaces at the beginning and at the end of the value.
+The transformation is only applied when transforming from HTTP.
+
+**Example:**
+
+```php
+class MyForm
+{
+    #[Trim]
+    public ?string $myString = null;
+}
+```
+
+#### TransformationError
+
+Source: [src/Transformer/Field/TransformationError.php](src/Transformer/Field/TransformationError.php)
+
+Configure error handling of transformation error.
+
+By default, when transformation fails, the field will be considered as invalid, 
+and the error message will be set to the error message of the first transformer that failed.
+
+> Note: this is not a transformer, but a configuration class.
+
+**Example:**
+
+```php
+class MyForm
+{
+    // You can customize the error message, and code, just like validation errors
+    #[TransformationError(message: 'This JSON is invalid', code: 'f59e2415-0b70-4177-9bc1-66ebbb65c75c'), Json]
+    public string $json;
+
+    // Fail silently: the field will be set to null, and no error will be displayed
+    #[TransformationError(ignore: true), Json]
+    public ?string $foo;
+
+    // Keep the original value instead of setting it to null
+    #[TransformationError(ignore: true, keepOriginalValue: true), Json]
+    public mixed $bar;
+}
+```
+
+**Constructor:**
+
+| Parameter           | Description                                                                                                                       |
+|---------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `ignore`            | If true, the field will be set to null, and no error will be displayed. Defaults to `false`.                                      |
+| `keepOriginalValue` | If true, the original value will be kept instead of setting it to null. Defaults to `false`.                                      |
+| `message`           | The error message to use, in replacement of the transformer error message.                                                        |
+| `code`              | The error code to use.                                                                                                            |
+| `hideSubErrors`     | If true, transformation errors raised using `TransformerException` will be hidden, and a generic error will be displayed instead. |
+
 ## Internal working
 
 The process of validating and hydrating a form is divided into 3 steps, plus a fourth optional step:

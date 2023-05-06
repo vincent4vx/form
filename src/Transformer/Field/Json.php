@@ -38,6 +38,7 @@ use function json_last_error_msg;
  *     #[Json(encodeOptions: JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)] // Change the display of the JSON.
  *     public mixed $pretty;
  * }
+ * </code>
  *
  * @see json_encode() Used when transforming to HTTP.
  * @see json_decode() Used when transforming from HTTP.

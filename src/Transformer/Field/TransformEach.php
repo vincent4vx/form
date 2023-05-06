@@ -19,6 +19,7 @@ use Quatrevieux\Form\RegistryInterface;
  *     ])]
  *     public ?array $tags = null;
  * }
+ * </code>
  */
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 final class TransformEach implements DelegatedFieldTransformerInterface

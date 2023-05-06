@@ -12,6 +12,24 @@ use Quatrevieux\Form\Util\Expr;
 /**
  * Implementation of RFC-4180 CSV format
  *
+ * Usage:
+ * <code>
+ * class MyForm
+ * {
+ *     // Will transform "foo,bar,baz" to ["foo", "bar", "baz"]
+ *     #[Csv]
+ *     public array $foo;
+ *
+ *     // You can specify separator
+ *     #[Csv(separator: ';')]
+ *     public array $bar;
+ *
+ *     // You can use ArrayCast to cast values
+ *     #[Csv, ArrayCast(CastType::INT)]
+ *     public array $baz;
+ * }
+ * </code>
+ *
  * @see https://www.rfc-editor.org/rfc/rfc4180
  *
  * @implements FieldTransformerGeneratorInterface<self>
@@ -20,7 +38,18 @@ use Quatrevieux\Form\Util\Expr;
 final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorInterface
 {
     public function __construct(
+        /**
+         * Separator character
+         * It must be a single character
+         */
         private readonly string $separator = ',',
+
+        /**
+         * Enclosure character
+         * It must be a single character, or an empty string
+         *
+         * This character is used to enclose fields containing special characters
+         */
         private readonly string $enclosure = '',
     ) {
     }

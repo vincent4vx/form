@@ -9,6 +9,24 @@ use Quatrevieux\Form\Transformer\TransformerException;
 /**
  * Configure error handling of transformation error
  *
+ * Usage:
+ * <code>
+ * class MyForm
+ * {
+ *     // You can customize the error message, and code, just like validation errors
+ *     #[TransformationError(message: 'This JSON is invalid', code: 'f59e2415-0b70-4177-9bc1-66ebbb65c75c'), Json]
+ *     public string $json;
+ *
+ *     // Fail silently: the field will be set to null, and no error will be displayed
+ *     #[TransformationError(ignore: true), Json]
+ *     public ?string $foo;
+ *
+ *     // Keep the original value instead of setting it to null
+ *     #[TransformationError(ignore: true, keepOriginalValue: true), Json]
+ *     public mixed $bar;
+ * }
+ * </code>
+ *
  * @see FieldTransformerInterface::transformFromHttp()
  * @see TransformationResult
  */
