@@ -40,6 +40,12 @@
         "psr/http-message": "^2.0"
     },
     "suggest": {
-        "symfony/security-csrf": "For use Csrf component"
+        "symfony/security-csrf": "For use Csrf component",
+        "psr/http-message": "For use UploadedFile constraint"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
     }
 }
