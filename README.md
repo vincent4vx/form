@@ -122,6 +122,49 @@ if ($submitted->valid()) {
 }
 ```
 
+### Embedded forms
+
+You can embed forms into other forms, using the `Embedded` or `ArrayOf` components.
+
+```php
+use Quatrevieux\Form\Embedded\ArrayOf;
+use Quatrevieux\Form\Embedded\Embedded;
+use Quatrevieux\Form\Validator\Constraint\Length;
+use Quatrevieux\Form\Validator\Constraint\PasswordStrength;
+
+class User
+{
+    #[Length(min: 3, max: 12)]
+    public string $pseudo;
+
+    // Use the Embedded attribute component to embed a form into another form
+    // Note: you can mark the property as nullable to make it optional
+    #[Embedded(Credentials::class)]
+    public Credentials $credentials;
+
+    // Works in the same way for arrays by using the ArrayOf attribute
+    #[ArrayOf(Address::class)]
+    public array $addresses;
+}
+
+class Credentials
+{
+    #[Length(min: 3, max: 256)]
+    public string $username;
+
+    #[PasswordStrength]
+    public string $password;
+}
+
+class Address
+{
+    public string $street;
+    public string $city;
+    public string $zipCode;
+    public string $country;
+}
+```
+
 ### Custom validator
 
 The library provides a set of built-in validators, as you can see [here](#validation), but you in a real-world application, 
@@ -1474,6 +1517,82 @@ class MyForm
 | `message`           | The error message to use, in replacement of the transformer error message.                                                        |
 | `code`              | The error code to use.                                                                                                            |
 | `hideSubErrors`     | If true, transformation errors raised using `TransformerException` will be hidden, and a generic error will be displayed instead. |
+
+### Components
+
+#### Checkbox
+
+Source: [src/Component/Checkbox.php](src/Component/Checkbox.php)
+
+Handle HTTP checkbox input.
+
+The field value is true when a value is present in the HTTP request and is equal to the given httpValue (default to "1").
+The field value is false when the value is not present in the HTTP request or is not equal to the given httpValue.
+So, the field value is always a non-nullable boolean.
+
+> Note: the http value will be cast to string before comparison.
+
+**Example:**
+
+```php
+final class MyForm
+{
+    #[Checkbox]
+    public bool $isAccepted;
+
+    // You can also define a custom http value
+    #[Checkbox(httpValue: 'yes')]
+    public bool $withCustomHttpValue;
+
+    // You can use validator to ensure the field is checked (or any other validation)
+    #[Checkbox, IsIdenticalTo(true, message: 'You must check this box')]
+    public bool $mustBeChecked;
+}
+```
+
+#### Csrf
+
+Source: [src/Component/Csrf/Csrf.php](src/Component/Csrf/Csrf.php)
+
+Add a token to the form to prevent CSRF attacks.
+
+To use this constraint, you must have the Symfony Security component installed (i.e. [symfony/security-csrf](https://symfony.com/doc/current/security/csrf.html)).
+and register the `CsrfManager` service in the form registry.
+
+The CSRF token can be regenerated on each request by setting the "refresh" option to true.
+
+**Example:**
+
+```php
+class MyForm
+{
+    // The CSRF token will be generated once per session
+    // Required constraint as no effect here : csrf token is always validated
+    #[Csrf]
+    public string $csrf;
+
+    // The CSRF token will be regenerated on each request
+    #[Csrf(refresh: true)]
+    public string $csrfRefresh;
+}
+
+// Add CsrfManager to the form registry (use PSR-11 container in this example)
+$container->register(new CsrfManager($container->get(CsrfTokenManagerInterface::class)));
+$registry = new ContainerRegistry($container);
+$factory = DefaultFormFactory::create($registry);
+
+// Create and submit the form
+$form = $factory->create(MyForm::class);
+$submitted = $form->submit($_POST);
+```
+
+**Constructor:**
+
+| Parameter | Description                                                                       |
+|-----------|-----------------------------------------------------------------------------------|
+| `id`      | The CSRF token id. Defaults to `form`.                                            |
+| `refresh` | If true, the CSRF token will be regenerated on each request. Defaults to `false`. |
+| `message` | The error message to use. Defaults to `Invalid CSRF token`.                       |
 
 ## Internal working
 
