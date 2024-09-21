@@ -2,7 +2,6 @@
 
 namespace Bench;
 
-use Bench\Fixtures\AggregatedForm;
 use Bench\Fixtures\SimpleForm;
 use Bench\Fixtures\SimpleFormSymfony;
 use Bench\Fixtures\SimpleFormVanilla;

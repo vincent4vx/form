@@ -18,17 +18,17 @@ final class GeneratedDataMapperFactory extends AbstractGeneratedFactory implemen
      * Fallback data mapper factory
      * Will be lazily instantiated to {@see RuntimeDataMapperFactory} if not provided in constructor
      *
-     * @var DataMapperFactoryInterface
+     * @var DataMapperFactoryInterface|null
      */
-    private readonly DataMapperFactoryInterface $factory;
+    private ?DataMapperFactoryInterface $factory = null;
 
     /**
      * Code generator
      * Will be lazily instantiated if not provided in constructor
      *
-     * @var DataMapperGenerator
+     * @var DataMapperGenerator|null
      */
-    private readonly DataMapperGenerator $generator;
+    private ?DataMapperGenerator $generator = null;
 
     /**
      * @param DataMapperFactoryInterface|null $factory Fallback data mapper factory. If not provided, will be lazily instantiated to {@see RuntimeDataMapperFactory}.
@@ -74,7 +74,6 @@ final class GeneratedDataMapperFactory extends AbstractGeneratedFactory implemen
      */
     protected function createRuntime(string $dataClass): DataMapperInterface
     {
-        // @phpstan-ignore-next-line
         $factory = $this->factory ??= new RuntimeDataMapperFactory();
         return $factory->create($dataClass);
     }
@@ -84,7 +83,6 @@ final class GeneratedDataMapperFactory extends AbstractGeneratedFactory implemen
      */
     protected function generate(string $generatedClassName, object $runtime): ?string
     {
-        // @phpstan-ignore-next-line
         $generator = $this->generator ??= new DataMapperGenerator();
         return $generator->generate($generatedClassName, $runtime);
     }

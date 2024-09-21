@@ -4,14 +4,10 @@ namespace Quatrevieux\Form\Transformer\Field;
 
 use Attribute;
 use InvalidArgumentException;
-
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
-
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
-
 use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
-
 use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\Validator\Constraint\ArrayShape;
 

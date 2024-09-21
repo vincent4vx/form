@@ -8,9 +8,7 @@ use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Transformer\TransformerException;
-
 use Quatrevieux\Form\Util\Call;
-
 use Quatrevieux\Form\Util\Code;
 
 use function is_array;

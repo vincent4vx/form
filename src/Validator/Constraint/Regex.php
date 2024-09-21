@@ -6,7 +6,6 @@ use Attribute;
 use InvalidArgumentException;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
-
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;

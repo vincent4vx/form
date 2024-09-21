@@ -20,12 +20,12 @@ class FormViewInstantiatorClassTest extends TestCase
 
 class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewInstantiatorInterface
 {
-    function submitted(array $value, array $errors, string $rootField = null): Quatrevieux\Form\View\FormView
+    function submitted(array $value, array $errors, ?string $rootField = null): Quatrevieux\Form\View\FormView
     {
         return $rootField === null ? new \Quatrevieux\Form\View\FormView([], $value) :  new \Quatrevieux\Form\View\FormView([], $value);
     }
 
-    function default(string $rootField = null): Quatrevieux\Form\View\FormView
+    function default(?string $rootField = null): Quatrevieux\Form\View\FormView
     {
         return $rootField === null ? new \Quatrevieux\Form\View\FormView([], []) :  new \Quatrevieux\Form\View\FormView([], []);
     }
@@ -57,12 +57,12 @@ class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewIns
 {
     private $foo;
 
-    function submitted(array $value, array $errors, string $rootField = null): Quatrevieux\Form\View\FormView
+    function submitted(array $value, array $errors, ?string $rootField = null): Quatrevieux\Form\View\FormView
     {
         return $rootField === null ? new \Quatrevieux\Form\View\FormView([], $value) :  new \Quatrevieux\Form\View\FormView([], $value);
     }
 
-    function default(string $rootField = null): Quatrevieux\Form\View\FormView
+    function default(?string $rootField = null): Quatrevieux\Form\View\FormView
     {
         return $rootField === null ? new \Quatrevieux\Form\View\FormView([], []) :  new \Quatrevieux\Form\View\FormView([], []);
     }
@@ -94,12 +94,12 @@ PHP,
 
 class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewInstantiatorInterface
 {
-    function submitted(array $value, array $errors, string $rootField = null): Quatrevieux\Form\View\FormView
+    function submitted(array $value, array $errors, ?string $rootField = null): Quatrevieux\Form\View\FormView
     {
         return $rootField === null ? new \Quatrevieux\Form\View\FormView(['foo' => create_field($value['_foo'] ?? null, $errors['foo'] ?? null, null)], $value) :  new \Quatrevieux\Form\View\FormView(['foo' => create_field($value['_foo'] ?? null, $errors['foo'] ?? null, $rootField)], $value);
     }
 
-    function default(string $rootField = null): Quatrevieux\Form\View\FormView
+    function default(?string $rootField = null): Quatrevieux\Form\View\FormView
     {
         return $rootField === null ? new \Quatrevieux\Form\View\FormView(['foo' => create_field(null, null, null)], []) :  new \Quatrevieux\Form\View\FormView(['foo' => create_field(null, null, $rootField)], []);
     }
@@ -131,12 +131,12 @@ PHP,
 
 class GeneratedFormViewInstantiator implements Quatrevieux\Form\View\FormViewInstantiatorInterface
 {
-    function submitted(array $value, array $errors, string $rootField = null): Quatrevieux\Form\View\FormView
+    function submitted(array $value, array $errors, ?string $rootField = null): Quatrevieux\Form\View\FormView
     {
         return $rootField === null ? new \Quatrevieux\Form\View\FormView([create_field($value['0'] ?? null, $errors[0] ?? null, "{}[0]"), create_field($value['1'] ?? null, $errors[1] ?? null, "{}[1]")], $value) :  new \Quatrevieux\Form\View\FormView([create_field($value['0'] ?? null, $errors[0] ?? null, "{$rootField}[0]"), create_field($value['1'] ?? null, $errors[1] ?? null, "{$rootField}[1]")], $value);
     }
 
-    function default(string $rootField = null): Quatrevieux\Form\View\FormView
+    function default(?string $rootField = null): Quatrevieux\Form\View\FormView
     {
         return $rootField === null ? new \Quatrevieux\Form\View\FormView([create_field(null, null, "{}[0]"), create_field(null, null, "{}[1]")], []) :  new \Quatrevieux\Form\View\FormView([create_field(null, null, "{$rootField}[0]"), create_field(null, null, "{$rootField}[1]")], []);
     }

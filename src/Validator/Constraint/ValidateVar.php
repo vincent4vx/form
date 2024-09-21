@@ -5,9 +5,7 @@ namespace Quatrevieux\Form\Validator\Constraint;
 use Attribute;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Validator\FieldError;
-
 use Quatrevieux\Form\Validator\Generator\ConstraintValidatorGeneratorInterface;
-
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpression;
 use Quatrevieux\Form\Validator\Generator\FieldErrorExpressionInterface;
 use Quatrevieux\Form\Validator\Generator\ValidatorGenerator;

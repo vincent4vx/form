@@ -19,17 +19,17 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
      * Fallback instantiator factory
      * Will be lazily instantiated to {@see RuntimeValidatorFactory} if not provided in constructor
      *
-     * @var ValidatorFactoryInterface
+     * @var ValidatorFactoryInterface|null
      */
-    private readonly ValidatorFactoryInterface $factory;
+    private ?ValidatorFactoryInterface $factory = null;
 
     /**
      * Code generator
      * Will be lazily instantiated if not provided in constructor
      *
-     * @var ValidatorGenerator
+     * @var ValidatorGenerator|null
      */
-    private readonly ValidatorGenerator $generator;
+    private ?ValidatorGenerator $generator = null;
     private readonly RegistryInterface $registry;
 
     /**
@@ -79,7 +79,6 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
      */
     protected function createRuntime(string $dataClass): ValidatorInterface
     {
-        // @phpstan-ignore-next-line
         $factory = $this->factory ??= new RuntimeValidatorFactory($this->registry);
         return $factory->create($dataClass);
     }
@@ -90,7 +89,6 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
     protected function generate(string $generatedClassName, object $runtime): ?string
     {
         if ($runtime instanceof RuntimeValidator) {
-            // @phpstan-ignore-next-line
             $generator = $this->generator ??= new ValidatorGenerator($this->registry);
             return $generator->generate($generatedClassName, $runtime);
         }

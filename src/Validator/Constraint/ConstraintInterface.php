@@ -20,6 +20,7 @@ interface ConstraintInterface
      * For example, a constraint `Foo` must have the code `e9ecc757-fa94-5487-8468-2917e92cae21`
      *
      * @see FieldError::$code
+     * @var string
      */
     public const CODE = 'bb8ebf72-1310-4d65-bdb5-9192708543ee';
 

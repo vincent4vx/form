@@ -13,7 +13,6 @@ use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\View\ChoiceView;
 use Quatrevieux\Form\View\LabelInterface;
 use Quatrevieux\Form\View\Provider\FieldChoiceProviderInterface;
-
 use ReflectionEnum;
 use Stringable;
 use UnitEnum;

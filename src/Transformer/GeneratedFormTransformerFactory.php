@@ -19,17 +19,17 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
      * Fallback transformer factory
      * Will be lazily initialized to {@see RuntimeFormTransformerFactory} if not passed in constructor
      *
-     * @var FormTransformerFactoryInterface
+     * @var FormTransformerFactoryInterface|null
      */
-    private readonly FormTransformerFactoryInterface $factory;
+    private ?FormTransformerFactoryInterface $factory = null;
 
     /**
      * Code generator
      * Will be lazily initialized if not passed in constructor
      *
-     * @var FormTransformerGenerator
+     * @var FormTransformerGenerator|null
      */
-    private readonly FormTransformerGenerator $generator;
+    private ?FormTransformerGenerator $generator = null;
     private readonly RegistryInterface $registry;
 
     /**
@@ -78,7 +78,6 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
      */
     protected function createRuntime(string $dataClass): FormTransformerInterface
     {
-        // @phpstan-ignore-next-line
         $factory = $this->factory ??= new RuntimeFormTransformerFactory($this->registry);
         return $factory->create($dataClass);
     }
@@ -92,7 +91,6 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
             return null;
         }
 
-        // @phpstan-ignore-next-line
         $generator = $this->generator ??= new FormTransformerGenerator($this->registry);
         return $generator->generate($generatedClassName, $runtime);
     }

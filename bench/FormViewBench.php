@@ -2,11 +2,9 @@
 
 namespace Bench;
 
-use Bench\Fixtures\AggregatedForm;
 use Bench\Fixtures\SimpleForm;
 use Bench\Fixtures\SimpleFormSymfony;
 use Bench\Fixtures\SimpleFormTemplate;
-use Bench\Fixtures\SimpleFormVanilla;
 use PhpBench\Attributes\AfterClassMethods;
 use PhpBench\Attributes\Groups;
 use PhpBench\Attributes\Iterations;

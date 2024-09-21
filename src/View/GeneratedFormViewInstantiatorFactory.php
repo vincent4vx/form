@@ -19,17 +19,17 @@ final class GeneratedFormViewInstantiatorFactory extends AbstractGeneratedFactor
      * Fallback view instantiator factory
      * Will be lazily initialized to {@see RuntimeFormViewInstantiatorFactory} if not passed in constructor
      *
-     * @var FormViewInstantiatorFactoryInterface
+     * @var FormViewInstantiatorFactoryInterface|null
      */
-    private readonly FormViewInstantiatorFactoryInterface $factory;
+    private ?FormViewInstantiatorFactoryInterface $factory = null;
 
     /**
      * Code generator
      * Will be lazily initialized if not passed in constructor
      *
-     * @var FormViewInstantiatorGenerator
+     * @var FormViewInstantiatorGenerator|null
      */
-    private readonly FormViewInstantiatorGenerator $generator;
+    private ?FormViewInstantiatorGenerator $generator = null;
     private readonly RegistryInterface $registry;
 
     /**
@@ -78,7 +78,6 @@ final class GeneratedFormViewInstantiatorFactory extends AbstractGeneratedFactor
      */
     protected function createRuntime(string $dataClass): object
     {
-        // @phpstan-ignore-next-line
         $factory = $this->factory ??= new RuntimeFormViewInstantiatorFactory($this->registry);
 
         return $factory->create($dataClass);
@@ -93,7 +92,6 @@ final class GeneratedFormViewInstantiatorFactory extends AbstractGeneratedFactor
             return null;
         }
 
-        // @phpstan-ignore-next-line
         $generator = $this->generator ??= new FormViewInstantiatorGenerator($this->registry);
 
         return $generator->generate($generatedClassName, $runtime);
