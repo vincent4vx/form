@@ -48,7 +48,7 @@ class CsvTest extends FormTestCase
     public function test_generateTransformFromHttp()
     {
         $generator = new FormTransformerGenerator(new DefaultRegistry());
-        $this->assertSame('(is_string($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? str_getcsv($__tmp_4e6c78d168de10f915401b0dad567ede, \',\', \'\', \'\') : null)', (new Csv())->generateTransformFromHttp(new Csv(), '$data["foo"]', $generator));
+        $this->assertSame('(is_string($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? explode(\',\', $__tmp_4e6c78d168de10f915401b0dad567ede) : null)', (new Csv())->generateTransformFromHttp(new Csv(), '$data["foo"]', $generator));
         $this->assertSame('(is_string($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? str_getcsv($__tmp_4e6c78d168de10f915401b0dad567ede, \';\', \'"\', \'\') : null)', (new Csv())->generateTransformFromHttp(new Csv(separator: ';', enclosure: '"'), '$data["foo"]', $generator));
     }
 

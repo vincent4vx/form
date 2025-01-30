@@ -205,7 +205,7 @@ class TestingTransformerWithTransformers extends Quatrevieux\Form\Transformer\Ab
     {
         $errors = [];
         $transformed = [
-            'foo' => (($__tmp_0f0c348b6cd003c8ae635417270d3a4d = (is_string($__tmp_5c44ecf262daa39f16eef451ec5e7c55 = $value['f_o_o'] ?? null) ? str_getcsv($__tmp_5c44ecf262daa39f16eef451ec5e7c55, ',', '', '') : null)) !== null ? (array) $__tmp_0f0c348b6cd003c8ae635417270d3a4d : null),
+            'foo' => (($__tmp_0fffb5b26202c431a521fa50e329d3a7 = (is_string($__tmp_5c44ecf262daa39f16eef451ec5e7c55 = $value['f_o_o'] ?? null) ? explode(',', $__tmp_5c44ecf262daa39f16eef451ec5e7c55) : null)) !== null ? (array) $__tmp_0fffb5b26202c431a521fa50e329d3a7 : null),
             'bar' => (is_scalar($__tmp_f36c42ca1e803ec1f4684adea78ba7dc = $value['b_a_r'] ?? null) ? (int) $__tmp_f36c42ca1e803ec1f4684adea78ba7dc : null),
         ];
 
@@ -223,7 +223,7 @@ class TestingTransformerWithTransformers extends Quatrevieux\Form\Transformer\Ab
     public function transformFieldFromHttp(string $fieldName, mixed $value): mixed
     {
         return match ($fieldName) {
-            'foo' => (($__tmp_7869df1446e84ddec6851bb0b3e099e3 = (is_string($__tmp_7d0596c36891967f3bb9d994b4a97c19 = $value) ? str_getcsv($__tmp_7d0596c36891967f3bb9d994b4a97c19, ',', '', '') : null)) !== null ? (array) $__tmp_7869df1446e84ddec6851bb0b3e099e3 : null),
+            'foo' => (($__tmp_488404a3e5df42d739b3d477995ec3d2 = (is_string($__tmp_7d0596c36891967f3bb9d994b4a97c19 = $value) ? explode(',', $__tmp_7d0596c36891967f3bb9d994b4a97c19) : null)) !== null ? (array) $__tmp_488404a3e5df42d739b3d477995ec3d2 : null),
             'bar' => (is_scalar($__tmp_7d0596c36891967f3bb9d994b4a97c19 = $value) ? (int) $__tmp_7d0596c36891967f3bb9d994b4a97c19 : null),
         };
     }
@@ -820,7 +820,7 @@ PHP
     {
         $generator = new FormTransformerGenerator(new DefaultRegistry());
 
-        $this->assertSame('(is_string($__tmp_72c574c21812108f20992797675b2810 = $foo["bar"] ?? null) ? str_getcsv($__tmp_72c574c21812108f20992797675b2810, \',\', \'\', \'\') : null)', $generator->generateTransformFromHttp(new Csv(), '$foo["bar"] ?? null'));
+        $this->assertSame('(is_string($__tmp_72c574c21812108f20992797675b2810 = $foo["bar"] ?? null) ? explode(\',\', $__tmp_72c574c21812108f20992797675b2810) : null)', $generator->generateTransformFromHttp(new Csv(), '$foo["bar"] ?? null'));
     }
 
     public function test_generateToHttp()

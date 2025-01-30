@@ -34,7 +34,7 @@ class FieldErrorTest extends TestCase
     {
         $error = new FieldError('bar {{ foo }}', ['foo' => 'baz']);
         $newError = $error->withTranslator(new class implements TranslatorInterface {
-            public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
+            public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
                 return 'translated';
             }

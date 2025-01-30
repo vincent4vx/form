@@ -9,6 +9,12 @@ use Quatrevieux\Form\Util\Call;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Util\Expr;
 
+use function explode;
+use function implode;
+use function is_array;
+use function is_string;
+use function str_getcsv;
+
 /**
  * Implementation of RFC-4180 CSV format
  *
@@ -63,6 +69,10 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
             return null;
         }
 
+        if (!$this->enclosure) {
+            return explode($this->separator, $value);
+        }
+
         return str_getcsv($value, $this->separator, $this->enclosure, '');
     }
 
@@ -95,10 +105,17 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
      */
     public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
+        if ($transformer->enclosure) {
+            return Code::expr($previousExpression)->storeAndFormat(
+                "(is_string({}) ? str_getcsv({}, {separator}, {enclosure}, '') : null)",
+                separator: $transformer->separator,
+                enclosure: $transformer->enclosure,
+            );
+        }
+
         return Code::expr($previousExpression)->storeAndFormat(
-            "(is_string({}) ? str_getcsv({}, {separator}, {enclosure}, '') : null)",
+            "(is_string({}) ? explode({separator}, {}) : null)",
             separator: $transformer->separator,
-            enclosure: $transformer->enclosure,
         );
     }
 

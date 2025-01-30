@@ -86,7 +86,7 @@ final class FieldError implements JsonSerializable, TranslatableInterface
     /**
      * Translates the error message to the given locale
      */
-    public function trans(TranslatorInterface $translator, string $locale = null): string
+    public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
         // Normalize placeholders parameters
         if ($parameters = $this->parameters) {

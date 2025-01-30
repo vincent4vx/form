@@ -201,7 +201,7 @@ class ArrayTranslator implements TranslatorInterface, LocaleAwareInterface
         $this->translations[$locale][$id] = $translation;
     }
 
-    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
+    public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         $locale = $locale ?? $this->getLocale();
 
