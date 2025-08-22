@@ -510,6 +510,28 @@ on the transformer implementation class (i.e. class which implements `FieldTrans
 
 See library [source code](src/Transformer/Field) for examples.
 
+### Readonly / immutable requests (PHP >= 8.4)
+
+If you want to use readonly properties in your form class, you can do it with some adjustments:
+- All `readonly` properties must **not** be initialized (i.e. no constructor)
+- The properties must be `public(set)` (asymmetric visibility since PHP 8.4) : by default PHP considers `public readonly` properties as `protected(set)`, so you need to explicitly allow setting the property value
+- Default values must be defined using the `DefaultValue` instead of initializing the property
+
+Here's an example of a readonly form class:
+
+```php
+final readonly class MyForm
+{
+    public(set) string $foo;
+
+    #[DefaultValue(42)]
+    public(set) ?int $bar;
+
+    #[Length(min: 3)]
+    public(set) string $baz;
+}
+```
+
 ## API
 
 ### Validation

@@ -6,6 +6,7 @@ use http\Exception\InvalidArgumentException;
 use Quatrevieux\Form\Fixtures\ConfiguredLengthValidator;
 use Quatrevieux\Form\Fixtures\FailingTransformerRequest;
 use Quatrevieux\Form\Fixtures\FooImplementation;
+use Quatrevieux\Form\Fixtures\ReadonlyRequest;
 use Quatrevieux\Form\Fixtures\RequestWithDefaultValue;
 use Quatrevieux\Form\Fixtures\RequiredParametersRequest;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
@@ -350,6 +351,30 @@ class FunctionalTest extends FormTestCase
     public function test_default_value()
     {
         $form = $this->form(RequestWithDefaultValue::class);
+
+        $submitted = $form->submit([]);
+
+        $this->assertTrue($submitted->valid());
+        $this->assertSame(42, $submitted->value()->foo);
+        $this->assertSame('???', $submitted->value()->bar);
+
+        $submitted = $form->submit([
+            'foo' => 123,
+            'bar' => 'abc',
+        ]);
+
+        $this->assertTrue($submitted->valid());
+        $this->assertSame(123, $submitted->value()->foo);
+        $this->assertSame('abc', $submitted->value()->bar);
+    }
+
+    public function test_readonly_request()
+    {
+        if (PHP_VERSION_ID < 80400) {
+            $this->markTestSkipped('Readonly properties are supported since PHP 8.4');
+        }
+
+        $form = $this->form(ReadonlyRequest::class);
 
         $submitted = $form->submit([]);
 
