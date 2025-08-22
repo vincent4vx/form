@@ -2,8 +2,8 @@ parameters:
     level: 9
     paths:
         - src
-    checkGenericClassInNonGenericObjectType: false
     ignoreErrors:
         - '#Call to an undefined( static)? method Quatrevieux\\Form\\Util\\Call#'
         - '#Call to an undefined method Quatrevieux\\Form\\Util\\Expr#'
         - '#Access to an undefined property Quatrevieux\\Form\\Util\\Expr#'
+        - identifier: missingType.generics

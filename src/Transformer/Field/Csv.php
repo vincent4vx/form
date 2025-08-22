@@ -47,6 +47,8 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
         /**
          * Separator character
          * It must be a single character
+         *
+         * @var non-empty-string
          */
         private readonly string $separator = ',',
 

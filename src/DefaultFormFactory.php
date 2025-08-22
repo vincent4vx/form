@@ -3,8 +3,8 @@
 namespace Quatrevieux\Form;
 
 use Closure;
-use Quatrevieux\Form\DataMapper\GeneratedDataMapperFactory;
 use Quatrevieux\Form\DataMapper\DataMapperFactoryInterface;
+use Quatrevieux\Form\DataMapper\GeneratedDataMapperFactory;
 use Quatrevieux\Form\DataMapper\RuntimeDataMapperFactory;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Transformer\GeneratedFormTransformerFactory;
@@ -52,7 +52,7 @@ final class DefaultFormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function import(object $data): FormInterface
+    public function import(object $data): ImportedFormInterface
     {
         return $this->create(get_class($data))->import($data);
     }

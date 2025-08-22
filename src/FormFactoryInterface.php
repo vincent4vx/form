@@ -24,9 +24,9 @@ interface FormFactoryInterface
      *
      * @param T $data DTO instance to import
      *
-     * @return FormInterface<T>
+     * @return ImportedFormInterface<T>
      *
      * @template T as object
      */
-    public function import(object $data): FormInterface;
+    public function import(object $data): ImportedFormInterface;
 }
