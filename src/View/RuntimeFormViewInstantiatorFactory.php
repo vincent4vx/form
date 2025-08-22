@@ -19,8 +19,7 @@ final class RuntimeFormViewInstantiatorFactory implements FormViewInstantiatorFa
 {
     public function __construct(
         private readonly RegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

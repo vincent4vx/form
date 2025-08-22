@@ -26,9 +26,8 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
 {
     public function __construct(
         private readonly FormTransformerFactoryInterface $transformerFactory,
-        private readonly DataMapperFactoryInterface $dataMapperFactory
-    ) {
-    }
+        private readonly DataMapperFactoryInterface $dataMapperFactory,
+    ) {}
 
     /**
      * {@inheritdoc}

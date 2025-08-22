@@ -61,8 +61,7 @@ final class DateTimeTransformer implements FieldTransformerInterface, FieldTrans
          * @var class-string<DateTimeInterface>
          */
         private readonly string $class = DateTimeImmutable::class,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -126,7 +125,7 @@ final class DateTimeTransformer implements FieldTransformerInterface, FieldTrans
         $createDate = Call::static($className)->createFromFormat(
             '!' . $transformer->format,
             $tmpVar,
-            $transformer->timezone ? new DateTimeZone($transformer->timezone) : null
+            $transformer->timezone ? new DateTimeZone($transformer->timezone) : null,
         );
         $createDate .= ' ?: throw ' . Code::new(InvalidArgumentException::class, ['The given value is not a valid date.']);
 

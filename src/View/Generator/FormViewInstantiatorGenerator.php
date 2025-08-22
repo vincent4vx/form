@@ -23,8 +23,7 @@ final class FormViewInstantiatorGenerator
          * @var FieldViewProviderGeneratorInterface<FieldViewProviderConfigurationInterface>
          */
         private readonly FieldViewProviderGeneratorInterface $fallbackFieldViewProviderGenerator = new GenericFieldViewProviderGenerator(),
-    ) {
-    }
+    ) {}
 
     /**
      * Generate the PHP code of the {@see RuntimeFormViewInstantiator} class
@@ -49,7 +48,7 @@ final class FormViewInstantiatorGenerator
                 Expr::this()
                     ->registry
                     ->getTransformerFactory()
-                    ->create($viewInstantiator->dataClassName)
+                    ->create($viewInstantiator->dataClassName),
             );
         }
 

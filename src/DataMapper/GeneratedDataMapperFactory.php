@@ -41,7 +41,7 @@ final class GeneratedDataMapperFactory extends AbstractGeneratedFactory implemen
         parent::__construct(
             $savePathResolver ?? Functions::savePathResolver(),
             $classNameResolver ?? Functions::classNameResolver('DataMapper'),
-            DataMapperInterface::class
+            DataMapperInterface::class,
         );
 
         if ($factory) {

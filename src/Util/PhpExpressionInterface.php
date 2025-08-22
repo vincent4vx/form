@@ -10,6 +10,4 @@ use Stringable;
  *
  * @see Code::raw() To create a new instance of this interface with a simple code string
  */
-interface PhpExpressionInterface extends Stringable
-{
-}
+interface PhpExpressionInterface extends Stringable {}

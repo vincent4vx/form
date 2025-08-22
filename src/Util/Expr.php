@@ -20,8 +20,7 @@ final class Expr implements PhpExpressionInterface
 {
     public function __construct(
         private readonly string $expr,
-    ) {
-    }
+    ) {}
 
     /**
      * Generate property access expression

@@ -10,6 +10,4 @@ namespace Quatrevieux\Form;
  *
  * @see FormInterface::import() For create an imported form
  */
-interface ImportedFormInterface extends FilledFormInterface
-{
-}
+interface ImportedFormInterface extends FilledFormInterface {}

@@ -43,8 +43,7 @@ final class RuntimeFormTransformer implements FormTransformerInterface
          * @var array<string, TransformationError>
          */
         public readonly array $fieldsTransformationErrors,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

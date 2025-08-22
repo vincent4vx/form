@@ -11,9 +11,8 @@ final class ClassType implements TypeInterface
         /**
          * @var class-string
          */
-        private readonly string $class
-    ) {
-    }
+        private readonly string $class,
+    ) {}
 
     /**
      * {@inheritdoc}

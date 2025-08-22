@@ -25,8 +25,7 @@ final class EmbeddedViewProvider implements FieldViewProviderInterface, FieldVie
 {
     public function __construct(
         private readonly FormViewInstantiatorFactoryInterface $instantiatorFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -68,7 +67,7 @@ final class EmbeddedViewProvider implements FieldViewProviderInterface, FieldVie
         return static function (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) use ($instantiatorFactory, $name): string {
             if ($rootFieldNameAccessor) {
                 $name = Code::raw('"{' . $rootFieldNameAccessor . '}[' . $name . ']"');
-                $use = ' use ('.$rootFieldNameAccessor.')';
+                $use = ' use (' . $rootFieldNameAccessor . ')';
             } else {
                 $use = '';
             }
@@ -78,15 +77,15 @@ final class EmbeddedViewProvider implements FieldViewProviderInterface, FieldVie
             $formView = $instantiatorFactory->submitted(
                 Code::raw('$value'),
                 Code::raw('$fieldsErrors'),
-                $name
+                $name,
             );
 
             $closure = Code::expr(
-                'function ($value, $fieldsErrors, $globalError)'.$use.' {' .
-                    '$formView = ' . $formView . ';' .
-                    '$formView->error = $globalError;' .
-                    'return $formView;' .
-                '}'
+                'function ($value, $fieldsErrors, $globalError)' . $use . ' {'
+                    . '$formView = ' . $formView . ';'
+                    . '$formView->error = $globalError;'
+                    . 'return $formView;'
+                . '}',
             );
 
             return $closure(

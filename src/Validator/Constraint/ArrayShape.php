@@ -94,8 +94,7 @@ final class ArrayShape extends SelfValidatedConstraint implements ConstraintVali
          * The error message to display
          */
         public readonly string $message = 'This value does not match the expected array shape.',
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

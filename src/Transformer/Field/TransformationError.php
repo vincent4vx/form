@@ -68,6 +68,5 @@ final class TransformationError
          * @var bool
          */
         public readonly bool $hideSubErrors = false,
-    ) {
-    }
+    ) {}
 }

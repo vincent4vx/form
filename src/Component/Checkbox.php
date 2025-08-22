@@ -52,8 +52,7 @@ final class Checkbox implements FieldTransformerInterface, FieldTransformerGener
 {
     public function __construct(
         private readonly string $httpValue = '1',
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -109,7 +108,7 @@ final class Checkbox implements FieldTransformerInterface, FieldTransformerGener
             $name,
             $configuration->httpValue,
             $error instanceof FieldError ? $error : null,
-            $attributes
+            $attributes,
         );
     }
 
@@ -120,7 +119,7 @@ final class Checkbox implements FieldTransformerInterface, FieldTransformerGener
     {
         return Code::expr($previousExpression)->storeAndFormat(
             'is_scalar({}) && (string) {} === {httpValue}',
-            httpValue: $transformer->httpValue
+            httpValue: $transformer->httpValue,
         );
     }
 
@@ -131,7 +130,7 @@ final class Checkbox implements FieldTransformerInterface, FieldTransformerGener
     {
         return Code::expr($previousExpression)->format(
             '({}) === true ? {httpValue} : null',
-            httpValue: $transformer->httpValue
+            httpValue: $transformer->httpValue,
         );
     }
 
@@ -145,16 +144,16 @@ final class Checkbox implements FieldTransformerInterface, FieldTransformerGener
         // Remove the required attribute : a checkbox field always have a value (true or false)
         unset($attributes['required']);
 
-        return static fn (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) => Code::new(FieldView::class, [
-            $rootFieldNameAccessor ? Code::raw('"{' . $rootFieldNameAccessor. '}[' . $name . ']"') : $name,
+        return static fn(string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) => Code::new(FieldView::class, [
+            $rootFieldNameAccessor ? Code::raw('"{' . $rootFieldNameAccessor . '}[' . $name . ']"') : $name,
             $configuration->httpValue,
             Code::expr($errorAccessor)->isInstanceOfOr(FieldError::class, null),
             $attributes + [
                 'checked' => Code::expr($valueAccessor)->storeAndFormat(
                     'is_scalar({}) && (string) {} === {httpValue}',
-                    httpValue: $configuration->httpValue
+                    httpValue: $configuration->httpValue,
                 ),
-            ]
+            ],
         ]);
     }
 }

@@ -23,9 +23,8 @@ use function is_array;
 final class ArrayOfViewProvider implements FieldViewProviderInterface, FieldViewProviderGeneratorInterface
 {
     public function __construct(
-        private readonly FormViewInstantiatorFactoryInterface $viewInstantiatorFactory
-    ) {
-    }
+        private readonly FormViewInstantiatorFactoryInterface $viewInstantiatorFactory,
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -58,7 +57,7 @@ final class ArrayOfViewProvider implements FieldViewProviderInterface, FieldView
             $fields,
             $value,
             $instantiator->default($name . '[]'),
-            $globalError
+            $globalError,
         );
     }
 
@@ -100,40 +99,40 @@ final class ArrayOfViewProvider implements FieldViewProviderInterface, FieldView
         return static function (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) use ($instantiatorFactory, $name): string {
             $fieldNameExpression = $rootFieldNameAccessor
                 ? Code::raw('"{' . $rootFieldNameAccessor . '}[' . $name . '][{$index}]"')
-                : Code::raw('"'.$name.'[{$index}]"')
+                : Code::raw('"' . $name . '[{$index}]"')
             ;
             $use = $rootFieldNameAccessor ? " use($rootFieldNameAccessor)" : '';
 
             $closure = Code::expr(
-                'function ($values, $errors)' . $use . ' {' .
-                    '$instantiator = ' . $instantiatorFactory . ';' .
-                    '$fieldsErrors = is_array($errors) ? $errors : [];' .
-                    '$fields = [];' .
-                    'foreach ($values as $index => $item) {' .
-                        '$fieldError = $fieldsErrors[$index] ?? [];' .
-                        '$fields[$index] = $field = ' . Code::expr('$instantiator')->submitted(
+                'function ($values, $errors)' . $use . ' {'
+                    . '$instantiator = ' . $instantiatorFactory . ';'
+                    . '$fieldsErrors = is_array($errors) ? $errors : [];'
+                    . '$fields = [];'
+                    . 'foreach ($values as $index => $item) {'
+                        . '$fieldError = $fieldsErrors[$index] ?? [];'
+                        . '$fields[$index] = $field = ' . Code::expr('$instantiator')->submitted(
                             Code::raw('(array) $item'),
                             Code::raw('is_array($fieldError) ? $fieldError : []'),
-                            $fieldNameExpression
-                        ) . ';' .
-                        '$field->error = $fieldError instanceof \\' . FieldError::class . ' ? $fieldError : null;' .
-                    '}' .
-                    'return ' . Code::new(FormView::class, [
+                            $fieldNameExpression,
+                        ) . ';'
+                        . '$field->error = $fieldError instanceof \\' . FieldError::class . ' ? $fieldError : null;'
+                    . '}'
+                    . 'return ' . Code::new(FormView::class, [
                         Code::raw('$fields'),
                         Code::raw('$values'),
                         Code::expr('$instantiator')->default(
                             $rootFieldNameAccessor
                                 ? Code::raw('"{' . $rootFieldNameAccessor . '}[' . $name . '][]"')
-                                : $name . '[]'
+                                : $name . '[]',
                         ),
                         Code::expr('$errors')->isInstanceOfOr(FieldError::class, null),
-                    ]) . ';' .
-                '}'
+                    ]) . ';'
+                . '}',
             );
 
             return $closure(
                 Code::raw("(array) ($valueAccessor)"),
-                Code::raw($errorAccessor)
+                Code::raw($errorAccessor),
             );
         };
     }

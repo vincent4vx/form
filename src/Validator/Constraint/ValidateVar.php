@@ -64,8 +64,7 @@ final class ValidateVar extends SelfValidatedConstraint implements ConstraintVal
          * The error message
          */
         public readonly string $message = 'This value is not a valid.',
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -88,7 +87,7 @@ final class ValidateVar extends SelfValidatedConstraint implements ConstraintVal
      */
     public function generate(ConstraintInterface $constraint, ValidatorGenerator $generator): FieldErrorExpressionInterface
     {
-        return FieldErrorExpression::single(fn (string $accessor) => (string) Code::expr($accessor)->format(
+        return FieldErrorExpression::single(fn(string $accessor) => (string) Code::expr($accessor)->format(
             'is_scalar({}) && filter_var({}, {filter}, {options}) === false ? {error} : null',
             filter: $constraint->filter,
             options: $constraint->options,

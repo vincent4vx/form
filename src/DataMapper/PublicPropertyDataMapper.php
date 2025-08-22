@@ -27,8 +27,7 @@ final class PublicPropertyDataMapper implements DataMapperInterface, DataMapperT
          * @var class-string<T> $className
          */
         private readonly string $className,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

@@ -51,8 +51,7 @@ final class ValidateBy implements ConstraintInterface
          * @var array<string, mixed>
          */
         public readonly array $options = [],
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

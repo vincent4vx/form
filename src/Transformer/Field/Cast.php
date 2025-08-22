@@ -24,9 +24,8 @@ use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 final class Cast implements FieldTransformerInterface, FieldTransformerGeneratorInterface
 {
     public function __construct(
-        private readonly CastType $type
-    ) {
-    }
+        private readonly CastType $type,
+    ) {}
 
     /**
      * {@inheritdoc}

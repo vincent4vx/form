@@ -37,12 +37,12 @@ final class GenericFieldViewProviderGenerator implements FieldViewProviderGenera
             $viewProvider = $configurationExpr;
         }
 
-        return static fn (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor = null): string => Call::object($viewProvider)->view(
+        return static fn(string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor = null): string => Call::object($viewProvider)->view(
             $varName,
-            $rootFieldNameAccessor ? Code::raw('"{' . $rootFieldNameAccessor. '}[' . $name . ']"') : $name,
+            $rootFieldNameAccessor ? Code::raw('"{' . $rootFieldNameAccessor . '}[' . $name . ']"') : $name,
             Code::raw($valueAccessor),
             Code::raw($errorAccessor),
-            $attributes
+            $attributes,
         );
     }
 }

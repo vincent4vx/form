@@ -147,32 +147,32 @@ final class ArrayType implements TypeInterface
         if (self::isArrayKey($this->keyType)) {
             $keyCheck = '';
         } else {
-            $keyCheck =
-                'if (!(' . $this->keyType->generateCheck('$key') . ')) {' .
-                    'return false;' .
-                '}'
+            $keyCheck
+                = 'if (!(' . $this->keyType->generateCheck('$key') . ')) {'
+                    . 'return false;'
+                . '}'
             ;
         }
 
         if (self::isMixed($this->valueType)) {
             $valueCheck = '';
         } else {
-            $valueCheck =
-                'if (!(' . $this->valueType->generateCheck('$value') . ')) {' .
-                    'return false;' .
-                '}'
+            $valueCheck
+                = 'if (!(' . $this->valueType->generateCheck('$value') . ')) {'
+                    . 'return false;'
+                . '}'
             ;
         }
 
         if ($keyCheck || $valueCheck) {
             $extraValues = $this->shape ? Call::array_diff_key(Code::raw($value), $keys) : Code::raw($value);
-            return '(function ($values) {' .
-                    'foreach ($values as $key => $value) {' .
-                        $keyCheck .
-                        $valueCheck .
-                    '}' .
-                    'return true;' .
-                '})(' . $extraValues . ')'
+            return '(function ($values) {'
+                    . 'foreach ($values as $key => $value) {'
+                        . $keyCheck
+                        . $valueCheck
+                    . '}'
+                    . 'return true;'
+                . '})(' . $extraValues . ')'
             ;
         }
 

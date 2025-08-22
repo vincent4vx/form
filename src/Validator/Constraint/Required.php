@@ -43,8 +43,7 @@ final class Required extends SelfValidatedConstraint implements ConstraintValida
 
     public function __construct(
         public readonly string $message = 'This value is required',
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -65,7 +64,7 @@ final class Required extends SelfValidatedConstraint implements ConstraintValida
     {
         $error = Code::new('FieldError', [$constraint->message, [], self::CODE]);
 
-        return FieldErrorExpression::single(fn (string $fieldAccessor) => "$fieldAccessor === null || $fieldAccessor === '' || $fieldAccessor === [] ? $error : null");
+        return FieldErrorExpression::single(fn(string $fieldAccessor) => "$fieldAccessor === null || $fieldAccessor === '' || $fieldAccessor === [] ? $error : null");
     }
 
     /**

@@ -65,8 +65,7 @@ final class Csrf implements ConstraintInterface, DelegatedFieldTransformerInterf
          * Error message
          */
         public readonly string $message = 'Invalid CSRF token',
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

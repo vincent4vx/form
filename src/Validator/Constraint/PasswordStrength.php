@@ -62,8 +62,7 @@ final class PasswordStrength extends SelfValidatedConstraint implements Constrai
          * Use placeholders `{{ strength }}` and `{{ min_strength }}` to display the strength and the minimum strength
          */
         public readonly string $message = 'The password is too weak',
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

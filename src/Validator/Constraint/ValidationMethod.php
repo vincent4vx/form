@@ -121,8 +121,7 @@ final class ValidationMethod extends SelfValidatedConstraint implements Constrai
          * @var string
          */
         public string $code = self::CODE,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

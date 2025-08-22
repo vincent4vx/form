@@ -19,8 +19,7 @@ final class ContainerRegistry implements RegistryInterface
 
     public function __construct(
         private readonly ContainerInterface $container,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

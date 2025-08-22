@@ -37,8 +37,7 @@ final class Form implements FormInterface
          * @var FormViewInstantiatorInterface|null
          */
         private readonly ?FormViewInstantiatorInterface $viewInstantiator,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

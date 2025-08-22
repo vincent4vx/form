@@ -29,7 +29,7 @@ final class TypeParser
      */
     public static function parse(string $type): TypeInterface
     {
-        $types = array_map(fn (string $type) => self::parseIntersection($type), explode('|', $type));
+        $types = array_map(fn(string $type) => self::parseIntersection($type), explode('|', $type));
 
         if (count($types) === 1) {
             return $types[0];
@@ -44,7 +44,7 @@ final class TypeParser
             $type = substr($type, 1, -1);
         }
 
-        $types = array_map(fn (string $type) => self::parseAtomic($type), explode('&', $type));
+        $types = array_map(fn(string $type) => self::parseAtomic($type), explode('&', $type));
 
         if (count($types) === 1) {
             return $types[0];

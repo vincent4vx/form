@@ -24,8 +24,7 @@ final class InstantiateWith implements DataMapperProviderInterface
          * @var class-string<DataMapperInterface>
          */
         public readonly string $dataMapperClassName,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

@@ -44,7 +44,7 @@ final class GeneratedValidatorFactory extends AbstractGeneratedFactory implement
         parent::__construct(
             $savePathResolver ?? Functions::savePathResolver(),
             $classNameResolver ?? Functions::classNameResolver('Validator'),
-            ValidatorInterface::class
+            ValidatorInterface::class,
         );
 
         $this->registry = $registry;

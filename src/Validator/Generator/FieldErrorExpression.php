@@ -24,8 +24,7 @@ final class FieldErrorExpression implements FieldErrorExpressionInterface
          * @var FieldErrorExpressionInterface::RETURN_TYPE_*
          */
         private readonly int $returnType = self::RETURN_TYPE_BOTH,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

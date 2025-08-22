@@ -45,8 +45,7 @@ final class FieldView implements Stringable
          * @var list<ChoiceView>|null
          */
         public ?array $choices = null,
-    ) {
-    }
+    ) {}
 
     /**
      * Define an attribute

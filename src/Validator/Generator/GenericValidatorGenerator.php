@@ -27,9 +27,9 @@ final class GenericValidatorGenerator implements ConstraintValidatorGeneratorInt
 
         // Optimisation of SelfValidatedConstraint
         if ($constraint instanceof ConstraintValidatorInterface) {
-            return FieldErrorExpression::undefined(fn (string $fieldAccessor) => "($constraintVarName = $newConstraintExpression)->validate($constraintVarName, $fieldAccessor, \$data)");
+            return FieldErrorExpression::undefined(fn(string $fieldAccessor) => "($constraintVarName = $newConstraintExpression)->validate($constraintVarName, $fieldAccessor, \$data)");
         } else {
-            return FieldErrorExpression::undefined(fn (string $fieldAccessor) => "($constraintVarName = $newConstraintExpression)->getValidator(\$this->registry)->validate($constraintVarName, $fieldAccessor, \$data)");
+            return FieldErrorExpression::undefined(fn(string $fieldAccessor) => "($constraintVarName = $newConstraintExpression)->getValidator(\$this->registry)->validate($constraintVarName, $fieldAccessor, \$data)");
         }
     }
 }

@@ -41,8 +41,7 @@ final class FieldError implements JsonSerializable, TranslatableInterface
          * If null, a DummyTranslator will be used
          */
         private ?TranslatorInterface $translator = null,
-    ) {
-    }
+    ) {}
 
     /**
      * Set the translator instance

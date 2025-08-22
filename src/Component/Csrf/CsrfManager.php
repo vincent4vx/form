@@ -36,13 +36,12 @@ final class CsrfManager implements ConfigurableFieldTransformerInterface, FieldV
 {
     public function __construct(
         private readonly CsrfTokenManagerInterface $tokenManager,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
      */
-    public function validate(ConstraintInterface $constraint, mixed $value, object $data): FieldError|null
+    public function validate(ConstraintInterface $constraint, mixed $value, object $data): ?FieldError
     {
         /** @var string $value Transformer always transform this value to string */
         $valid = $constraint->refresh
@@ -90,7 +89,7 @@ final class CsrfManager implements ConfigurableFieldTransformerInterface, FieldV
             $name,
             $value,
             $error instanceof FieldError ? $error : null,
-            $attributes
+            $attributes,
         );
     }
 

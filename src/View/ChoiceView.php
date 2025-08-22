@@ -31,8 +31,7 @@ final class ChoiceView
          * Note: multiple choice can be selected in case of array input
          */
         public readonly bool $selected = false,
-    ) {
-    }
+    ) {}
 
     /**
      * Get the translated label

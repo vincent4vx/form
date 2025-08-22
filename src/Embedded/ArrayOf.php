@@ -40,8 +40,7 @@ final class ArrayOf implements ConstraintInterface, DelegatedFieldTransformerInt
          * @var class-string
          */
         public readonly string $class,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

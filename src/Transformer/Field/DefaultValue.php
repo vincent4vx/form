@@ -41,8 +41,7 @@ final class DefaultValue implements FieldTransformerInterface, FieldTransformerG
 {
     public function __construct(
         private readonly mixed $value,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

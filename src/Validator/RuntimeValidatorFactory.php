@@ -19,8 +19,7 @@ final class RuntimeValidatorFactory implements ValidatorFactoryInterface
 {
     public function __construct(
         private readonly RegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

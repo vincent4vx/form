@@ -13,6 +13,5 @@ final class HttpField
 {
     public function __construct(
         public readonly string $name,
-    ) {
-    }
+    ) {}
 }

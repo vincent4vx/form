@@ -19,8 +19,7 @@ final class FieldTransformersAggregate implements FieldTransformerInterface
          */
         private readonly array $transformers,
         private readonly RegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

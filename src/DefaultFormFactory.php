@@ -34,8 +34,7 @@ final class DefaultFormFactory implements FormFactoryInterface
         private readonly ValidatorFactoryInterface $validatorFactory,
         private readonly FormTransformerFactoryInterface $transformerFactory,
         private readonly ?FormViewInstantiatorFactoryInterface $formViewInstantiatorFactory = null,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

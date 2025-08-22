@@ -28,8 +28,7 @@ final class RuntimeFormTransformerFactory implements FormTransformerFactoryInter
 {
     public function __construct(
         private readonly RegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

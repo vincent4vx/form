@@ -53,8 +53,7 @@ final class Embedded implements ConstraintInterface, DelegatedFieldTransformerIn
          * @var class-string
          */
         public readonly string $class,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

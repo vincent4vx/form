@@ -37,8 +37,7 @@ final class ArrayCast implements FieldTransformerInterface, FieldTransformerGene
          * If false, transformed array will be converted to a list (i.e. sequential keys).
          */
         private readonly bool $preserveKeys = true,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

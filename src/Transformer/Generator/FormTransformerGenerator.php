@@ -29,8 +29,7 @@ final class FormTransformerGenerator
          * @var FieldTransformerGeneratorInterface<DelegatedFieldTransformerInterface>
          */
         private readonly FieldTransformerGeneratorInterface $delegatedFieldTransformerGenerator = new DelegatedFieldTransformerGenerator(),
-    ) {
-    }
+    ) {}
 
     /**
      * Compile given FormTransformer to a class
@@ -50,7 +49,7 @@ final class FormTransformerGenerator
             $classHelper->declareField(
                 $fieldName,
                 $fieldNameMapping[$fieldName] ?? $fieldName,
-                $fieldErrorConfigurations[$fieldName] ?? null
+                $fieldErrorConfigurations[$fieldName] ?? null,
             );
 
             foreach ($transformers as $transformer) {
@@ -59,9 +58,9 @@ final class FormTransformerGenerator
 
                 $classHelper->addFieldTransformationExpression(
                     $fieldName,
-                    fn (string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression, $this),
-                    fn (string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression, $this),
-                    $canThrowError
+                    fn(string $previousExpression) => $generator->generateTransformFromHttp($transformer, $previousExpression, $this),
+                    fn(string $previousExpression) => $generator->generateTransformToHttp($transformer, $previousExpression, $this),
+                    $canThrowError,
                 );
             }
         }

@@ -57,8 +57,7 @@ final class FieldViewConfiguration implements FieldViewProviderConfigurationInte
          * @see FieldView::$attributes
          */
         public readonly array $attributes = [],
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -106,11 +105,11 @@ final class FieldViewConfiguration implements FieldViewProviderConfigurationInte
             $attributes['type'] ??= $configuration->type;
         }
 
-        return static fn (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) => Code::new(FieldView::class, [
-            $rootFieldNameAccessor ? Code::raw('"{' . $rootFieldNameAccessor. '}[' . $name . ']"') : $name,
+        return static fn(string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) => Code::new(FieldView::class, [
+            $rootFieldNameAccessor ? Code::raw('"{' . $rootFieldNameAccessor . '}[' . $name . ']"') : $name,
             $configuration->defaultValue !== null ? Code::raw($valueAccessor . ' ?? ' . Code::value($configuration->defaultValue)) : Code::raw($valueAccessor),
             Code::expr($errorAccessor)->isInstanceOfOr(FieldError::class, null),
-            $attributes
+            $attributes,
         ]);
     }
 

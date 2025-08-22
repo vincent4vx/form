@@ -68,8 +68,7 @@ final class Choice extends SelfValidatedConstraint implements ConstraintValidato
          * Use {{ value }} as placeholder for the invalid value.
          */
         public readonly string $message = 'The value is not a valid choice.',
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -191,16 +190,16 @@ final class Choice extends SelfValidatedConstraint implements ConstraintValidato
         $fieldError = Code::new(FieldError::class, [$this->message, ['value' => Code::raw($debugValue)], self::CODE]);
 
         $inArrayAggregate = Code::expr(
-            'function ($values) {' .
-                '$errors = [];' .
-                '$choices = ' . $choices . ';' .
-                'foreach ($values as $key => $value) {' .
-                    "if (!{$inArray}) {" .
-                        '$errors[$key] = ' . $fieldError . ';' .
-                    '}' .
-                '}' .
-                'return $errors ?: null;' .
-            '}'
+            'function ($values) {'
+                . '$errors = [];'
+                . '$choices = ' . $choices . ';'
+                . 'foreach ($values as $key => $value) {'
+                    . "if (!{$inArray}) {"
+                        . '$errors[$key] = ' . $fieldError . ';'
+                    . '}'
+                . '}'
+                . 'return $errors ?: null;'
+            . '}',
         );
 
         return $inArrayAggregate(Code::raw($accessor));

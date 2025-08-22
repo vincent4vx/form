@@ -95,7 +95,7 @@ final class ValidatorClass
                 \$errors[{$fieldNameString}] = {$errorWithTranslator};
             }
 
-            PHP
+            PHP,
             );
         }
 

@@ -43,7 +43,7 @@ final class GeneratedFormTransformerFactory extends AbstractGeneratedFactory imp
         parent::__construct(
             $savePathResolver ?? Functions::savePathResolver(),
             $classNameResolver ?? Functions::classNameResolver('Transformer'),
-            FormTransformerInterface::class
+            FormTransformerInterface::class,
         );
 
         $this->registry = $registry;

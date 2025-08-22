@@ -51,8 +51,7 @@ final class FormView implements ArrayAccess, IteratorAggregate, Countable
          * @var FieldError|null
          */
         public ?FieldError $error = null,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

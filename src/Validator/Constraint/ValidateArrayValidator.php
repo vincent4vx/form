@@ -25,9 +25,8 @@ use function is_array;
 final class ValidateArrayValidator implements ConstraintValidatorInterface, ConstraintValidatorGeneratorInterface
 {
     public function __construct(
-        private RegistryInterface $registry
-    ) {
-    }
+        private RegistryInterface $registry,
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -116,7 +115,7 @@ final class ValidateArrayValidator implements ConstraintValidatorInterface, Cons
         return Code::new('FieldError', [
             $constraint->message,
             ['item_errors' => Code::raw('$errors')],
-            ValidateArray::CODE
+            ValidateArray::CODE,
         ]);
     }
 
@@ -126,7 +125,7 @@ final class ValidateArrayValidator implements ConstraintValidatorInterface, Cons
             $errorExpression = match ($returnType) {
                 FieldErrorExpressionInterface::RETURN_TYPE_SINGLE => '$error->withTranslator($translator)',
                 FieldErrorExpressionInterface::RETURN_TYPE_AGGREGATE => "''",
-                default => '(\is_array($error) ? \'\' : $error->withTranslator($translator))'
+                default => '(\is_array($error) ? \'\' : $error->withTranslator($translator))',
             };
 
             return '$errors .= ' . Call::object('$translator')->trans($constraint->itemMessage, [
@@ -138,7 +137,7 @@ final class ValidateArrayValidator implements ConstraintValidatorInterface, Cons
         return match ($returnType) {
             FieldErrorExpressionInterface::RETURN_TYPE_SINGLE => '$errors[$key] = $error->withTranslator($translator);',
             FieldErrorExpressionInterface::RETURN_TYPE_AGGREGATE => '$errors[$key] = $error;',
-            default => '$errors[$key] = \is_array($error) ? $error : $error->withTranslator($translator);'
+            default => '$errors[$key] = \is_array($error) ? $error : $error->withTranslator($translator);',
         };
     }
 }

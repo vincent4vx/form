@@ -14,8 +14,7 @@ abstract class AbstractGeneratedFormTransformer implements FormTransformerInterf
 {
     public function __construct(
         protected readonly RegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -26,8 +25,7 @@ abstract class AbstractGeneratedFormTransformer implements FormTransformerInterf
             public function __construct(
                 private readonly AbstractGeneratedFormTransformer $transformer,
                 private readonly string $fieldName,
-            ) {
-            }
+            ) {}
 
             public function transformFromHttp(mixed $value): mixed
             {

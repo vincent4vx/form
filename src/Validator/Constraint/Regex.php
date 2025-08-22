@@ -102,7 +102,7 @@ final class Regex extends SelfValidatedConstraint implements FieldViewAttributes
      */
     public function generate(ConstraintInterface $constraint, ValidatorGenerator $generator): FieldErrorExpressionInterface
     {
-        return FieldErrorExpression::single(fn (string $accessor) => (string) Code::expr($accessor)->format(
+        return FieldErrorExpression::single(fn(string $accessor) => (string) Code::expr($accessor)->format(
             'is_scalar({}) && !preg_match({pattern}, (string) {}) ? {error} : null',
             pattern: $constraint->getGrepPattern(),
             error: new FieldError($constraint->message, code: self::CODE),

@@ -23,8 +23,7 @@ final class ArrayOfTransformer implements ConfigurableFieldTransformerInterface,
 {
     public function __construct(
         private readonly RegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -93,24 +92,24 @@ final class ArrayOfTransformer implements ConfigurableFieldTransformerInterface,
     public function generateTransformFromHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $varName = Code::varName($previousExpression);
-        $body = 'function ($value) {' .
-            '$transformer = ' . Call::object('$this->registry->getTransformerFactory()')->create($transformer->class) . ';' .
-            '$dataMapper = ' . Call::object('$this->registry->getDataMapperFactory()')->create($transformer->class) . ';' .
-            '$result = [];' .
-            '$errors = [];' .
-            'foreach ($value as $key => $item) {' .
-                '$transformationResult = $transformer->transformFromHttp((array) $item);' .
-                'if ($transformationResult->errors) {' .
-                    '$errors[$key] = $transformationResult->errors;' .
-                '} else {' .
-                    '$result[$key] = $dataMapper->toDataObject($transformationResult->values);' .
-                '}' .
-            '}' .
-            'if ($errors) {' .
-                'throw ' . Code::new(TransformerException::class, ['Some elements are invalid', Code::raw('$errors')]) . ';' .
-            '}' .
-            'return $result;' .
-        '}';
+        $body = 'function ($value) {'
+            . '$transformer = ' . Call::object('$this->registry->getTransformerFactory()')->create($transformer->class) . ';'
+            . '$dataMapper = ' . Call::object('$this->registry->getDataMapperFactory()')->create($transformer->class) . ';'
+            . '$result = [];'
+            . '$errors = [];'
+            . 'foreach ($value as $key => $item) {'
+                . '$transformationResult = $transformer->transformFromHttp((array) $item);'
+                . 'if ($transformationResult->errors) {'
+                    . '$errors[$key] = $transformationResult->errors;'
+                . '} else {'
+                    . '$result[$key] = $dataMapper->toDataObject($transformationResult->values);'
+                . '}'
+            . '}'
+            . 'if ($errors) {'
+                . 'throw ' . Code::new(TransformerException::class, ['Some elements are invalid', Code::raw('$errors')]) . ';'
+            . '}'
+            . 'return $result;'
+        . '}';
 
         return "!is_array({$varName} = {$previousExpression}) ? null : ({$body})({$varName})";
     }
@@ -121,15 +120,15 @@ final class ArrayOfTransformer implements ConfigurableFieldTransformerInterface,
     public function generateTransformToHttp(object $transformer, string $previousExpression, FormTransformerGenerator $generator): string
     {
         $varName = Code::varName($previousExpression);
-        $body = 'function ($value) {' .
-            '$transformer = ' . Call::object('$this->registry->getTransformerFactory()')->create($transformer->class) . ';' .
-            '$dataMapper = ' . Call::object('$this->registry->getDataMapperFactory()')->create($transformer->class) . ';' .
-            '$result = [];' .
-            'foreach ($value as $key => $item) {' .
-                '$result[$key] = $transformer->transformToHttp($dataMapper->toArray($item));' .
-            '}' .
-            'return $result;' .
-        '}';
+        $body = 'function ($value) {'
+            . '$transformer = ' . Call::object('$this->registry->getTransformerFactory()')->create($transformer->class) . ';'
+            . '$dataMapper = ' . Call::object('$this->registry->getDataMapperFactory()')->create($transformer->class) . ';'
+            . '$result = [];'
+            . 'foreach ($value as $key => $item) {'
+                . '$result[$key] = $transformer->transformToHttp($dataMapper->toArray($item));'
+            . '}'
+            . 'return $result;'
+        . '}';
 
         return "!is_array({$varName} = {$previousExpression}) ? null : ({$body})({$varName})";
     }

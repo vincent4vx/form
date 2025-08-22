@@ -57,8 +57,7 @@ final class Csv implements FieldTransformerInterface, FieldTransformerGeneratorI
          * This character is used to enclose fields containing special characters
          */
         private readonly string $enclosure = '',
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

@@ -18,8 +18,7 @@ final class ValidatorGenerator
          * @var ConstraintValidatorGeneratorInterface<ConstraintInterface>
          */
         private readonly ConstraintValidatorGeneratorInterface $genericValidatorGenerator = new GenericValidatorGenerator(),
-    ) {
-    }
+    ) {}
 
     /**
      * Generates the class implementation of {@see ValidatorInterface} following constrains stored into given validator

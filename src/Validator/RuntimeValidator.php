@@ -24,8 +24,7 @@ final class RuntimeValidator implements ValidatorInterface
          * @var array<string, list<ConstraintInterface>>
          */
         public readonly array $fieldsConstraints,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

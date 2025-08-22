@@ -317,9 +317,7 @@ final class Code
     public static function raw(string $code): PhpExpressionInterface
     {
         return new class ($code) implements PhpExpressionInterface {
-            public function __construct(private readonly string $code)
-            {
-            }
+            public function __construct(private readonly string $code) {}
 
             public function __toString(): string
             {
@@ -355,10 +353,10 @@ final class Code
     {
         // @phpstan-ignore-next-line
         $custom = self::$customObjectExpressions ??= [
-            stdClass::class => fn (stdClass $value) => '(object) ' . self::dumpArray((array) $value),
-            UnitEnum::class => fn (UnitEnum $value) => '\\' . get_class($value) . '::' . $value->name,
-            DateTimeZone::class => fn (DateTimeZone $value) => self::new(DateTimeZone::class, [$value->getName()]),
-            FieldError::class => fn (FieldError $value) => self::new(FieldError::class, [$value->message, $value->parameters, $value->code]),
+            stdClass::class => fn(stdClass $value) => '(object) ' . self::dumpArray((array) $value),
+            UnitEnum::class => fn(UnitEnum $value) => '\\' . get_class($value) . '::' . $value->name,
+            DateTimeZone::class => fn(DateTimeZone $value) => self::new(DateTimeZone::class, [$value->getName()]),
+            FieldError::class => fn(FieldError $value) => self::new(FieldError::class, [$value->message, $value->parameters, $value->code]),
         ];
 
         foreach ($custom as $class => $callback) {

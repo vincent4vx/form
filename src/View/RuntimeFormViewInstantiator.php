@@ -46,8 +46,7 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
          * @var array<string, FieldChoiceProviderInterface>
          */
         public readonly array $choicesProviderByField,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

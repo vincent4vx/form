@@ -25,6 +25,5 @@ final class TransformationResult
          * @var array<string, FieldError|mixed[]>
          */
         public readonly array $errors,
-    ) {
-    }
+    ) {}
 }

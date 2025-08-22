@@ -24,8 +24,7 @@ final class ArrayOfValidator implements ConstraintValidatorInterface, Constraint
 {
     public function __construct(
         private readonly RegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -58,16 +57,16 @@ final class ArrayOfValidator implements ConstraintValidatorInterface, Constraint
     {
         return FieldErrorExpression::aggregate(function (string $fieldAccessor) use ($constraint) {
             $validator = Call::object('$this->registry->getValidatorFactory()')->create($constraint->class);
-            $body = 'function ($value) {' .
-                '$validator = ' . $validator . ';' .
-                '$errors = [];' .
-                'foreach ($value as $key => $item) {' .
-                    'if ($itemErrors = $validator->validate($item)) {' .
-                        '$errors[$key] = $itemErrors;' .
-                    '}' .
-                '}' .
-                'return $errors ?: null;' .
-            '}';
+            $body = 'function ($value) {'
+                . '$validator = ' . $validator . ';'
+                . '$errors = [];'
+                . 'foreach ($value as $key => $item) {'
+                    . 'if ($itemErrors = $validator->validate($item)) {'
+                        . '$errors[$key] = $itemErrors;'
+                    . '}'
+                . '}'
+                . 'return $errors ?: null;'
+            . '}';
 
             return "!is_array({$fieldAccessor}) ? null : ({$body})({$fieldAccessor})";
         });

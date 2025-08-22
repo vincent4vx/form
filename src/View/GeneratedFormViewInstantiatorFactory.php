@@ -43,7 +43,7 @@ final class GeneratedFormViewInstantiatorFactory extends AbstractGeneratedFactor
         parent::__construct(
             $savePathResolver ?? Functions::savePathResolver(),
             $classNameResolver ?? Functions::classNameResolver('ViewInstantiator'),
-            FormViewInstantiatorInterface::class
+            FormViewInstantiatorInterface::class,
         );
 
         $this->registry = $registry;

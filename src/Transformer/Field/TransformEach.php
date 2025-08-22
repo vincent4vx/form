@@ -37,8 +37,7 @@ final class TransformEach implements DelegatedFieldTransformerInterface
          * @var bool
          */
         public readonly bool  $handleElementsErrors = false,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

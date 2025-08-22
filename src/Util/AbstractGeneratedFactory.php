@@ -31,9 +31,8 @@ abstract class AbstractGeneratedFactory
          *
          * @var class-string<T>
          */
-        private readonly string $type
-    ) {
-    }
+        private readonly string $type,
+    ) {}
 
     /**
      * Call constructor of the generated class to create a new instance

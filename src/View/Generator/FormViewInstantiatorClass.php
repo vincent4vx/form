@@ -94,12 +94,12 @@ final class FormViewInstantiatorClass
     {
         $newExprWithRootField = Code::new(FormView::class, [
             $this->generateFieldsCode('$value', '$errors', '$rootField'),
-            Code::raw('$value')
+            Code::raw('$value'),
         ]);
 
         $newExprWithoutRootField = Code::new(FormView::class, [
             $this->generateFieldsCode('$value', '$errors', null),
-            Code::raw('$value')
+            Code::raw('$value'),
         ]);
 
         $this->submittedMethod->setBody("return \$rootField === null ? {$newExprWithoutRootField} :  {$newExprWithRootField};");
@@ -112,12 +112,12 @@ final class FormViewInstantiatorClass
     {
         $newExprWithRootField = Code::new(FormView::class, [
             $this->generateFieldsCode(null, null, '$rootField'),
-            []
+            [],
         ]);
 
         $newExprWithoutRootField = Code::new(FormView::class, [
             $this->generateFieldsCode(null, null, null),
-            []
+            [],
         ]);
 
         $this->defaultMethod->setBody("return \$rootField === null ? {$newExprWithoutRootField} :  {$newExprWithRootField};");
@@ -152,7 +152,7 @@ final class FormViewInstantiatorClass
             $fields[$field] = Code::raw($fieldViewExpression(
                 $valueVarName ? $valueVarName . '[' . Code::value($httpFieldName) . '] ?? null' : 'null',
                 $errorVarName ? $errorVarName . '[' . Code::value($field) . '] ?? null' : 'null',
-                $rootFieldVarName
+                $rootFieldVarName,
             ));
         }
 

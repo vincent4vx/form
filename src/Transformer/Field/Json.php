@@ -93,8 +93,7 @@ final class Json implements FieldTransformerInterface, FieldTransformerGenerator
          * @var int Bitmask of JSON_* constants.
          */
         private readonly int $encodeOptions = 0,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -151,10 +150,10 @@ final class Json implements FieldTransformerInterface, FieldTransformerGenerator
             $transformer->parseOptions,
         );
 
-        return "({$varName} = {$previousExpression}) === null ? null : " .
-            "(!is_scalar({$varName}) ? throw new \InvalidArgumentException('The value must be a string') : " .
-            "(!({$varName} = {$decode}) && json_last_error() !== JSON_ERROR_NONE ? throw new \InvalidArgumentException('The value is not a valid JSON : ' . json_last_error_msg()) : " .
-            "{$varName}))"
+        return "({$varName} = {$previousExpression}) === null ? null : "
+            . "(!is_scalar({$varName}) ? throw new \InvalidArgumentException('The value must be a string') : "
+            . "(!({$varName} = {$decode}) && json_last_error() !== JSON_ERROR_NONE ? throw new \InvalidArgumentException('The value is not a valid JSON : ' . json_last_error_msg()) : "
+            . "{$varName}))"
         ;
     }
 

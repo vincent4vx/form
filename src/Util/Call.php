@@ -15,8 +15,7 @@ final class Call
     private function __construct(
         private readonly string $object,
         private readonly bool $static,
-    ) {
-    }
+    ) {}
 
     /**
      * Configure a static method call

@@ -24,8 +24,7 @@ final class TransformEachImpl implements ConfigurableFieldTransformerInterface, 
 {
     public function __construct(
         private readonly RegistryInterface $registry,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -58,7 +57,7 @@ final class TransformEachImpl implements ConfigurableFieldTransformerInterface, 
                 $errors[$key] = new FieldError(
                     message: $e->getMessage(),
                     code: TransformationError::CODE,
-                    translator: $this->registry->getTranslator()
+                    translator: $this->registry->getTranslator(),
                 );
             }
         }
@@ -113,7 +112,7 @@ final class TransformEachImpl implements ConfigurableFieldTransformerInterface, 
         if (!$transformer->handleElementsErrors) {
             return Code::expr($previousExpression)->storeAndFormat(
                 '{} === null ? null : \array_map(fn ($item) => {expression}, (array) {})',
-                expression: Code::raw($expression)
+                expression: Code::raw($expression),
             );
         }
 
@@ -124,27 +123,27 @@ final class TransformEachImpl implements ConfigurableFieldTransformerInterface, 
             Code::raw('$translator'),
         ]);
 
-        $expression = 'function ($values) use ($translator) { ' .
-            '$errors = []; ' .
-            '$transformed = []; ' .
-            'foreach ($values as $key => $item) { ' .
-                'try { ' .
-                    '$transformed[$key] = ' . $expression . '; ' .
-                '} catch (\\' . TransformerException::class . ' $e) { ' .
-                    '$errors[$key] = $e->errors; ' .
-                '} catch (\Exception $e) { ' .
-                    '$errors[$key] = ' . $fieldErrorFromException . '; ' .
-                '} ' .
-            '} ' .
-            'if ($errors) { ' .
-                'throw ' . Code::new(TransformerException::class, ['Some elements of the array are invalid', Code::raw('$errors')]) . '; ' .
-            '} ' .
-            'return $transformed; ' .
-        '}';
+        $expression = 'function ($values) use ($translator) { '
+            . '$errors = []; '
+            . '$transformed = []; '
+            . 'foreach ($values as $key => $item) { '
+                . 'try { '
+                    . '$transformed[$key] = ' . $expression . '; '
+                . '} catch (\\' . TransformerException::class . ' $e) { '
+                    . '$errors[$key] = $e->errors; '
+                . '} catch (\Exception $e) { '
+                    . '$errors[$key] = ' . $fieldErrorFromException . '; '
+                . '} '
+            . '} '
+            . 'if ($errors) { '
+                . 'throw ' . Code::new(TransformerException::class, ['Some elements of the array are invalid', Code::raw('$errors')]) . '; '
+            . '} '
+            . 'return $transformed; '
+        . '}';
 
         return Code::expr($previousExpression)->storeAndFormat(
             '{} === null ? null : ({expression})((array) {})',
-            expression: Code::raw($expression)
+            expression: Code::raw($expression),
         );
     }
 
@@ -161,7 +160,7 @@ final class TransformEachImpl implements ConfigurableFieldTransformerInterface, 
 
         return Code::expr($previousExpression)->storeAndFormat(
             '{} === null ? null : \array_map(fn ($item) => {expression}, (array) {})',
-            expression: Code::raw($expression)
+            expression: Code::raw($expression),
         );
     }
 

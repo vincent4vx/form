@@ -24,8 +24,7 @@ final class EmbeddedValidator implements ConstraintValidatorInterface, Constrain
 {
     public function __construct(
         private readonly ValidatorFactoryInterface $validatorFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -49,6 +48,6 @@ final class EmbeddedValidator implements ConstraintValidatorInterface, Constrain
     {
         $classNameString = Code::value($constraint->class);
 
-        return FieldErrorExpression::aggregate(fn (string $propertyAccessor) => "is_object($propertyAccessor) ? \$this->registry->getValidatorFactory()->create($classNameString)->validate($propertyAccessor) : null");
+        return FieldErrorExpression::aggregate(fn(string $propertyAccessor) => "is_object($propertyAccessor) ? \$this->registry->getValidatorFactory()->create($classNameString)->validate($propertyAccessor) : null");
     }
 }

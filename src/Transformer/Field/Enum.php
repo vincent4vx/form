@@ -85,8 +85,7 @@ final class Enum implements FieldTransformerInterface, FieldTransformerGenerator
          * Use {{ value }} as placeholder for the input value
          */
         private readonly string $errorMessage = 'The value {{ value }} is not a valid choice.',
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -145,7 +144,7 @@ final class Enum implements FieldTransformerInterface, FieldTransformerGenerator
             $choices[] = new ChoiceView(
                 $httpValue,
                 $case instanceof LabelInterface ? $case : null,
-                $httpValue == $currentValue
+                $httpValue == $currentValue,
             );
         }
 
@@ -165,8 +164,8 @@ final class Enum implements FieldTransformerInterface, FieldTransformerGenerator
                 Expr::new(FieldError::class, [
                     $transformer->errorMessage,
                     ['value' => $varName->format('is_scalar({}) || {} instanceof \Stringable ? {} : print_r({}, true)')],
-                    self::CODE
-                ])
+                    self::CODE,
+                ]),
             ])
             : 'null'
         ;

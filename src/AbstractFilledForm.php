@@ -45,8 +45,7 @@ abstract class AbstractFilledForm implements FilledFormInterface
          * @var mixed[]
          */
         protected readonly array $httpValue,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

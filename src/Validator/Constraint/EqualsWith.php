@@ -47,8 +47,7 @@ final class EqualsWith extends SelfValidatedConstraint implements ConstraintVali
          * If true, use a strict comparison (i.e. ===), so type and value will be compared
          */
         public readonly bool $strict = true,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -76,9 +75,9 @@ final class EqualsWith extends SelfValidatedConstraint implements ConstraintVali
         $error = Code::new('FieldError', [$constraint->message, ['field' => $constraint->field], self::CODE]);
 
         if ($constraint->strict) {
-            return FieldErrorExpression::single(fn (string $fieldAccessor) => "$fieldAccessor !== $otherAccessor ? $error : null");
+            return FieldErrorExpression::single(fn(string $fieldAccessor) => "$fieldAccessor !== $otherAccessor ? $error : null");
         } else {
-            return FieldErrorExpression::single(fn (string $fieldAccessor) => "$fieldAccessor != $otherAccessor ? $error : null");
+            return FieldErrorExpression::single(fn(string $fieldAccessor) => "$fieldAccessor != $otherAccessor ? $error : null");
         }
     }
 }

@@ -32,8 +32,7 @@ abstract class AbstractComparisonConstraint extends SelfValidatedConstraint impl
          * @var string
          */
         public readonly string $message = 'This value is not valid.',
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -60,10 +59,10 @@ abstract class AbstractComparisonConstraint extends SelfValidatedConstraint impl
         $error = Code::new(FieldError::class, [
             $constraint->message,
             ['value' => $expected],
-            static::CODE
+            static::CODE,
         ]);
 
-        return FieldErrorExpression::single(fn (string $accessor): string => "is_scalar({$accessor}) && !({$accessor} {$this->operator()} {$expected}) ? {$error} : null");
+        return FieldErrorExpression::single(fn(string $accessor): string => "is_scalar({$accessor}) && !({$accessor} {$this->operator()} {$expected}) ? {$error} : null");
     }
 
     /**

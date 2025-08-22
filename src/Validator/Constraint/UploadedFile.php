@@ -138,8 +138,7 @@ final class UploadedFile extends SelfValidatedConstraint implements FieldViewAtt
          * - allowed_mime_types: the list of allowed mime types, separated by comma
          */
         public readonly string $messageInvalidMimeType = 'The file mime type "{{ current_mime_type }}" is not allowed, allowed mime types are {{ allowed_mime_types }}',
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -188,8 +187,8 @@ final class UploadedFile extends SelfValidatedConstraint implements FieldViewAtt
 
         if ($this->allowedExtensions) {
             $extensions = array_map(
-                fn ($ext) => '.' . $ext,
-                $this->allowedExtensions
+                fn($ext) => '.' . $ext,
+                $this->allowedExtensions,
             );
             $accept[] = implode(',', $extensions);
         }
@@ -218,17 +217,17 @@ final class UploadedFile extends SelfValidatedConstraint implements FieldViewAtt
                     'current_size' => Code::raw(Call::static(FileSize::class)->format($accessor->getSize())),
                     'max_size' => FileSize::format($maxSize),
                 ],
-                self::CODE
+                self::CODE,
             ]);
 
             $checks = [];
 
             $checks[] = '(' . $accessor . ' instanceof \\' . UploadedFileInterface::class . ' ? null : ' . $genericError . ')';
-            $checks[] = 'match($__tmpUploadError = ' . $accessor . '->getError()) {' .
-                'UPLOAD_ERR_OK => null,' .
-                "UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => ({$accessor}->getSize() === null ? {$genericError} : {$fileSizeError})," .
-                'default => ' . Code::new(FieldError::class, [$constraint->messageUploadedFailed, ['error' => Code::raw('$__tmpUploadError')], self::CODE]) .
-            '}';
+            $checks[] = 'match($__tmpUploadError = ' . $accessor . '->getError()) {'
+                . 'UPLOAD_ERR_OK => null,'
+                . "UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => ({$accessor}->getSize() === null ? {$genericError} : {$fileSizeError}),"
+                . 'default => ' . Code::new(FieldError::class, [$constraint->messageUploadedFailed, ['error' => Code::raw('$__tmpUploadError')], self::CODE])
+            . '}';
 
             if ($constraint->maxSize !== null) {
                 $checks[] = "({$accessor}->getSize() !== null ? null : {$genericError})";
@@ -242,11 +241,11 @@ final class UploadedFile extends SelfValidatedConstraint implements FieldViewAtt
                         'current_extension' => Code::raw(Call::pathinfo($accessor->getClientFilename(), PATHINFO_EXTENSION)),
                         'allowed_extensions' => implode(', ', $constraint->allowedExtensions),
                     ],
-                    self::CODE
+                    self::CODE,
                 ]);
                 $checkExtensionExpression  = array_map(
-                    fn ($ext) => Call::str_ends_with(Code::raw('$__tmpFileName'), '.' . $ext),
-                    $constraint->allowedExtensions
+                    fn($ext) => Call::str_ends_with(Code::raw('$__tmpFileName'), '.' . $ext),
+                    $constraint->allowedExtensions,
                 );
                 $checkExtensionExpression = implode(' || ', $checkExtensionExpression);
 
@@ -261,7 +260,7 @@ final class UploadedFile extends SelfValidatedConstraint implements FieldViewAtt
                         'current_mime_type' => $accessor->getClientMediaType(),
                         'allowed_mime_types' => implode(', ', $constraint->allowedMimeTypes),
                     ],
-                    self::CODE
+                    self::CODE,
                 ]);
                 $checkMimeTypeExpression = array_map(
                     function ($mime) {
@@ -271,7 +270,7 @@ final class UploadedFile extends SelfValidatedConstraint implements FieldViewAtt
 
                         return '$__tmpFileMimeType === ' . Code::value($mime);
                     },
-                    $constraint->allowedMimeTypes
+                    $constraint->allowedMimeTypes,
                 );
                 $checkMimeTypeExpression = implode(' || ', $checkMimeTypeExpression);
 
@@ -372,7 +371,7 @@ final class UploadedFile extends SelfValidatedConstraint implements FieldViewAtt
                 'current_size' => FileSize::format($currentSize),
                 'max_size' => FileSize::format($maxSize),
             ],
-            self::CODE
+            self::CODE,
         );
     }
 
@@ -390,7 +389,7 @@ final class UploadedFile extends SelfValidatedConstraint implements FieldViewAtt
                 'current_extension' => $extension,
                 'allowed_extensions' => implode(', ', $this->allowedExtensions),
             ],
-            self::CODE
+            self::CODE,
         );
     }
 
@@ -406,7 +405,7 @@ final class UploadedFile extends SelfValidatedConstraint implements FieldViewAtt
                 'current_mime_type' => $mime,
                 'allowed_mime_types' => implode(', ', $this->allowedMimeTypes),
             ],
-            self::CODE
+            self::CODE,
         );
     }
 }

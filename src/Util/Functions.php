@@ -20,7 +20,7 @@ final class Functions
     public static function savePathResolver(?string $basePath = null): Closure
     {
         $basePath ??= sys_get_temp_dir();
-        return fn (string $className) => $basePath . DIRECTORY_SEPARATOR . str_replace('\\', '_', $className) . '.php';
+        return fn(string $className) => $basePath . DIRECTORY_SEPARATOR . str_replace('\\', '_', $className) . '.php';
     }
 
     /**
@@ -32,6 +32,6 @@ final class Functions
      */
     public static function classNameResolver(string $suffix): Closure
     {
-        return fn (string $dataClassName) => str_replace('\\', '_', $dataClassName) . $suffix;
+        return fn(string $dataClassName) => str_replace('\\', '_', $dataClassName) . $suffix;
     }
 }
