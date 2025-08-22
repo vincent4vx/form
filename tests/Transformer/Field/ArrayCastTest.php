@@ -60,8 +60,8 @@ class ArrayCastTest extends FormTestCase
     public function test_generateTransformFromHttp()
     {
         $generator = new FormTransformerGenerator(new DefaultRegistry());
-        $this->assertSame('(($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) !== null ? array_map(static fn ($value) => (is_scalar($__tmp_7d0596c36891967f3bb9d994b4a97c19 = $value) ? (int) $__tmp_7d0596c36891967f3bb9d994b4a97c19 : null), (array) $__tmp_4e6c78d168de10f915401b0dad567ede) : null)', (new ArrayCast(CastType::Int))->generateTransformFromHttp(new ArrayCast(CastType::Int), '$data["foo"]', $generator));
-        $this->assertSame('(($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) !== null ? (static function ($values) { $r = []; foreach ($values as $value) { $r[] = (is_scalar($__tmp_7d0596c36891967f3bb9d994b4a97c19 = $value) ? (int) $__tmp_7d0596c36891967f3bb9d994b4a97c19 : null); } return $r; })((array) $__tmp_4e6c78d168de10f915401b0dad567ede) : null)', (new ArrayCast(CastType::Int))->generateTransformFromHttp(new ArrayCast(CastType::Int, false), '$data["foo"]', $generator));
+        $this->assertSame('(($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) !== null ? array_map(static fn ($value) => (($__tmp_7d0596c36891967f3bb9d994b4a97c19 = $value) !== \'\' && is_scalar($__tmp_7d0596c36891967f3bb9d994b4a97c19) ? (int) $__tmp_7d0596c36891967f3bb9d994b4a97c19 : null), (array) $__tmp_4e6c78d168de10f915401b0dad567ede) : null)', (new ArrayCast(CastType::Int))->generateTransformFromHttp(new ArrayCast(CastType::Int), '$data["foo"]', $generator));
+        $this->assertSame('(($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) !== null ? (static function ($values) { $r = []; foreach ($values as $value) { $r[] = (($__tmp_7d0596c36891967f3bb9d994b4a97c19 = $value) !== \'\' && is_scalar($__tmp_7d0596c36891967f3bb9d994b4a97c19) ? (int) $__tmp_7d0596c36891967f3bb9d994b4a97c19 : null); } return $r; })((array) $__tmp_4e6c78d168de10f915401b0dad567ede) : null)', (new ArrayCast(CastType::Int))->generateTransformFromHttp(new ArrayCast(CastType::Int, false), '$data["foo"]', $generator));
     }
 
     public function test_generateTransformToHttp()

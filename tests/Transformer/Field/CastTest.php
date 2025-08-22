@@ -41,7 +41,7 @@ class CastTest extends FormTestCase
     public function test_generateTransformFromHttp()
     {
         $generator = new FormTransformerGenerator(new DefaultRegistry());
-        $this->assertSame('(is_scalar($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) ? (int) $__tmp_4e6c78d168de10f915401b0dad567ede : null)', (new Cast(CastType::Int))->generateTransformFromHttp(new Cast(CastType::Int), '$data["foo"]', $generator));
+        $this->assertSame('(($__tmp_4e6c78d168de10f915401b0dad567ede = $data["foo"]) !== \'\' && is_scalar($__tmp_4e6c78d168de10f915401b0dad567ede) ? (int) $__tmp_4e6c78d168de10f915401b0dad567ede : null)', (new Cast(CastType::Int))->generateTransformFromHttp(new Cast(CastType::Int), '$data["foo"]', $generator));
     }
 
     public function test_generateTransformToHttp()

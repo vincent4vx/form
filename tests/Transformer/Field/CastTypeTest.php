@@ -27,7 +27,7 @@ class CastTypeTest extends TestCase
     {
         return [
             [CastType::Int, '-1', -1],
-            [CastType::Int, '', 0],
+            [CastType::Int, '', null],
             [CastType::Int, 1.5, 1],
             [CastType::Int, 'foo', 0],
             [CastType::Int, null, null],
@@ -36,7 +36,7 @@ class CastTypeTest extends TestCase
 
             [CastType::Float, '-1', -1.0],
             [CastType::Float, '1.258', 1.258],
-            [CastType::Float, '', 0.0],
+            [CastType::Float, '', null],
             [CastType::Float, 1.5, 1.5],
             [CastType::Float, 'foo', 0.0],
             [CastType::Float, null, null],
@@ -91,8 +91,8 @@ class CastTypeTest extends TestCase
 
     public function test_generateCastExpression()
     {
-        $this->assertSame('(is_scalar($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) ? (int) $__tmp_cf8d20da9cb97be602abb1ce003a22b3 : null)', CastType::Int->generateCastExpression('$data["foo"] ?? null'));
-        $this->assertSame('(is_scalar($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) ? (float) $__tmp_cf8d20da9cb97be602abb1ce003a22b3 : null)', CastType::Float->generateCastExpression('$data["foo"] ?? null'));
+        $this->assertSame('(($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) !== \'\' && is_scalar($__tmp_cf8d20da9cb97be602abb1ce003a22b3) ? (int) $__tmp_cf8d20da9cb97be602abb1ce003a22b3 : null)', CastType::Int->generateCastExpression('$data["foo"] ?? null'));
+        $this->assertSame('(($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) !== \'\' && is_scalar($__tmp_cf8d20da9cb97be602abb1ce003a22b3) ? (float) $__tmp_cf8d20da9cb97be602abb1ce003a22b3 : null)', CastType::Float->generateCastExpression('$data["foo"] ?? null'));
         $this->assertSame('(is_scalar($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) || $__tmp_cf8d20da9cb97be602abb1ce003a22b3 instanceof \Stringable ? (string) $__tmp_cf8d20da9cb97be602abb1ce003a22b3 : null)', CastType::String->generateCastExpression('$data["foo"] ?? null'));
         $this->assertSame('(is_scalar($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) ? (bool) $__tmp_cf8d20da9cb97be602abb1ce003a22b3 : null)', CastType::Bool->generateCastExpression('$data["foo"] ?? null'));
         $this->assertSame('(($__tmp_cf8d20da9cb97be602abb1ce003a22b3 = $data["foo"] ?? null) !== null ? (object) $__tmp_cf8d20da9cb97be602abb1ce003a22b3 : null)', CastType::Object->generateCastExpression('$data["foo"] ?? null'));

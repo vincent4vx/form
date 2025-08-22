@@ -7,6 +7,8 @@ use ReflectionNamedType;
 use ReflectionType;
 use Stringable;
 
+use function is_scalar;
+
 /**
  * Available cast types
  * To disable cast, use Mixed
@@ -38,8 +40,8 @@ enum CastType
         }
 
         return match ($this) {
-            self::Int => is_scalar($value) ? (int) $value : null,
-            self::Float => is_scalar($value) ? (float) $value : null,
+            self::Int => $value !== '' && is_scalar($value) ? (int) $value : null,
+            self::Float => $value !== '' && is_scalar($value) ? (float) $value : null,
             self::String => is_scalar($value) || $value instanceof Stringable ? (string) $value : null,
             self::Bool => is_scalar($value) ? (bool) $value : null,
             self::Object => (object) $value,
@@ -61,8 +63,8 @@ enum CastType
         $tmpVarName = Code::varName($expressionToCast);
 
         return match ($this) {
-            self::Int => "(is_scalar($tmpVarName = $expressionToCast) ? (int) $tmpVarName : null)",
-            self::Float => "(is_scalar($tmpVarName = $expressionToCast) ? (float) $tmpVarName : null)",
+            self::Int => "(($tmpVarName = $expressionToCast) !== '' && is_scalar($tmpVarName) ? (int) $tmpVarName : null)",
+            self::Float => "(($tmpVarName = $expressionToCast) !== '' && is_scalar($tmpVarName) ? (float) $tmpVarName : null)",
             self::String => "(is_scalar($tmpVarName = $expressionToCast) || $tmpVarName instanceof \Stringable ? (string) $tmpVarName : null)",
             self::Bool => "(is_scalar($tmpVarName = $expressionToCast) ? (bool) $tmpVarName : null)",
             self::Object => "(($tmpVarName = $expressionToCast) !== null ? (object) $tmpVarName : null)",
