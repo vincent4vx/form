@@ -92,7 +92,7 @@ final class Enum implements FieldTransformerInterface, FieldTransformerGenerator
      */
     public function transformFromHttp(mixed $value): ?UnitEnum
     {
-        if ($value === null) {
+        if ($value === null || $value === '') {
             return null;
         }
 
@@ -187,7 +187,7 @@ final class Enum implements FieldTransformerInterface, FieldTransformerGenerator
             $parse = "\\{$class}::tryFrom(({$typeName}) {$varName}) ?? {$onError}";
         }
 
-        return "(({$varName} = {$previousExpression}) === null ? null : ({$varName} instanceof \\{$class} ? {$varName} : (is_scalar({$varName}) ? {$parse} : {$onError})))";
+        return "(({$varName} = {$previousExpression}) === null || {$varName} === '' ? null : ({$varName} instanceof \\{$class} ? {$varName} : (is_scalar({$varName}) ? {$parse} : {$onError})))";
     }
 
     /**
