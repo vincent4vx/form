@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\Validator;
 
 use Quatrevieux\Form\RegistryInterface;
+use Quatrevieux\Form\Transformer\Field\DefaultValue;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
 use Quatrevieux\Form\Validator\Constraint\Required;
 use ReflectionAttribute;
@@ -34,7 +35,7 @@ final class RuntimeValidatorFactory implements ValidatorFactoryInterface
         $fieldsConstraints = [];
 
         foreach ($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            $requiredShouldBeAdded = ($type = $property->getType()) && !$type->allowsNull();
+            $requiredShouldBeAdded = ($type = $property->getType()) && !$type->allowsNull() && !$property->hasDefaultValue();
             $fieldConstraints = [];
 
             foreach ($property->getAttributes(ConstraintInterface::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
@@ -43,6 +44,13 @@ final class RuntimeValidatorFactory implements ValidatorFactoryInterface
                 if ($requiredShouldBeAdded && $attribute->getName() === Required::class) {
                     $requiredShouldBeAdded = false;
                 }
+            }
+
+            // If a default value is defined, we assume that the field is not required
+            // This behavior can be overridden by defining the Required attribute explicitly
+            // See: https://github.com/vincent4vx/form/issues/15
+            if ($requiredShouldBeAdded) {
+                $requiredShouldBeAdded = $property->getAttributes(DefaultValue::class) === [];
             }
 
             if ($requiredShouldBeAdded) {
