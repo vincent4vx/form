@@ -9,6 +9,7 @@ class FormViewTest extends TestCase
     public function test_array_access()
     {
         $form = new FormView(
+            'MyForm',
             ['foo' => new FieldView('foo', 'bar', null, [])],
             ['foo' => 'bar'],
         );
@@ -23,6 +24,7 @@ class FormViewTest extends TestCase
     {
         $this->expectException(\BadMethodCallException::class);
         $form = new FormView(
+            'MyForm',
             ['foo' => new FieldView('foo', 'bar', null, [])],
             ['foo' => 'bar'],
         );
@@ -34,6 +36,7 @@ class FormViewTest extends TestCase
     {
         $this->expectException(\BadMethodCallException::class);
         $form = new FormView(
+            'MyForm',
             ['foo' => new FieldView('foo', 'bar', null, [])],
             ['foo' => 'bar'],
         );
@@ -44,6 +47,7 @@ class FormViewTest extends TestCase
     public function test_iterator()
     {
         $form = new FormView(
+            'MyForm',
             [
                 'foo' => new FieldView('foo', 'bar', null, []),
                 'bar' => new FieldView('bar', null, null, []),

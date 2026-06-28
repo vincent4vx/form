@@ -73,8 +73,8 @@ final class FormViewInstantiatorGenerator
             );
         }
 
-        $classHelper->generateSubmitted();
-        $classHelper->generateDefault();
+        $classHelper->generateSubmitted($viewInstantiator->dataClassName);
+        $classHelper->generateDefault($viewInstantiator->dataClassName);
 
         return $classHelper->code();
     }

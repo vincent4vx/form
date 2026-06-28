@@ -89,15 +89,19 @@ final class FormViewInstantiatorClass
 
     /**
      * Generate the body of {@see FormViewInstantiatorInterface::submitted()} method
+     *
+     * @param class-string $dataClassName The DTO class name of the form structure
      */
-    public function generateSubmitted(): void
+    public function generateSubmitted(string $dataClassName): void
     {
         $newExprWithRootField = Code::new(FormView::class, [
+            $dataClassName,
             $this->generateFieldsCode('$value', '$errors', '$rootField'),
             Code::raw('$value'),
         ]);
 
         $newExprWithoutRootField = Code::new(FormView::class, [
+            $dataClassName,
             $this->generateFieldsCode('$value', '$errors', null),
             Code::raw('$value'),
         ]);
@@ -107,15 +111,19 @@ final class FormViewInstantiatorClass
 
     /**
      * Generate the body of {@see FormViewInstantiatorInterface::default()} method
+     *
+     * @param class-string $dataClassName The DTO class name of the form structure
      */
-    public function generateDefault(): void
+    public function generateDefault(string $dataClassName): void
     {
         $newExprWithRootField = Code::new(FormView::class, [
+            $dataClassName,
             $this->generateFieldsCode(null, null, '$rootField'),
             [],
         ]);
 
         $newExprWithoutRootField = Code::new(FormView::class, [
+            $dataClassName,
             $this->generateFieldsCode(null, null, null),
             [],
         ]);

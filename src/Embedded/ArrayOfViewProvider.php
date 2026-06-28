@@ -54,6 +54,7 @@ final class ArrayOfViewProvider implements FieldViewProviderInterface, FieldView
         }
 
         return new FormView(
+            $configuration->class,
             $fields,
             $value,
             $instantiator->default($name . '[]'),
@@ -96,7 +97,7 @@ final class ArrayOfViewProvider implements FieldViewProviderInterface, FieldView
     {
         $instantiatorFactory = Expr::this()->registry->getFormViewInstantiatorFactory()->create($configuration->class);
 
-        return static function (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) use ($instantiatorFactory, $name): string {
+        return static function (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) use ($instantiatorFactory, $name, $configuration): string {
             $fieldNameExpression = $rootFieldNameAccessor
                 ? Code::raw('"{' . $rootFieldNameAccessor . '}[' . $name . '][{$index}]"')
                 : Code::raw('"' . $name . '[{$index}]"')
@@ -118,6 +119,7 @@ final class ArrayOfViewProvider implements FieldViewProviderInterface, FieldView
                         . '$field->error = $fieldError instanceof \\' . FieldError::class . ' ? $fieldError : null;'
                     . '}'
                     . 'return ' . Code::new(FormView::class, [
+                        $configuration->class,
                         Code::raw('$fields'),
                         Code::raw('$values'),
                         Code::expr('$instantiator')->default(

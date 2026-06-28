@@ -91,6 +91,6 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
             }
         }
 
-        return new FormView($fields, $value);
+        return new FormView($this->dataClassName, $fields, $value);
     }
 }

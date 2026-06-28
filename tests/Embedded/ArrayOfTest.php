@@ -176,6 +176,7 @@ class ArrayOfTest extends FormTestCase
         ])->view();
 
         $this->assertEquals(new FormView(
+            ArrayItem::class,
             fields: [
                 'name' => new FieldView('items[][name]', null, null, ['required' => true, 'minlength' => 3]),
                 'value' => new FieldView('items[][value]', null, null, ['required' => true]),
@@ -227,6 +228,7 @@ class ArrayOfTest extends FormTestCase
         ])->view();
 
         $this->assertEquals(new FormView(
+            ArrayItem::class,
             fields: [
                 'name' => new FieldView('items[][name]', null, null, ['required' => true, 'minlength' => 3]),
                 'value' => new FieldView('items[][value]', null, null, ['required' => true]),
@@ -252,8 +254,8 @@ class ArrayOfTest extends FormTestCase
     {
         $view = new ArrayOf(ArrayItem::class);
 
-        $this->assertSame('(function ($values, $errors) use($rootField) {$instantiator = $this->registry->getFormViewInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\');$fieldsErrors = is_array($errors) ? $errors : [];$fields = [];foreach ($values as $index => $item) {$fieldError = $fieldsErrors[$index] ?? [];$fields[$index] = $field = $instantiator->submitted((array) $item, is_array($fieldError) ? $fieldError : [], "{$rootField}[foo][{$index}]");$field->error = $fieldError instanceof \Quatrevieux\Form\Validator\FieldError ? $fieldError : null;}return new \Quatrevieux\Form\View\FormView($fields, $values, $instantiator->default("{$rootField}[foo][]"), $errors instanceof \Quatrevieux\Form\Validator\FieldError ? $errors : null);})((array) ($value["foo"] ?? null), $errors["foo"] ?? null)', $view->getViewProvider($this->registry)->generateFieldViewExpression($view, 'foo', [])('$value["foo"] ?? null', '$errors["foo"] ?? null', '$rootField'));
-        $this->assertSame('(function ($values, $errors) {$instantiator = $this->registry->getFormViewInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\');$fieldsErrors = is_array($errors) ? $errors : [];$fields = [];foreach ($values as $index => $item) {$fieldError = $fieldsErrors[$index] ?? [];$fields[$index] = $field = $instantiator->submitted((array) $item, is_array($fieldError) ? $fieldError : [], "foo[{$index}]");$field->error = $fieldError instanceof \Quatrevieux\Form\Validator\FieldError ? $fieldError : null;}return new \Quatrevieux\Form\View\FormView($fields, $values, $instantiator->default(\'foo[]\'), $errors instanceof \Quatrevieux\Form\Validator\FieldError ? $errors : null);})((array) ($value["foo"] ?? null), $errors["foo"] ?? null)', $view->getViewProvider($this->registry)->generateFieldViewExpression($view, 'foo', [])('$value["foo"] ?? null', '$errors["foo"] ?? null', null));
+        $this->assertSame('(function ($values, $errors) use($rootField) {$instantiator = $this->registry->getFormViewInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\');$fieldsErrors = is_array($errors) ? $errors : [];$fields = [];foreach ($values as $index => $item) {$fieldError = $fieldsErrors[$index] ?? [];$fields[$index] = $field = $instantiator->submitted((array) $item, is_array($fieldError) ? $fieldError : [], "{$rootField}[foo][{$index}]");$field->error = $fieldError instanceof \Quatrevieux\Form\Validator\FieldError ? $fieldError : null;}return new \Quatrevieux\Form\View\FormView(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\', $fields, $values, $instantiator->default("{$rootField}[foo][]"), $errors instanceof \Quatrevieux\Form\Validator\FieldError ? $errors : null);})((array) ($value["foo"] ?? null), $errors["foo"] ?? null)', $view->getViewProvider($this->registry)->generateFieldViewExpression($view, 'foo', [])('$value["foo"] ?? null', '$errors["foo"] ?? null', '$rootField'));
+        $this->assertSame('(function ($values, $errors) {$instantiator = $this->registry->getFormViewInstantiatorFactory()->create(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\');$fieldsErrors = is_array($errors) ? $errors : [];$fields = [];foreach ($values as $index => $item) {$fieldError = $fieldsErrors[$index] ?? [];$fields[$index] = $field = $instantiator->submitted((array) $item, is_array($fieldError) ? $fieldError : [], "foo[{$index}]");$field->error = $fieldError instanceof \Quatrevieux\Form\Validator\FieldError ? $fieldError : null;}return new \Quatrevieux\Form\View\FormView(\'Quatrevieux\\\Form\\\Embedded\\\ArrayItem\', $fields, $values, $instantiator->default(\'foo[]\'), $errors instanceof \Quatrevieux\Form\Validator\FieldError ? $errors : null);})((array) ($value["foo"] ?? null), $errors["foo"] ?? null)', $view->getViewProvider($this->registry)->generateFieldViewExpression($view, 'foo', [])('$value["foo"] ?? null', '$errors["foo"] ?? null', null));
     }
 }
 
