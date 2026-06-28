@@ -46,6 +46,21 @@ class ChoiceViewTest extends TestCase
         $this->assertSame('translated', $view->localizedLabel());
     }
 
+    public function test_use_Label()
+    {
+        $label = new Label('label');
+
+        $view = new ChoiceView('value', $label);
+
+        $this->assertSame('label', $view->localizedLabel());
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->with('label')->willReturn('translated');
+        $view->setTranslator($translator);
+
+        $this->assertSame('translated', $view->localizedLabel());
+    }
+
     public function test_use_translatableInterface()
     {
         $label = new class implements TranslatableInterface {
