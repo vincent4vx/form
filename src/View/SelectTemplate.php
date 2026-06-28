@@ -30,20 +30,23 @@ enum SelectTemplate
      * Perform rendering of the field view
      *
      * @param FieldView $view
+     * @param string|null $locale
      * @return string
      */
-    public function __invoke(FieldView $view): string
+    public function __invoke(FieldView $view, ?string $locale = null): string
     {
-        return $this->render($view);
+        return $this->render($view, $locale);
     }
 
     /**
      * Perform rendering of the field view
      *
      * @param FieldView $view
+     * @param string|null $locale
+     *
      * @return string
      */
-    public function render(FieldView $view): string
+    public function render(FieldView $view, ?string $locale = null): string
     {
         $choices = $view->choices ?? [];
         $template = $this->choiceTemplate();
@@ -52,7 +55,7 @@ enum SelectTemplate
         $html = '';
 
         foreach ($choices as $choice) {
-            $html .= self::renderChoice($template, $selected, $view, $choice);
+            $html .= self::renderChoice($template, $selected, $view, $choice, $locale);
         }
 
         return self::renderInput($this->inputTemplate(), $view, $html);
@@ -83,11 +86,11 @@ enum SelectTemplate
         };
     }
 
-    private static function renderChoice(string $template, string $selected, FieldView $view, ChoiceView $choice): string
+    private static function renderChoice(string $template, string $selected, FieldView $view, ChoiceView $choice, ?string $locale): string
     {
         return strtr($template, [
             '{{ value }}' => htmlspecialchars((string) $choice->value, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5),
-            '{{ label }}' => htmlspecialchars($choice->localizedLabel() ?: (string) $choice->value, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5),
+            '{{ label }}' => htmlspecialchars($choice->localizedLabel($locale) ?: (string) $choice->value, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5),
             '{{ name }}' => htmlspecialchars($view->name, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5),
             '{{ attributes }}' => $choice->selected ? $selected : '',
         ]);

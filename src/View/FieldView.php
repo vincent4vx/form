@@ -131,13 +131,14 @@ final class FieldView implements Stringable
     /**
      * Render the field view as an HTML string
      *
-     * @param callable(self):string $renderer Renderer function. It will receive the current field view as argument.
+     * @param callable(self, string|null):string $renderer Renderer function. It will receive the current field view as first argument, and the locale as second argument.
+     * @param string|null $locale If the input has translated data (e.g. choice labels), define the locale to use.
      *
      * @return string
      */
-    public function render(callable $renderer): string
+    public function render(callable $renderer, ?string $locale = null): string
     {
-        return $renderer($this);
+        return $renderer($this, $locale);
     }
 
     /**

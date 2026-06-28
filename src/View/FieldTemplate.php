@@ -20,9 +20,11 @@ enum FieldTemplate: string
      * Perform rendering of the field view
      *
      * @param FieldView $view
+     * @param string|null $locale
+     *
      * @return string
      */
-    public function __invoke(FieldView $view): string
+    public function __invoke(FieldView $view, ?string $locale = null): string
     {
         return self::renderTemplate($this->value, $view);
     }
