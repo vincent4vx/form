@@ -6,6 +6,16 @@ use Quatrevieux\Form\FormTestCase;
 
 class SelectTemplateTest extends FormTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->translator->add('fr', 'label1', 'étiquette1');
+        $this->translator->add('fr', 'label2', 'étiquette2');
+        $this->translator->add('es', 'label1', 'etiqueta1');
+        $this->translator->add('es', 'label2', 'etiqueta2');
+    }
+
     public function test_render_Select()
     {
         $view = new FieldView('name', 'value', null, ['class' => 'foo', 'required' => true], [
@@ -16,6 +26,24 @@ class SelectTemplateTest extends FormTestCase
         $this->assertSame(
             '<select name="name" class="foo" required ><option value="value1" >label1</option><option value="value2" selected>label2</option></select>',
             $view->render(SelectTemplate::Select)
+        );
+    }
+
+    public function test_render_Select_with_locale()
+    {
+        $view = (new FieldView('name', 'value', null, ['class' => 'foo', 'required' => true]))->choices([
+            new ChoiceView('value1', 'label1'),
+            new ChoiceView('value2', 'label2', true),
+        ], $this->translator);
+
+        $this->assertSame(
+            '<select name="name" class="foo" required ><option value="value1" >étiquette1</option><option value="value2" selected>étiquette2</option></select>',
+            $view->render(SelectTemplate::Select, 'fr')
+        );
+
+        $this->assertSame(
+            '<select name="name" class="foo" required ><option value="value1" >etiqueta1</option><option value="value2" selected>etiqueta2</option></select>',
+            $view->render(SelectTemplate::Select, 'es')
         );
     }
 
@@ -32,6 +60,19 @@ class SelectTemplateTest extends FormTestCase
         );
     }
 
+    public function test_render_Radio_with_locale()
+    {
+        $view = (new FieldView('name', 'value', null, ['class' => 'foo']))->choices([
+            new ChoiceView('value1', 'label1'),
+            new ChoiceView('value2', 'label2', true),
+        ], $this->translator);
+
+        $this->assertSame(
+            '<div class="foo" ><label><input type="radio" name="name" value="value1" >étiquette1</label><label><input type="radio" name="name" value="value2" checked>étiquette2</label><div>',
+            $view->render(SelectTemplate::Radio, 'fr')
+        );
+    }
+
     public function test_render_Checkbox()
     {
         $view = new FieldView('name', 'value', null, ['class' => 'foo'], [
@@ -42,6 +83,19 @@ class SelectTemplateTest extends FormTestCase
         $this->assertSame(
             '<div class="foo" ><label><input type="checkbox" name="name" value="value1" >label1</label><label><input type="checkbox" name="name" value="value2" checked>label2</label><div>',
             $view->render(SelectTemplate::Checkbox)
+        );
+    }
+
+    public function test_render_Checkbox_with_locale()
+    {
+        $view = (new FieldView('name', 'value', null, ['class' => 'foo']))->choices([
+            new ChoiceView('value1', 'label1'),
+            new ChoiceView('value2', 'label2', true),
+        ], $this->translator);
+
+        $this->assertSame(
+            '<div class="foo" ><label><input type="checkbox" name="name" value="value1" >étiquette1</label><label><input type="checkbox" name="name" value="value2" checked>étiquette2</label><div>',
+            $view->render(SelectTemplate::Checkbox, 'fr')
         );
     }
 }
