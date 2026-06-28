@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\View;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChoiceViewTest extends TestCase
@@ -29,6 +30,26 @@ class ChoiceViewTest extends TestCase
             }
 
             public function translatedLabel(TranslatorInterface $translator, ?string $locale = null): string
+            {
+                return $translator->trans('label', [], null, $locale);
+            }
+        };
+
+        $view = new ChoiceView('value', $label);
+
+        $this->assertSame('label', $view->localizedLabel());
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->with('label')->willReturn('translated');
+        $view->setTranslator($translator);
+
+        $this->assertSame('translated', $view->localizedLabel());
+    }
+
+    public function test_use_translatableInterface()
+    {
+        $label = new class implements TranslatableInterface {
+            public function trans(TranslatorInterface $translator, ?string $locale = null): string
             {
                 return $translator->trans('label', [], null, $locale);
             }
