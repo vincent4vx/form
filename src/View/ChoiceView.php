@@ -2,6 +2,8 @@
 
 namespace Quatrevieux\Form\View;
 
+use Quatrevieux\Form\DummyTranslator;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -24,7 +26,7 @@ final class ChoiceView
          * Choice label
          * The label will be translated if a translator is set
          */
-        public readonly string|LabelInterface|null $label = null,
+        public readonly string|LabelInterface|TranslatableInterface|null $label = null,
 
         /**
          * Is the selected choice ?
@@ -50,6 +52,10 @@ final class ChoiceView
 
         if ($this->label instanceof LabelInterface) {
             return $translator ? $this->label->translatedLabel($translator, $locale) : $this->label->label();
+        }
+
+        if ($this->label instanceof TranslatableInterface) {
+            return $this->label->trans($translator ?? DummyTranslator::instance(), $locale);
         }
 
         return $translator ? $translator->trans($this->label, [], null, $locale) : $this->label;
