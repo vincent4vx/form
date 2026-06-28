@@ -112,11 +112,11 @@ class EmbeddedTest extends FormTestCase
         $this->assertEquals([
             'name' => new FieldView('name', null, null, ['required' => true]),
             'value' => new FieldView('value', null, null, ['required' => true]),
-            'embedded' => new FormView([
+            'embedded' => new FormView(EmbeddedForm::class, [
                 'foo' => new FieldView('embedded[foo]', null, null, ['minlength' => 3, 'maxlength' => 5, 'required' => true]),
                 'bar' => new FieldView('embedded[bar]', null, null, ['required' => true]),
             ], []),
-            'optionalEmbedded' => new FormView([
+            'optionalEmbedded' => new FormView(EmbeddedForm::class, [
                 'foo' => new FieldView('optionalEmbedded[foo]', null, null, ['minlength' => 3, 'maxlength' => 5, 'required' => true]),
                 'bar' => new FieldView('optionalEmbedded[bar]', null, null, ['required' => true]),
             ], []),
@@ -135,14 +135,14 @@ class EmbeddedTest extends FormTestCase
         $this->assertEquals([
             'name' => new FieldView('name', 'foo', null, ['required' => true]),
             'value' => new FieldView('value', '42', null, ['required' => true]),
-            'embedded' => new FormView([
+            'embedded' => new FormView(EmbeddedForm::class, [
                 'foo' => new FieldView('embedded[foo]', 'azer', null, ['minlength' => 3, 'maxlength' => 5, 'required' => true]),
                 'bar' => new FieldView('embedded[bar]', '4,2,6', null, ['required' => true]),
             ], [
                 'foo' => 'azer',
                 'bar' => '4,2,6',
             ]),
-            'optionalEmbedded' => new FormView([
+            'optionalEmbedded' => new FormView(EmbeddedForm::class, [
                 'foo' => new FieldView('optionalEmbedded[foo]', null, null, ['minlength' => 3, 'maxlength' => 5, 'required' => true]),
                 'bar' => new FieldView('optionalEmbedded[bar]', null, null, ['required' => true]),
             ], []),
@@ -172,14 +172,14 @@ class EmbeddedTest extends FormTestCase
         $this->assertEquals([
             'name' => new FieldView('name', 'foo', null, ['required' => true]),
             'value' => new FieldView('value', '42', null, ['required' => true]),
-            'embedded' => new FormView([
+            'embedded' => new FormView(EmbeddedForm::class, [
                 'foo' => new FieldView('embedded[foo]', 'azer', null, ['minlength' => 3, 'maxlength' => 5, 'required' => true]),
                 'bar' => new FieldView('embedded[bar]', '4,2,6', null, ['required' => true]),
             ], [
                 'foo' => 'azer',
                 'bar' => '4,2,6',
             ]),
-            'optionalEmbedded' => new FormView([
+            'optionalEmbedded' => new FormView(EmbeddedForm::class, [
                 'foo' => new FieldView('optionalEmbedded[foo]', 'aqw', null, ['minlength' => 3, 'maxlength' => 5, 'required' => true]),
                 'bar' => new FieldView('optionalEmbedded[bar]', '7,4,1', null, ['required' => true]),
             ], [
@@ -212,14 +212,14 @@ class EmbeddedTest extends FormTestCase
         $this->assertEquals([
             'name' => new FieldView('name', 'bar', null, ['required' => true]),
             'value' => new FieldView('value', 666, null, ['required' => true]),
-            'embedded' => new FormView([
+            'embedded' => new FormView(EmbeddedForm::class, [
                 'foo' => new FieldView('embedded[foo]', 'qwerty', null, ['minlength' => 3, 'maxlength' => 5, 'required' => true]),
                 'bar' => new FieldView('embedded[bar]', '1,2,3', null, ['required' => true]),
             ], [
                 'foo' => 'qwerty',
                 'bar' => '1,2,3',
             ]),
-            'optionalEmbedded' => new FormView([
+            'optionalEmbedded' => new FormView(EmbeddedForm::class, [
                 'foo' => new FieldView('optionalEmbedded[foo]', null, null, ['minlength' => 3, 'maxlength' => 5, 'required' => true]),
                 'bar' => new FieldView('optionalEmbedded[bar]', null, null, ['required' => true]),
             ], []),
@@ -242,11 +242,11 @@ class EmbeddedTest extends FormTestCase
         $this->assertEquals([
             'name' => new FieldView('name', 'foo', null, ['required' => true]),
             'value' => new FieldView('value', '42', null, ['required' => true]),
-            'embedded' => new FormView([
+            'embedded' => new FormView(EmbeddedForm::class, [
                 'foo' => new FieldView('embedded[foo]', null, null, ['minlength' => 3, 'maxlength' => 5, 'required' => true]),
                 'bar' => new FieldView('embedded[bar]', null, null, ['required' => true]),
             ], [], error: new FieldError('This value is required', code: Required::CODE, translator: DummyTranslator::instance())),
-            'optionalEmbedded' => new FormView([
+            'optionalEmbedded' => new FormView(EmbeddedForm::class, [
                 'foo' => new FieldView('optionalEmbedded[foo]', null, null, ['minlength' => 3, 'maxlength' => 5, 'required' => true]),
                 'bar' => new FieldView('optionalEmbedded[bar]', null, null, ['required' => true]),
             ], []),

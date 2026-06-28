@@ -228,6 +228,7 @@ class FunctionalTest extends FormTestCase
         $form = $this->form(SimpleRequest::class);
         $view = $form->view();
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', null, null, []),
             'bar' => new FieldView('bar', null, null, []),
@@ -236,6 +237,7 @@ class FunctionalTest extends FormTestCase
 
         $view = $form->submit(['foo' => 'aaa', 'bar' => 'bbb'])->view();
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', 'aaa', null, []),
             'bar' => new FieldView('bar', 'bbb', null, []),
@@ -248,6 +250,7 @@ class FunctionalTest extends FormTestCase
 
         $view = $form->import($request)->view();
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', 'ccc', null, []),
             'bar' => new FieldView('bar', 'ddd', null, []),
@@ -295,6 +298,7 @@ class FunctionalTest extends FormTestCase
 
         $view = $form->submit(['bar' => 'a'])->view();
 
+        $this->assertSame(RequiredParametersRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', null, new FieldError('This value is required', [], Required::CODE, DummyTranslator::instance()), ['required' => true]),
             'bar' => new FieldView('bar', 'a', new FieldError('The value is too short. It should have {{ min }} characters or more.', ['min' => 3], Length::CODE, DummyTranslator::instance()), ['required' => true, 'minlength' => 3]),

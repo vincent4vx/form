@@ -18,11 +18,13 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
         $view = $instantiator->default();
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([], $view->fields);
         $this->assertEquals([], $view->value);
 
         $view = $instantiator->submitted(['foo' => 'bar'], []);
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([], $view->fields);
         $this->assertEquals(['foo' => 'bar'], $view->value);
     }
@@ -36,6 +38,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
         $view = $instantiator->default();
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', null, null, []),
             'bar' => new FieldView('bar', null, null, []),
@@ -44,6 +47,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
         $view = $instantiator->submitted(['foo' => 'bar'], []);
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', 'bar', null, []),
             'bar' => new FieldView('bar', null, null, []),
@@ -52,6 +56,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
         $view = $instantiator->submitted(['foo' => 'aaa', 'bar' => 'bbb'], ['foo' => new FieldError('my error')]);
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', 'aaa', new FieldError('my error'), []),
             'bar' => new FieldView('bar', 'bbb', null, []),
@@ -68,6 +73,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
         $view = $instantiator->default('root[foo]');
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('root[foo][foo]', null, null, []),
             'bar' => new FieldView('root[foo][bar]', null, null, []),
@@ -86,6 +92,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
         $view = $instantiator->default();
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('my_foo', null, null, []),
             'bar' => new FieldView('my_bar', null, null, []),
@@ -94,6 +101,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
         $view = $instantiator->submitted(['my_foo' => 'bar'], []);
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('my_foo', 'bar', null, []),
             'bar' => new FieldView('my_bar', null, null, []),
@@ -102,6 +110,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
         $view = $instantiator->submitted(['my_foo' => 'aaa', 'my_bar' => 'bbb'], ['foo' => new FieldError('my error')]);
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('my_foo', 'aaa', new FieldError('my error'), []),
             'bar' => new FieldView('my_bar', 'bbb', null, []),
@@ -119,10 +128,11 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
         $view = $instantiator->default();
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', 'aaa', null, ['id' => 'my_foo']),
             'bar' => new FieldView('bar', null, null, ['class' => 'my_class']),
-            'embedded' => new FormView([
+            'embedded' => new FormView(SimpleRequest::class, [
                 'foo' => new FieldView('embedded[foo]', null, null, []),
                 'bar' => new FieldView('embedded[bar]', null, null, []),
             ], []),
@@ -145,7 +155,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
         $this->assertEquals([
             'foo' => new FieldView('foo', 'bar', new FieldError('my error'), ['id' => 'my_foo']),
             'bar' => new FieldView('bar', null, null, ['class' => 'my_class']),
-            'embedded' => new FormView([
+            'embedded' => new FormView(SimpleRequest::class, [
                 'foo' => new FieldView('embedded[foo]', 'aaa', null, []),
                 'bar' => new FieldView('embedded[bar]', 'bbb', new FieldError('other error'), []),
             ], [
@@ -164,6 +174,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
         $view = $instantiator->default();
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', null, null, ['class' => 'my_class']),
             'bar' => new FieldView('bar', null, null, []),
@@ -172,6 +183,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
         $view = $instantiator->submitted(['foo' => 'bar'], []);
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', 'bar', null, ['class' => 'my_class']),
             'bar' => new FieldView('bar', null, null, []),
@@ -180,6 +192,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
 
         $view = $instantiator->submitted(['foo' => 'aaa', 'bar' => 'bbb'], ['foo' => new FieldError('my error')]);
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', 'aaa', new FieldError('my error'), ['class' => 'my_class']),
             'bar' => new FieldView('bar', 'bbb', null, []),
@@ -211,6 +224,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
         $expectedChoices[1]->setTranslator(DummyTranslator::instance());
         $expectedChoices[2]->setTranslator(DummyTranslator::instance());
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', null, null, choices: $expectedChoices),
         ], $view->fields);
@@ -227,6 +241,7 @@ class RuntimeFormViewInstantiatorTest extends FormTestCase
         $expectedChoices[1]->setTranslator(DummyTranslator::instance());
         $expectedChoices[2]->setTranslator(DummyTranslator::instance());
 
+        $this->assertSame(SimpleRequest::class, $view->class);
         $this->assertEquals([
             'foo' => new FieldView('foo', 2, null, choices: $expectedChoices),
         ], $view->fields);

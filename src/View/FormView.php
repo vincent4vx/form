@@ -25,6 +25,13 @@ final class FormView implements ArrayAccess, IteratorAggregate, Countable
 {
     public function __construct(
         /**
+         * The DTO class name representing form structure of the current view.
+         *
+         * @var class-string
+         */
+        public readonly string $class,
+
+        /**
          * Form fields indexed by name (or index in case of array)
          *
          * @var array<string|int, FieldView|FormView>
