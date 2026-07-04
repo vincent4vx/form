@@ -10,6 +10,8 @@ use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
 use Quatrevieux\Form\Validator\ValidatorFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function assert;
+
 /**
  * Implementation of registry using PSR-11 container
  */
@@ -40,6 +42,17 @@ final class ContainerRegistry implements RegistryInterface
             ? $this->container->get(TranslatorInterface::class)
             : DummyTranslator::instance()
         ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getService(string $className): object
+    {
+        $service = $this->container->get($className);
+        assert($service instanceof $className);
+
+        return $service;
     }
 
     /**

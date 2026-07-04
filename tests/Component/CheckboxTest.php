@@ -8,7 +8,6 @@ use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Validator\Constraint\IdenticalTo;
 use Quatrevieux\Form\View\Provider\FieldViewAttributesProviderInterface;
-use Quatrevieux\Form\View\Provider\FieldViewConfiguration;
 
 class CheckboxTest extends FormTestCase
 {

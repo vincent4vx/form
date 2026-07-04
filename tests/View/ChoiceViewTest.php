@@ -3,6 +3,9 @@
 namespace Quatrevieux\Form\View;
 
 use PHPUnit\Framework\TestCase;
+use Quatrevieux\Form\Choice\Label\Label;
+use Quatrevieux\Form\Choice\Label\LabelInterface;
+use Quatrevieux\Form\Choice\View\ChoiceView;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

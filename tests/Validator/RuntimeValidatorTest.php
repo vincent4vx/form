@@ -6,7 +6,6 @@ use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Validator\Constraint\EqualsWith;
 use Quatrevieux\Form\Validator\Constraint\Length;
-use Quatrevieux\Form\Validator\Constraint\NullConstraintValidatorRegistry;
 
 class RuntimeValidatorTest extends FormTestCase
 {

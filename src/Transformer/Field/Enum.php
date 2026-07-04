@@ -4,15 +4,16 @@ namespace Quatrevieux\Form\Transformer\Field;
 
 use Attribute;
 use BackedEnum;
+use Quatrevieux\Form\Choice\Label\LabelInterface;
+use Quatrevieux\Form\Choice\View\ChoiceView;
+use Quatrevieux\Form\Choice\View\FieldChoiceViewProviderInterface;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Transformer\TransformerException;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\Validator\FieldError;
-use Quatrevieux\Form\View\ChoiceView;
-use Quatrevieux\Form\View\LabelInterface;
-use Quatrevieux\Form\View\Provider\FieldChoiceProviderInterface;
 use ReflectionEnum;
 use Stringable;
 use UnitEnum;
@@ -52,7 +53,7 @@ use function print_r;
  * @implements FieldTransformerGeneratorInterface<Enum>
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Enum implements FieldTransformerInterface, FieldTransformerGeneratorInterface, FieldChoiceProviderInterface
+final class Enum implements FieldTransformerInterface, FieldTransformerGeneratorInterface, FieldChoiceViewProviderInterface
 {
     public const CODE = '052417e1-3a0d-5cd0-afdf-486cfe606edf';
 
@@ -133,7 +134,7 @@ final class Enum implements FieldTransformerInterface, FieldTransformerGenerator
     /**
      * {@inheritdoc}
      */
-    public function choices(mixed $currentValue, FieldTransformerInterface $transformer): array
+    public function choiceViews(mixed $currentValue, FieldTransformerInterface $transformer, RegistryInterface $registry): array
     {
         $choices = [];
 

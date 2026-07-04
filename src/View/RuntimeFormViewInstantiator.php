@@ -2,8 +2,8 @@
 
 namespace Quatrevieux\Form\View;
 
+use Quatrevieux\Form\Choice\View\FieldChoiceViewProviderInterface;
 use Quatrevieux\Form\RegistryInterface;
-use Quatrevieux\Form\View\Provider\FieldChoiceProviderInterface;
 use Quatrevieux\Form\View\Provider\FieldViewProviderConfigurationInterface;
 
 /**
@@ -43,7 +43,7 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
         public readonly array $attributesByField,
 
         /**
-         * @var array<string, FieldChoiceProviderInterface>
+         * @var array<string, FieldChoiceViewProviderInterface>
          */
         public readonly array $choicesProviderByField,
     ) {}
@@ -83,7 +83,7 @@ final class RuntimeFormViewInstantiator implements FormViewInstantiatorInterface
                 $fieldTransformer = $formTransformer->fieldTransformer($name);
                 $translator = $this->registry->getTranslator();
 
-                $fieldView->choices = $this->choicesProviderByField[$name]->choices($fieldValue, $fieldTransformer);
+                $fieldView->choices = $this->choicesProviderByField[$name]->choiceViews($fieldValue, $fieldTransformer, $this->registry);
 
                 foreach ($fieldView->choices as $choice) {
                     $choice->setTranslator($translator);

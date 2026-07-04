@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\View;
 
 use PHPUnit\Framework\TestCase;
+use Quatrevieux\Form\Choice\View\ChoiceView;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldViewTest extends TestCase

@@ -1,23 +1,24 @@
 <?php
 
-namespace Quatrevieux\Form\View\Provider;
+namespace Quatrevieux\Form\Choice\View;
 
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
-use Quatrevieux\Form\View\ChoiceView;
 
 /**
  * Provide choice views to a {@see FieldView} object
  * This type should be used as attribute on the corresponding property on the DTO.
  */
-interface FieldChoiceProviderInterface
+interface FieldChoiceViewProviderInterface
 {
     /**
      * Get the choices for the field
      *
      * @param mixed $currentValue Current field value, in raw HTTP format. Will be used to determine the selected choice.
      * @param FieldTransformerInterface $transformer Current field transformer. Will be used to transform the choices values to HTTP format.
+     * @param RegistryInterface $registry The registry. Can be used to load choices from a service.
      *
      * @return list<ChoiceView>
      */
-    public function choices(mixed $currentValue, FieldTransformerInterface $transformer): array;
+    public function choiceViews(mixed $currentValue, FieldTransformerInterface $transformer, RegistryInterface $registry): array;
 }

@@ -4,7 +4,6 @@ namespace Quatrevieux\Form;
 
 use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\DataMapper\DataMapperFactoryInterface;
-use Quatrevieux\Form\DataMapper\DataMapperInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;

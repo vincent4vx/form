@@ -28,6 +28,11 @@ final class DefaultRegistry implements RegistryInterface
      */
     private array $validators = [];
 
+    /**
+     * @var array<class-string, object>
+     */
+    private array $services = [];
+
     private ?TranslatorInterface $translator = null;
 
     /**
@@ -57,6 +62,15 @@ final class DefaultRegistry implements RegistryInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getService(string $className): object
+    {
+        // @phpstan-ignore-next-line
+        return $this->services[$className] ?? throw new InvalidArgumentException(sprintf('Service "%s" is not registered', $className));
+    }
+
+    /**
      * Register a transformer
      *
      * @param T $transformer Transformer instance
@@ -80,6 +94,19 @@ final class DefaultRegistry implements RegistryInterface
     public function registerValidator(ConstraintValidatorInterface $validator, ?string $className = null): void
     {
         $this->validators[$className ?? get_class($validator)] = $validator;
+    }
+
+    /**
+     * Register a service
+     *
+     * @param V $service Service instance
+     * @param class-string<V>|null $className Class name of the service. If null, the class name of the instance will be used.
+     *
+     * @template V as object
+     */
+    public function registerService(object $service, ?string $className = null): void
+    {
+        $this->services[$className ?? get_class($service)] = $service;
     }
 
     /**

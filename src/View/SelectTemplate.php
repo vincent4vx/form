@@ -2,6 +2,8 @@
 
 namespace Quatrevieux\Form\View;
 
+use Quatrevieux\Form\Choice\View\ChoiceView;
+
 use function htmlspecialchars;
 use function strtr;
 

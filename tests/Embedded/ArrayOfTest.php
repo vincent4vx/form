@@ -8,7 +8,6 @@ use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Generator\FieldTransformerGeneratorInterface;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Validator\Constraint\Length;
-use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\View\FieldView;
 use Quatrevieux\Form\View\FormView;
 

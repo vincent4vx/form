@@ -2,7 +2,7 @@
 
 namespace Quatrevieux\Form\Fixtures;
 
-use Quatrevieux\Form\Validator\Constraint\Choice;
+use Quatrevieux\Form\Choice\Choice;
 
 class WithChoiceRequest
 {
