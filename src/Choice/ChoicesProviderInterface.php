@@ -5,6 +5,12 @@ namespace Quatrevieux\Form\Choice;
 use Quatrevieux\Form\Choice\Label\LabelInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
+/**
+ * Interface for provide choices lazily, or if external dependencies are required.
+ *
+ * If the implementation also implements {@see FieldChoiceViewProviderInterface}, custom choice view implementation
+ * can also be provided.
+ */
 interface ChoicesProviderInterface
 {
     /**

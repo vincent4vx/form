@@ -5,8 +5,10 @@ namespace Quatrevieux\Form\Choice;
 use Attribute;
 use Quatrevieux\Form\Choice\Label\Label;
 use Quatrevieux\Form\Choice\View\ChoiceView;
+use Quatrevieux\Form\Choice\View\FieldChoiceViewProviderInterface;
 use Quatrevieux\Form\DummyTranslator;
 use Quatrevieux\Form\FormTestCase;
+use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\ArrayCast;
 use Quatrevieux\Form\Transformer\Field\CastType;
 use Quatrevieux\Form\Transformer\Field\FieldTransformerInterface;
@@ -22,6 +24,7 @@ class ChoiceTest extends FormTestCase
         parent::setUp();
 
         $this->container->set(MyChoiceProvider::class, new MyChoiceProvider());
+        $this->container->set(MyChoiceProvider2::class, new MyChoiceProvider2());
     }
 
     public function test_code()
@@ -117,9 +120,15 @@ class ChoiceTest extends FormTestCase
             new ChoiceView(122, new Label('Bar')),
         ]), $view['withProvider']->choices);
 
+        $this->assertEquals($setTranslator([
+            new ChoiceView(42, 'Choice 42'),
+            new ChoiceView(122, 'Choice 122'),
+        ]), $view['withProviderCustomView']->choices);
+
         $this->assertEquals('<select name="value" ><option value="15" selected>15</option><option value="23" >23</option><option value="45" >45</option></select>', $view['value']->render(SelectTemplate::Select));
         $this->assertEquals('<select name="withLabel" ><option value="15" >Foo</option><option value="23" >Other value</option><option value="45" >Random label</option></select>', $view['withLabel']->render(SelectTemplate::Select));
         $this->assertEquals('<select name="withProvider" ><option value="42" selected>Foo</option><option value="122" >Bar</option></select>', $view['withProvider']->render(SelectTemplate::Select));
+        $this->assertEquals('<select name="withProviderCustomView" ><option value="42" >Choice 42</option><option value="122" >Choice 122</option></select>', $view['withProviderCustomView']->render(SelectTemplate::Select));
         $this->assertEquals('<div ><label><input type="radio" name="withLabel" value="15" >Foo</label><label><input type="radio" name="withLabel" value="23" >Other value</label><label><input type="radio" name="withLabel" value="45" >Random label</label><div>', $view['withLabel']->render(SelectTemplate::Radio));
     }
 
@@ -173,6 +182,10 @@ class ChoiceTestRequest
     #[Choice(MyChoiceProvider::class)]
     #[ArrayCast(CastType::Int)]
     public ?array $withProviderArray;
+
+    #[Choice(MyChoiceProvider2::class)]
+    public ?int $withProviderCustomView;
+
 }
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -203,6 +216,39 @@ class MyChoiceProvider implements ChoicesProviderInterface
     {
         yield new Label('Foo') => 42;
         yield new Label('Bar') => 122;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function contains(mixed $value): bool
+    {
+        return $value === 42 || $value === 122;
+    }
+}
+
+class MyChoiceProvider2 implements ChoicesProviderInterface, FieldChoiceViewProviderInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function choices(): iterable
+    {
+        return [42, 122];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function choiceViews(mixed $currentValue, FieldTransformerInterface $transformer, RegistryInterface $registry): array
+    {
+        $views = [];
+
+        foreach ($this->choices() as $choice) {
+            $views[] = new ChoiceView($choice, 'Choice ' . $choice, $currentValue == $choice);
+        }
+
+        return $views;
     }
 
     /**

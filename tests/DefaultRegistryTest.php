@@ -40,6 +40,17 @@ class DefaultRegistryTest extends TestCase
         $this->assertSame($translator, $registry->getTranslator());
     }
 
+    public function test_get_set_service()
+    {
+        $registry = new DefaultRegistry();
+
+        $registry->registerService($service = new \stdClass());
+        $this->assertSame($service, $registry->getService(\stdClass::class));
+
+        $registry->registerService($service = new \stdClass(), 'foo');
+        $this->assertSame($service, $registry->getService('foo'));
+    }
+
     public function test_registerTransformer()
     {
         $registry = new DefaultRegistry();
