@@ -2,7 +2,6 @@
 
 namespace Quatrevieux\Form;
 
-use http\Exception\InvalidArgumentException;
 use Quatrevieux\Form\Fixtures\ConfiguredLengthValidator;
 use Quatrevieux\Form\Fixtures\FailingTransformerRequest;
 use Quatrevieux\Form\Fixtures\FooImplementation;

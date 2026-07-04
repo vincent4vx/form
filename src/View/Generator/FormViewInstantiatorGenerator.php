@@ -3,11 +3,11 @@
 namespace Quatrevieux\Form\View\Generator;
 
 use Closure;
+use Quatrevieux\Form\Choice\View\FieldChoiceViewProviderInterface;
 use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Util\Expr;
 use Quatrevieux\Form\View\FieldView;
-use Quatrevieux\Form\View\Provider\FieldChoiceProviderInterface;
 use Quatrevieux\Form\View\Provider\FieldViewProviderConfigurationInterface;
 use Quatrevieux\Form\View\RuntimeFormViewInstantiator;
 
@@ -85,13 +85,14 @@ final class FormViewInstantiatorGenerator
      * @param Closure(string, string, ?string):string $baseExpression FieldView instantiation expression generator
      * @return Closure(string, string, ?string):string The FieldView expression generator with choices
      */
-    private function generateChoices(Closure $baseExpression, FieldChoiceProviderInterface $choicesProvider, string $fieldName): Closure
+    private function generateChoices(Closure $baseExpression, FieldChoiceViewProviderInterface $choicesProvider, string $fieldName): Closure
     {
         return function (string $valueAccessor, string $errorAccessor, ?string $rootFieldNameAccessor) use ($baseExpression, $choicesProvider, $fieldName) {
             $transformer = Expr::this()->transformer->fieldTransformer($fieldName);
             $translator = Expr::this()->registry->getTranslator();
+            $registry = Expr::this()->registry;
 
-            $choices = Expr::value($choicesProvider)->choices(Code::raw($valueAccessor), $transformer);
+            $choices = Expr::value($choicesProvider)->choiceViews(Code::raw($valueAccessor), $transformer, $registry);
             $fieldViewExpr = Code::expr($baseExpression($valueAccessor, $errorAccessor, $rootFieldNameAccessor));
 
             return $fieldViewExpr->choices($choices, $translator);

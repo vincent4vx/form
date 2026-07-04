@@ -2,15 +2,14 @@
 
 namespace Quatrevieux\Form\Transformer\Field;
 
+use Quatrevieux\Form\Choice\Label\LabelInterface;
+use Quatrevieux\Form\Choice\Label\LabelTrait;
 use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\FormTestCase;
 use Quatrevieux\Form\Transformer\Generator\FormTransformerGenerator;
 use Quatrevieux\Form\Validator\Constraint\ConstraintInterface;
-use Quatrevieux\Form\View\LabelInterface;
-use Quatrevieux\Form\View\LabelTrait;
 use Quatrevieux\Form\View\SelectTemplate;
 use Ramsey\Uuid\Uuid;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EnumTest extends FormTestCase
 {

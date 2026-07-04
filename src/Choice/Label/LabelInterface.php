@@ -1,7 +1,8 @@
 <?php
 
-namespace Quatrevieux\Form\View;
+namespace Quatrevieux\Form\Choice\Label;
 
+use Quatrevieux\Form\Choice\View\ChoiceView;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**

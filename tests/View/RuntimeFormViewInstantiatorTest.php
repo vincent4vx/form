@@ -2,11 +2,12 @@
 
 namespace Quatrevieux\Form\View;
 
+use Quatrevieux\Form\Choice\Choice;
+use Quatrevieux\Form\Choice\View\ChoiceView;
 use Quatrevieux\Form\DummyTranslator;
 use Quatrevieux\Form\Embedded\Embedded;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\FormTestCase;
-use Quatrevieux\Form\Validator\Constraint\Choice;
 use Quatrevieux\Form\Validator\FieldError;
 use Quatrevieux\Form\View\Provider\FieldViewConfiguration;
 

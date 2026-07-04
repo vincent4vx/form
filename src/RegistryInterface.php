@@ -39,6 +39,16 @@ interface RegistryInterface
     public function getConstraintValidator(string $className): ConstraintValidatorInterface;
 
     /**
+     * Get a service instance by its class name
+     *
+     * @param class-string<V> $className Service class name
+     *
+     * @return V
+     * @template V as object
+     */
+    public function getService(string $className): object;
+
+    /**
      * Get the configured translator instance
      * If no translator is configured, a {@see DummyTranslator} will be returned
      *

@@ -1,7 +1,8 @@
 <?php
 
-namespace Quatrevieux\Form\View;
+namespace Quatrevieux\Form\Choice\View;
 
+use Quatrevieux\Form\Choice\Label\LabelInterface;
 use Quatrevieux\Form\DummyTranslator;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;

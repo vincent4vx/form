@@ -4,7 +4,6 @@ namespace Quatrevieux\Form;
 
 use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\DataMapper\DataMapperFactoryInterface;
-use Quatrevieux\Form\DataMapper\DataMapperInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\FormTransformerFactoryInterface;
 use Quatrevieux\Form\Validator\Constraint\ConstraintValidatorInterface;
@@ -39,6 +38,17 @@ class DefaultRegistryTest extends TestCase
 
         $registry->setTranslator($translator = $this->createMock(TranslatorInterface::class));
         $this->assertSame($translator, $registry->getTranslator());
+    }
+
+    public function test_get_set_service()
+    {
+        $registry = new DefaultRegistry();
+
+        $registry->registerService($service = new \stdClass());
+        $this->assertSame($service, $registry->getService(\stdClass::class));
+
+        $registry->registerService($service = new \stdClass(), 'foo');
+        $this->assertSame($service, $registry->getService('foo'));
     }
 
     public function test_registerTransformer()

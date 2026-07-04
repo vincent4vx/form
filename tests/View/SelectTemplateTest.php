@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form\View;
 
+use Quatrevieux\Form\Choice\View\ChoiceView;
 use Quatrevieux\Form\FormTestCase;
 
 class SelectTemplateTest extends FormTestCase

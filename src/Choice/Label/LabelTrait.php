@@ -1,6 +1,6 @@
 <?php
 
-namespace Quatrevieux\Form\View;
+namespace Quatrevieux\Form\Choice\Label;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 

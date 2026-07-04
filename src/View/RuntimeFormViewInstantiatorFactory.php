@@ -2,9 +2,9 @@
 
 namespace Quatrevieux\Form\View;
 
+use Quatrevieux\Form\Choice\View\FieldChoiceViewProviderInterface;
 use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\HttpField;
-use Quatrevieux\Form\View\Provider\FieldChoiceProviderInterface;
 use Quatrevieux\Form\View\Provider\FieldViewAttributesProviderInterface;
 use Quatrevieux\Form\View\Provider\FieldViewConfiguration;
 use Quatrevieux\Form\View\Provider\FieldViewProviderConfigurationInterface;
@@ -115,9 +115,9 @@ final class RuntimeFormViewInstantiatorFactory implements FormViewInstantiatorFa
         return $attributes;
     }
 
-    private function choicesProvider(ReflectionProperty $property): ?FieldChoiceProviderInterface
+    private function choicesProvider(ReflectionProperty $property): ?FieldChoiceViewProviderInterface
     {
-        foreach ($property->getAttributes(FieldChoiceProviderInterface::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+        foreach ($property->getAttributes(FieldChoiceViewProviderInterface::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
             return $attribute->newInstance();
         }
 
