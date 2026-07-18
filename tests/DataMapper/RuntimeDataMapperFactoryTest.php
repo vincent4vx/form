@@ -4,7 +4,9 @@ namespace Quatrevieux\Form\DataMapper;
 
 use ArrayObject;
 use Quatrevieux\Form\DefaultRegistry;
+use Quatrevieux\Form\Fixtures\RequiredParametersRequestConstructor;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
+use Quatrevieux\Form\Fixtures\SimpleRequestConstructor;
 use Quatrevieux\Form\FormTestCase;
 
 class RuntimeDataMapperFactoryTest extends FormTestCase
@@ -16,6 +18,24 @@ class RuntimeDataMapperFactoryTest extends FormTestCase
 
         $this->assertEquals(new PublicPropertyDataMapper(SimpleRequest::class), $dataMapper);
         $this->assertSame(SimpleRequest::class, $dataMapper->className());
+    }
+
+    public function test_create_simple_constructor()
+    {
+        $factory = new RuntimeDataMapperFactory($registry = new DefaultRegistry());
+        $dataMapper = $factory->create(SimpleRequestConstructor::class);
+
+        $this->assertEquals(new ConstructorDataMapper(SimpleRequestConstructor::class, $registry), $dataMapper);
+        $this->assertSame(SimpleRequestConstructor::class, $dataMapper->className());
+    }
+
+    public function test_create_constructor_required_parameters()
+    {
+        $factory = new RuntimeDataMapperFactory($registry = new DefaultRegistry());
+        $dataMapper = $factory->create(RequiredParametersRequestConstructor::class);
+
+        $this->assertEquals(new ConstructorDataMapper(RequiredParametersRequestConstructor::class, $registry), $dataMapper);
+        $this->assertSame(RequiredParametersRequestConstructor::class, $dataMapper->className());
     }
 
     public function test_create_with_custom_data_mapper()
