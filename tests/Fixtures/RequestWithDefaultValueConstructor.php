@@ -2,10 +2,6 @@
 
 namespace Quatrevieux\Form\Fixtures;
 
-use Quatrevieux\Form\DataMapper\ConstructorDataMapper;
-use Quatrevieux\Form\DataMapper\InstantiateWith;
-
-#[InstantiateWith(ConstructorDataMapper::class)]
 class RequestWithDefaultValueConstructor
 {
     public function __construct(
