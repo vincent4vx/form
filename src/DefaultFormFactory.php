@@ -69,7 +69,7 @@ final class DefaultFormFactory implements FormFactoryInterface
     {
         $registry ??= new DefaultRegistry();
 
-        $registry->setDataMapperFactory($dataMapperFactory = new RuntimeDataMapperFactory());
+        $registry->setDataMapperFactory($dataMapperFactory = new RuntimeDataMapperFactory($registry));
         $registry->setValidatorFactory($validatorFactory = new RuntimeValidatorFactory($registry));
         $registry->setTransformerFactory($transformerFactory = new RuntimeFormTransformerFactory($registry));
 
@@ -96,6 +96,7 @@ final class DefaultFormFactory implements FormFactoryInterface
         $registry ??= new DefaultRegistry();
 
         $registry->setDataMapperFactory($dataMapperFactory = new GeneratedDataMapperFactory(
+            $registry,
             savePathResolver: $savePathResolver,
         ));
         $registry->setValidatorFactory($validatorFactory = new GeneratedValidatorFactory(

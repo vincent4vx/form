@@ -29,17 +29,22 @@ class DataMapperGeneratorTest extends TestCase
 
 class DataMapperWithSimpleProperties implements Quatrevieux\Form\DataMapper\DataMapperInterface
 {
+    public function __construct(
+        public readonly Quatrevieux\Form\RegistryInterface $registry,
+    ) {
+    }
+
     function className(): string
     {
         return Quatrevieux\Form\Fixtures\SimpleRequest::class;
     }
 
-    function toDataObject(array $fields): object
+    function toDataObject(array $fields): Quatrevieux\Form\DataMapper\DataMapperResult
     {
         $object = new \Quatrevieux\Form\Fixtures\SimpleRequest();
         $object->foo = $fields['foo'] ?? null;
         $object->bar = $fields['bar'] ?? null;
-        return $object;
+        return new \Quatrevieux\Form\DataMapper\DataMapperResult($object);
     }
 
     function toArray(object $data): array
@@ -63,12 +68,17 @@ PHP, $code);
 
 class DataMapperWithNonNullableProperties implements Quatrevieux\Form\DataMapper\DataMapperInterface
 {
+    public function __construct(
+        public readonly Quatrevieux\Form\RegistryInterface $registry,
+    ) {
+    }
+
     function className(): string
     {
         return Quatrevieux\Form\Fixtures\RequiredParametersRequest::class;
     }
 
-    function toDataObject(array $fields): object
+    function toDataObject(array $fields): Quatrevieux\Form\DataMapper\DataMapperResult
     {
         $object = new \Quatrevieux\Form\Fixtures\RequiredParametersRequest();
         if (($__tmp_acbd18db4cc2f85cedef654fccc4a4d8 = $fields['foo'] ?? null) !== null) {
@@ -77,7 +87,7 @@ class DataMapperWithNonNullableProperties implements Quatrevieux\Form\DataMapper
         if (($__tmp_37b51d194a7513e45b56f6524f2d51f2 = $fields['bar'] ?? null) !== null) {
             $object->bar = $__tmp_37b51d194a7513e45b56f6524f2d51f2;
         }
-        return $object;
+        return new \Quatrevieux\Form\DataMapper\DataMapperResult($object);
     }
 
     function toArray(object $data): array

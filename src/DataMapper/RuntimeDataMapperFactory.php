@@ -2,6 +2,7 @@
 
 namespace Quatrevieux\Form\DataMapper;
 
+use Quatrevieux\Form\RegistryInterface;
 use ReflectionAttribute;
 use ReflectionClass;
 
@@ -11,6 +12,10 @@ use ReflectionClass;
  */
 final class RuntimeDataMapperFactory implements DataMapperFactoryInterface
 {
+    public function __construct(
+        private readonly RegistryInterface $registry,
+    ) {}
+
     /**
      * {@inheritdoc}
      */
@@ -19,7 +24,7 @@ final class RuntimeDataMapperFactory implements DataMapperFactoryInterface
         $dataMapper = null;
 
         foreach ((new ReflectionClass($dataClass))->getAttributes(DataMapperProviderInterface::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-            $dataMapper = $attribute->newInstance()->getDataMapper($dataClass);
+            $dataMapper = $attribute->newInstance()->getDataMapper($dataClass, $this->registry);
         }
 
         return $dataMapper ?? new PublicPropertyDataMapper($dataClass);

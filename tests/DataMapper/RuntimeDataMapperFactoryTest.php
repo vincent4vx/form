@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\DataMapper;
 
 use ArrayObject;
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
 use Quatrevieux\Form\FormTestCase;
 
@@ -10,7 +11,7 @@ class RuntimeDataMapperFactoryTest extends FormTestCase
 {
     public function test_create_simple()
     {
-        $factory = new RuntimeDataMapperFactory();
+        $factory = new RuntimeDataMapperFactory(new DefaultRegistry());
         $dataMapper = $factory->create(SimpleRequest::class);
 
         $this->assertEquals(new PublicPropertyDataMapper(SimpleRequest::class), $dataMapper);
@@ -19,7 +20,7 @@ class RuntimeDataMapperFactoryTest extends FormTestCase
 
     public function test_create_with_custom_data_mapper()
     {
-        $factory = new RuntimeDataMapperFactory();
+        $factory = new RuntimeDataMapperFactory(new DefaultRegistry());
         $dataMapper = $factory->create(FormWithCustomDataMapper::class);
 
         $this->assertEquals(new CustomDataMapper(FormWithCustomDataMapper::class), $dataMapper);
@@ -27,12 +28,13 @@ class RuntimeDataMapperFactoryTest extends FormTestCase
 
         $dto = $dataMapper->toDataObject(['foo' => 'bar', 'bar' => 42]);
 
-        $this->assertInstanceOf(FormWithCustomDataMapper::class, $dto);
-        $this->assertSame('bar', $dto->foo);
-        $this->assertSame(42, $dto->bar);
-        $this->assertEquals(['foo' => 'bar', 'bar' => 42], $dto->getArrayCopy());
+        $this->assertSame([], $dto->errors);
+        $this->assertInstanceOf(FormWithCustomDataMapper::class, $dto->dto);
+        $this->assertSame('bar', $dto->dto->foo);
+        $this->assertSame(42, $dto->dto->bar);
+        $this->assertEquals(['foo' => 'bar', 'bar' => 42], $dto->dto->getArrayCopy());
 
-        $this->assertEquals(['foo' => 'bar', 'bar' => 42], $dataMapper->toArray($dto));
+        $this->assertEquals(['foo' => 'bar', 'bar' => 42], $dataMapper->toArray($dto->dto));
     }
 }
 
@@ -50,11 +52,11 @@ class CustomDataMapper implements DataMapperInterface
     ) {
     }
 
-    public function toDataObject(array $fields): object
+    public function toDataObject(array $fields): DataMapperResult
     {
         $class = $this->className;
 
-        return new $class($fields, ArrayObject::ARRAY_AS_PROPS | ArrayObject::STD_PROP_LIST);
+        return new DataMapperResult(new $class($fields, ArrayObject::ARRAY_AS_PROPS | ArrayObject::STD_PROP_LIST));
     }
 
     public function toArray(object $data): array

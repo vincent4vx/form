@@ -8,6 +8,7 @@ use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
 use Quatrevieux\Form\DataMapper\DataMapperInterface;
+use Quatrevieux\Form\RegistryInterface;
 
 /**
  * Class generator helper for generates {@see DataMapperInterface} class
@@ -33,6 +34,12 @@ final class DataMapperClass
         $this->toArrayMethod = Method::from([DataMapperInterface::class, 'toArray'])->setComment(null);
 
         $this->class->addImplement(DataMapperInterface::class);
+
+        $this->class->addMethod('__construct')
+            ->setVisibility('public')
+            ->addPromotedParameter('registry')->setType(RegistryInterface::class)->setReadOnly()
+        ;
+
         $this->class->addMember($this->classNameMethod);
         $this->class->addMember($this->toDataObjectMethod);
         $this->class->addMember($this->toArrayMethod);
