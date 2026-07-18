@@ -99,8 +99,8 @@ final class ConstructorDataMapper implements DataMapperInterface, DataMapperType
         $newDtoCode = Code::new($this->className, $parametersCode);
 
         // Handle required parameters errors
-        $requiredParameters = array_filter($parameters, static fn (ConstructorParameterMetadata $param) => $param->required);
-        $requiredParametersErrors = array_map(static fn (ConstructorParameterMetadata $param) => $param->requiredMessage, $requiredParameters);
+        $requiredParameters = array_filter($parameters, static fn(ConstructorParameterMetadata $param) => $param->required);
+        $requiredParametersErrors = array_map(static fn(ConstructorParameterMetadata $param) => $param->requiredMessage, $requiredParameters);
         $requiredParametersErrorsCode = Code::value($requiredParametersErrors);
 
         $newFieldErrorCode = Code::new(FieldError::class, [new Expr('$message'), [], Required::CODE, Expr::this()->registry->getTranslator()]);
@@ -181,7 +181,7 @@ final class ConstructorDataMapper implements DataMapperInterface, DataMapperType
         return $this->parameters = $parameters;
     }
 
-    private function resolveFallbackValueFromType(ReflectionType|null $type): mixed
+    private function resolveFallbackValueFromType(?ReflectionType $type): mixed
     {
         if (!$type || $type->allowsNull()) {
             return null;
