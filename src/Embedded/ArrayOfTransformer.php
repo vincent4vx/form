@@ -50,7 +50,7 @@ final class ArrayOfTransformer implements ConfigurableFieldTransformerInterface,
             if ($transformationResult->errors) {
                 $errors[$key] = $transformationResult->errors;
             } else {
-                $result[$key] = $dataMapper->toDataObject($transformationResult->values);
+                $result[$key] = $dataMapper->toDataObject($transformationResult->values)->dto;
             }
         }
 
@@ -102,7 +102,7 @@ final class ArrayOfTransformer implements ConfigurableFieldTransformerInterface,
                 . 'if ($transformationResult->errors) {'
                     . '$errors[$key] = $transformationResult->errors;'
                 . '} else {'
-                    . '$result[$key] = $dataMapper->toDataObject($transformationResult->values);'
+                    . '$result[$key] = $dataMapper->toDataObject($transformationResult->values)->dto;'
                 . '}'
             . '}'
             . 'if ($errors) {'

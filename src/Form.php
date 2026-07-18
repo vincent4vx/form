@@ -46,13 +46,13 @@ final class Form implements FormInterface
     {
         $transformation = $this->transformer->transformFromHttp($data);
         $dto = $this->dataMapper->toDataObject($transformation->values);
-        $errors = $this->validator->validate($dto, $transformation->errors);
+        $errors = $this->validator->validate($dto->dto, $transformation->errors + $dto->errors);
 
         return new SubmittedForm(
             $this,
             $this->viewInstantiator,
             $data,
-            $dto,
+            $dto->dto,
             $errors,
         );
     }

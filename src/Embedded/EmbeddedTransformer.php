@@ -47,7 +47,7 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
             throw new TransformerException('Embedded form has errors', $transformationResult->errors);
         }
 
-        return $dataMapper->toDataObject($transformationResult->values);
+        return $dataMapper->toDataObject($transformationResult->values)->dto;
     }
 
     /**
@@ -79,7 +79,7 @@ final class EmbeddedTransformer implements ConfigurableFieldTransformerInterface
         $transformationResultVarName = Expr::varName($transformationResult);
         $transformerException = Code::new(TransformerException::class, ['Embedded form has errors', $transformationResultVarName->errors]);
 
-        return "is_array({$varName} = {$previousExpression}) ? {$dataMapper}->toDataObject(({$transformationResultVarName} = {$transformationResult})->errors ? throw {$transformerException} : {$transformationResultVarName}->values) : null";
+        return "is_array({$varName} = {$previousExpression}) ? {$dataMapper}->toDataObject(({$transformationResultVarName} = {$transformationResult})->errors ? throw {$transformerException} : {$transformationResultVarName}->values)->dto : null";
     }
 
     /**

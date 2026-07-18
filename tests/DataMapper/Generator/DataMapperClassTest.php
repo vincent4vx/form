@@ -19,12 +19,17 @@ class DataMapperClassTest extends TestCase
 
 class MyDataMapper implements Quatrevieux\Form\DataMapper\DataMapperInterface
 {
+    public function __construct(
+        public readonly Quatrevieux\Form\RegistryInterface $registry,
+    ) {
+    }
+
     function className(): string
     {
         return MyDto::class;
     }
 
-    function toDataObject(array $fields): object
+    function toDataObject(array $fields): Quatrevieux\Form\DataMapper\DataMapperResult
     {
         return MyDto::create($data);
     }

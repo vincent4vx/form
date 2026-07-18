@@ -23,12 +23,12 @@ interface DataMapperInterface
      * Fields passed to this method must be transformed to the correct type.
      *
      * @param array<string, mixed> $fields Associative array of fields, where keys are field names and values are field values.
-     * @return T
+     * @return DataMapperResult<T>
      *
      * @see FormTransformerInterface::transformFromHttp() For converting HTTP data to the correct type, to be passed to this method
      * @see DataMapperInterface::toArray() For the reverse operation
      */
-    public function toDataObject(array $fields): object;
+    public function toDataObject(array $fields): DataMapperResult;
 
     /**
      * Extract the data object into an associative array of fields

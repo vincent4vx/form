@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\DataMapper;
 
 use PHPUnit\Framework\TestCase;
+use Quatrevieux\Form\DefaultRegistry;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
 
 class GeneratedDataMapperFactoryTest extends TestCase
@@ -12,6 +13,7 @@ class GeneratedDataMapperFactoryTest extends TestCase
     protected function setUp(): void
     {
         $this->factory = new GeneratedDataMapperFactory(
+            new DefaultRegistry(),
             savePathResolver: fn(string $className) => __DIR__.'/_tmp/'.$className.'.php',
             classNameResolver: fn(string $dataClass) => 'Test'.(new \ReflectionClass($dataClass))->getShortName().'DataMapper'
         );
@@ -46,17 +48,22 @@ class GeneratedDataMapperFactoryTest extends TestCase
 
 class TestSimpleRequestDataMapper implements Quatrevieux\Form\DataMapper\DataMapperInterface
 {
+    public function __construct(
+        public readonly Quatrevieux\Form\RegistryInterface $registry,
+    ) {
+    }
+
     function className(): string
     {
         return Quatrevieux\Form\Fixtures\SimpleRequest::class;
     }
 
-    function toDataObject(array $fields): object
+    function toDataObject(array $fields): Quatrevieux\Form\DataMapper\DataMapperResult
     {
         $object = new \Quatrevieux\Form\Fixtures\SimpleRequest();
         $object->foo = $fields['foo'] ?? null;
         $object->bar = $fields['bar'] ?? null;
-        return $object;
+        return new \Quatrevieux\Form\DataMapper\DataMapperResult($object);
     }
 
     function toArray(object $data): array

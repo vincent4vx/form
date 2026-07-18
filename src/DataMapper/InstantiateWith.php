@@ -3,6 +3,7 @@
 namespace Quatrevieux\Form\DataMapper;
 
 use Attribute;
+use Quatrevieux\Form\RegistryInterface;
 
 /**
  * Define data mapper class to use for instantiate data object
@@ -29,9 +30,9 @@ final class InstantiateWith implements DataMapperProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getDataMapper(string $dataClassName): DataMapperInterface
+    public function getDataMapper(string $dataClassName, RegistryInterface $registry): DataMapperInterface
     {
         $className = $this->dataMapperClassName;
-        return new $className($dataClassName);
+        return new $className($dataClassName, $registry);
     }
 }

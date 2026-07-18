@@ -10,6 +10,7 @@ use ReflectionProperty;
 use TypeError;
 
 use function get_object_vars;
+use function sprintf;
 
 /**
  * Simple data mapper implementation using default constructor and fill directly public properties
@@ -40,7 +41,7 @@ final class PublicPropertyDataMapper implements DataMapperInterface, DataMapperT
     /**
      * {@inheritdoc}
      */
-    public function toDataObject(array $fields): object
+    public function toDataObject(array $fields): DataMapperResult
     {
         $className = $this->className;
         $object = new $className();
@@ -53,7 +54,7 @@ final class PublicPropertyDataMapper implements DataMapperInterface, DataMapperT
             }
         }
 
-        return $object;
+        return new DataMapperResult($object);
     }
 
     /**
@@ -92,7 +93,7 @@ final class PublicPropertyDataMapper implements DataMapperInterface, DataMapperT
             }
         }
 
-        $code .= 'return $object;';
+        $code .= sprintf('return new \%s($object);', DataMapperResult::class);
 
         return $code;
     }

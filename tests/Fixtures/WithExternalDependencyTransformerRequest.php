@@ -2,6 +2,8 @@
 
 namespace Quatrevieux\Form\Fixtures;
 
+use Quatrevieux\Form\DataMapper\ConstructorDataMapper;
+use Quatrevieux\Form\DataMapper\InstantiateWith;
 use Quatrevieux\Form\RegistryInterface;
 use Quatrevieux\Form\Transformer\Field\ConfigurableFieldTransformerInterface;
 use Quatrevieux\Form\Transformer\Field\DelegatedFieldTransformerInterface;
@@ -10,6 +12,15 @@ class WithExternalDependencyTransformerRequest
 {
     #[FooTransformer('aqw')]
     public string $foo;
+}
+
+#[InstantiateWith(ConstructorDataMapper::class)]
+class WithExternalDependencyTransformerRequestConstructor
+{
+    public function __construct(
+        #[FooTransformer('aqw')]
+        public readonly string $foo,
+    ) {}
 }
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
