@@ -6,6 +6,7 @@ use Quatrevieux\Form\Util\Code;
 use Quatrevieux\Form\Util\Expr;
 use ReflectionClass;
 use stdClass;
+use UnitEnum;
 
 use function is_object;
 
@@ -20,7 +21,11 @@ final class ConstructorParameterMetadata
 
     public function compiledFallback(): string
     {
-        if (is_object($this->fallback) && $this->fallback::class !== stdClass::class) {
+        if (
+            is_object($this->fallback)
+            && $this->fallback::class !== stdClass::class
+            && !$this->fallback instanceof UnitEnum
+        ) {
             return (string) Expr::new(ReflectionClass::class, [$this->fallback::class])->newInstanceWithoutConstructor();
         }
 
