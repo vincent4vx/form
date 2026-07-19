@@ -13,6 +13,7 @@ use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionType;
+use stdClass;
 
 use function array_filter;
 use function array_map;
@@ -93,7 +94,7 @@ final class ConstructorDataMapper implements DataMapperInterface, DataMapperType
         $parametersCode = [];
 
         foreach ($parameters as $parameter) {
-            $parametersCode[$parameter->name] = new Expr(sprintf('$fields[%s] ?? %s', Code::value($parameter->name), Code::value($parameter->fallback)));
+            $parametersCode[$parameter->name] = new Expr(sprintf('$fields[%s] ?? %s', Code::value($parameter->name), $parameter->compiledFallback()));
         }
 
         $newDtoCode = Code::new($this->className, $parametersCode);
@@ -191,12 +192,18 @@ final class ConstructorDataMapper implements DataMapperInterface, DataMapperType
             throw new LogicException(sprintf('Cannot use complex type with %s on %s', self::class, $this->className));
         }
 
+        if (!$type->isBuiltin()) {
+            // @phpstan-ignore-next-line
+            return (new ReflectionClass($type->getName()))->newInstanceWithoutConstructor();
+        }
+
         return match ($type->getName()) {
             'int' => 0,
             'float' => 0.0,
             'string' => '',
             'bool' => false,
             'array' => [],
+            'object' => new stdClass(),
             default => throw new LogicException(sprintf('Cannot resolve fallback value for type %s on %s', $type->getName(), $this->className)),
         };
     }
