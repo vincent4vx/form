@@ -193,6 +193,7 @@ final class ConstructorDataMapper implements DataMapperInterface, DataMapperType
         }
 
         if (!$type->isBuiltin()) {
+            // @phpstan-ignore-next-line
             return (new ReflectionClass($type->getName()))->newInstanceWithoutConstructor();
         }
 
