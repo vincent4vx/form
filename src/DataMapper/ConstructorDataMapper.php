@@ -13,7 +13,6 @@ use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionType;
-
 use stdClass;
 
 use function array_filter;
