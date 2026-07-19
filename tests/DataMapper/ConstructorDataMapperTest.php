@@ -5,7 +5,9 @@ namespace Quatrevieux\Form\DataMapper;
 use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\DataMapper\Generator\DataMapperGenerator;
 use Quatrevieux\Form\DefaultRegistry;
+use Quatrevieux\Form\Fixtures\ConstructorWithSimpleEnum;
 use Quatrevieux\Form\Fixtures\EmbeddedFormConstructor;
+use Quatrevieux\Form\Fixtures\MySimpleEnum;
 use Quatrevieux\Form\Fixtures\RequestWithDefaultValueConstructor;
 use Quatrevieux\Form\Fixtures\RequiredParametersRequestConstructor;
 use Quatrevieux\Form\Fixtures\SimpleRequestConstructor;
@@ -148,7 +150,6 @@ PHP, $mapper->generateToDataObject($mapper));
         $this->assertEquals('This value is required', (string) $dto->errors['bar']);
         $this->assertEquals('This value is required', (string) $dto->errors['embedded']);
 
-
         $dto = $mapper->toDataObject([
             'foo' => 'azerty',
             'bar' => 'uiop',
@@ -175,6 +176,47 @@ PHP, $mapper->generateToDataObject($mapper));
                 $dto = new \Quatrevieux\Form\Fixtures\WithEmbeddedConstructor(foo: $fields['foo'] ?? '', bar: $fields['bar'] ?? '', embedded: $fields['embedded'] ?? (new \ReflectionClass('Quatrevieux\\Form\\Fixtures\\EmbeddedFormConstructor'))->newInstanceWithoutConstructor());
 
                 foreach (['foo' => 'This value is required', 'bar' => 'This value is required', 'embedded' => 'This value is required'] as $field => $message) {
+                    if (!isset($fields[$field])) {
+                        $errors[$field] = new \Quatrevieux\Form\Validator\FieldError($message, [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5', $this->registry->getTranslator());
+                    }
+                }
+
+                return new \Quatrevieux\Form\DataMapper\DataMapperResult($dto, $errors);
+            PHP,
+            $mapper->generateToDataObject($mapper)
+        );
+    }
+
+    public function test_with_enum()
+    {
+        $mapper = new ConstructorDataMapper(ConstructorWithSimpleEnum::class, new DefaultRegistry());
+
+        $dto = $mapper->toDataObject([]);
+
+        $this->assertSame(ConstructorWithSimpleEnum::class, $mapper->className());
+        $this->assertInstanceOf(ConstructorWithSimpleEnum::class, $dto->dto);
+
+        $this->assertSame(MySimpleEnum::Foo, $dto->dto->enum);
+
+        $this->assertCount(1, $dto->errors);
+        $this->assertEquals('This value is required', (string) $dto->errors['enum']);
+
+        $dto = $mapper->toDataObject([
+            'enum' => MySimpleEnum::Bar,
+        ]);
+
+        $this->assertEquals(new ConstructorWithSimpleEnum(
+            enum: MySimpleEnum::Bar
+        ), $dto->dto);
+
+        $this->assertEmpty($dto->errors);
+
+        $this->assertSame(
+            <<<'PHP'
+                $errors = [];
+                $dto = new \Quatrevieux\Form\Fixtures\ConstructorWithSimpleEnum(enum: $fields['enum'] ?? \Quatrevieux\Form\Fixtures\MySimpleEnum::Foo);
+
+                foreach (['enum' => 'This value is required'] as $field => $message) {
                     if (!isset($fields[$field])) {
                         $errors[$field] = new \Quatrevieux\Form\Validator\FieldError($message, [], 'b1ac3a70-06db-5cd6-8f0e-8e6b98b3fcb5', $this->registry->getTranslator());
                     }
