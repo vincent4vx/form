@@ -7,6 +7,7 @@ use PhpBench\Reflection\ReflectionClass;
 use PHPUnit\Framework\TestCase;
 use Quatrevieux\Form\Fixtures\ConfiguredLengthValidator;
 use Quatrevieux\Form\Fixtures\SimpleRequest;
+use Quatrevieux\Form\Fixtures\SimpleRequestConstructor;
 use Quatrevieux\Form\Fixtures\TestConfig;
 use Quatrevieux\Form\Fixtures\WithExternalDependencyConstraintRequest;
 use Quatrevieux\Form\Util\Functions;
@@ -44,6 +45,34 @@ class DefaultFormFactoryTest extends TestCase
         $this->assertInstanceOf(SimpleRequest::class, $form->submit([])->value());
 
         $this->assertSame($form, $factory->create(SimpleRequest::class));
+    }
+
+    public function test_create_with_data()
+    {
+        $factory = DefaultFormFactory::runtime();
+        $form = $factory->create(SimpleRequest::class, ['foo' => 'aaaa']);
+
+        $this->assertInstanceOf(ImportedForm::class, $form);
+        $this->assertSame('aaaa', $form->value()->foo);
+        $this->assertFalse(isset($form->value()->bar));
+
+        $expected = new SimpleRequest();
+        $expected->foo = 'aaaa';
+        $expected->bar = 'bbbb';
+        $this->assertEquals($expected, $form->submit(['bar' => 'bbbb'])->value());
+    }
+
+    public function test_create_with_data_constructor()
+    {
+        $factory = DefaultFormFactory::runtime();
+        $form = $factory->create(SimpleRequestConstructor::class, ['foo' => 'aaaa']);
+
+        $this->assertInstanceOf(ImportedForm::class, $form);
+        $this->assertSame('aaaa', $form->value()->foo);
+        $this->assertFalse(isset($form->value()->bar));
+
+        $expected = new SimpleRequestConstructor('aaaa', 'bbbb');
+        $this->assertEquals($expected, $form->submit(['bar' => 'bbbb'])->value());
     }
 
     public function test_import()

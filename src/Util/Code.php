@@ -84,20 +84,28 @@ final class Code
     public static function instantiate(object $o): string
     {
         $reflection = new ReflectionClass($o);
+        $constructor = $reflection->getConstructor();
+
+        if (!$constructor) {
+            return self::new($o::class);
+        }
 
         $properties = [];
 
-        foreach ($reflection->getProperties() as $property) {
-            if ($property->isPromoted()) {
-                $value = $property->getValue($o);
+        foreach ($constructor->getParameters() as $parameter) {
+            if (!$parameter->isPromoted()) {
+                continue;
+            }
 
-                if ($value !== $property->getDefaultValue()) {
-                    $properties[$property->name] = $property->getValue($o);
-                }
+            $property = $reflection->getProperty($parameter->name);
+            $value = $property->getValue($o);
+
+            if (!$parameter->isDefaultValueAvailable() || $value !== $parameter->getDefaultValue()) {
+                $properties[$property->name] = $value;
             }
         }
 
-        return self::new(get_class($o), $properties);
+        return self::new($o::class, $properties);
     }
 
     /**

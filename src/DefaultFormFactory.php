@@ -39,8 +39,12 @@ final class DefaultFormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(string $dataClass): FormInterface
+    public function create(string $dataClass, array $data = []): FormInterface
     {
+        if ($data) {
+            return $this->import($this->dataMapperFactory->create($dataClass)->toDataObject($data)->dto);
+        }
+
         return $this->cache[$dataClass] ??= new Form(
             $this->transformerFactory->create($dataClass),
             $this->dataMapperFactory->create($dataClass),
