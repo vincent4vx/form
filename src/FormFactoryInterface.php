@@ -11,12 +11,13 @@ interface FormFactoryInterface
      * Create a form instance which handle given DTO class
      *
      * @param class-string<T> $dataClass DTO class name
+     * @param array<string, mixed> $data Initial data to populate the form. Keys must corresponds to form properties. Partial data are accepted.
      *
      * @return FormInterface<T>
      *
      * @template T as object
      */
-    public function create(string $dataClass): FormInterface;
+    public function create(string $dataClass, array $data = []): FormInterface;
 
     /**
      * Create a form and import data into it

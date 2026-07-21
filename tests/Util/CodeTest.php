@@ -31,9 +31,9 @@ class CodeTest extends TestCase
         $this->assertSame("['foo', 123]", Code::value(['foo', 123]));
         $this->assertSame("['foo' => 123, 'bar' => 456]", Code::value(['foo' => 123, 'bar' => 456]));
         $this->assertSame("(object) ['foo' => 'bar']", Code::value((object) ['foo' => 'bar']));
-        $this->assertSame("new \Quatrevieux\Form\Transformer\Field\Csv(separator: ';', enclosure: '')", Code::value(new Csv(separator: ';')));
+        $this->assertSame("new \Quatrevieux\Form\Transformer\Field\Csv(separator: ';')", Code::value(new Csv(separator: ';')));
         $this->assertSame("\Quatrevieux\Form\Transformer\Field\CastType::Int", Code::value(CastType::Int));
-        $this->assertSame("[new \Quatrevieux\Form\Transformer\Field\Csv(separator: ';', enclosure: ''), new \Quatrevieux\Form\Transformer\Field\ArrayCast(elementType: \Quatrevieux\Form\Transformer\Field\CastType::Int, preserveKeys: true)]", Code::value([new Csv(separator: ';'), new ArrayCast(CastType::Int)]));
+        $this->assertSame("[new \Quatrevieux\Form\Transformer\Field\Csv(separator: ';'), new \Quatrevieux\Form\Transformer\Field\ArrayCast(elementType: \Quatrevieux\Form\Transformer\Field\CastType::Int)]", Code::value([new Csv(separator: ';'), new ArrayCast(CastType::Int)]));
         $this->assertSame('$foo', Code::value(Code::raw('$foo')));
         $this->assertSame('new \DateTimeZone(\'Europe/Paris\')', Code::value(new \DateTimeZone('Europe/Paris')));
     }

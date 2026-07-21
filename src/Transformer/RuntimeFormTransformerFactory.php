@@ -100,7 +100,7 @@ final class RuntimeFormTransformerFactory implements FormTransformerFactoryInter
     {
         $transformers = [];
         $needCast = $property->hasType();
-        $needDefaultValue = $property->getDefaultValue() !== null;
+        $needDefaultValue = $property->hasDefaultValue() && $property->getDefaultValue() !== null;
 
         foreach ($property->getAttributes() as $attribute) {
             $className = $attribute->getName();
