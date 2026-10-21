@@ -62,7 +62,7 @@ abstract class AbstractComparisonConstraint extends SelfValidatedConstraint impl
             static::CODE,
         ]);
 
-        return FieldErrorExpression::single(fn(string $accessor): string => "is_scalar({$accessor}) && !({$accessor} {$this->operator()} {$expected}) ? {$error} : null");
+        return FieldErrorExpression::single(fn(string $accessor): string => "(is_scalar({$accessor}) && !({$accessor} {$this->operator()} {$expected}) ? {$error} : null)");
     }
 
     /**

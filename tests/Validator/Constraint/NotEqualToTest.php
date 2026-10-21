@@ -36,7 +36,7 @@ class NotEqualToTest extends FormTestCase
     {
         $constraint = new NotEqualTo(value: 'bar');
 
-        $this->assertGeneratedValidator('is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) != \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should not be equal to {{ value }}.\', [\'value\' => \'bar\'], \'64ea4d23-adda-57cc-81eb-fdfe82610ec9\') : null', $constraint);
+        $this->assertGeneratedValidator('(is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) != \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should not be equal to {{ value }}.\', [\'value\' => \'bar\'], \'64ea4d23-adda-57cc-81eb-fdfe82610ec9\') : null)', $constraint);
     }
 }
 

@@ -36,7 +36,7 @@ class GreaterThanTest extends FormTestCase
     {
         $constraint = new GreaterThan(value: 'bar');
 
-        $this->assertGeneratedValidator('is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) > \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should be greater than {{ value }}.\', [\'value\' => \'bar\'], \'53c005df-2c8c-5bd6-9fcf-923c82500a9d\') : null', $constraint);
+        $this->assertGeneratedValidator('(is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) > \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should be greater than {{ value }}.\', [\'value\' => \'bar\'], \'53c005df-2c8c-5bd6-9fcf-923c82500a9d\') : null)', $constraint);
     }
 }
 

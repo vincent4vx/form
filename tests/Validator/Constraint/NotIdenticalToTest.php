@@ -36,7 +36,7 @@ class NotIdenticalToTest extends FormTestCase
     {
         $constraint = new NotIdenticalTo(value: 'bar');
 
-        $this->assertGeneratedValidator('is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) !== \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should not be same as {{ value }}.\', [\'value\' => \'bar\'], \'9ca21c2d-bea0-5848-a218-91eb6cabd3f9\') : null', $constraint);
+        $this->assertGeneratedValidator('(is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) !== \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should not be same as {{ value }}.\', [\'value\' => \'bar\'], \'9ca21c2d-bea0-5848-a218-91eb6cabd3f9\') : null)', $constraint);
     }
 }
 
