@@ -36,7 +36,7 @@ class GreaterThanOrEqualTest extends FormTestCase
     {
         $constraint = new GreaterThanOrEqual(value: 'bar');
 
-        $this->assertGeneratedValidator('is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) >= \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should be greater than or equal to {{ value }}.\', [\'value\' => \'bar\'], \'fbe34b3a-b434-5047-8fa8-947d1a37583f\') : null', $constraint);
+        $this->assertGeneratedValidator('(is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) >= \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should be greater than or equal to {{ value }}.\', [\'value\' => \'bar\'], \'fbe34b3a-b434-5047-8fa8-947d1a37583f\') : null)', $constraint);
     }
 }
 

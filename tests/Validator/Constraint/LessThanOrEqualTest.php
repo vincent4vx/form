@@ -36,7 +36,7 @@ class LessThanOrEqualTest extends FormTestCase
     {
         $constraint = new LessThanOrEqual(value: 'bar');
 
-        $this->assertGeneratedValidator('is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) <= \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should be less than or equal to {{ value }}.\', [\'value\' => \'bar\'], \'00ca521f-5da3-5336-8469-20d7e571c2dc\') : null', $constraint);
+        $this->assertGeneratedValidator('(is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) <= \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should be less than or equal to {{ value }}.\', [\'value\' => \'bar\'], \'00ca521f-5da3-5336-8469-20d7e571c2dc\') : null)', $constraint);
     }
 }
 

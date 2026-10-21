@@ -36,7 +36,7 @@ class IdenticalToTest extends FormTestCase
     {
         $constraint = new IdenticalTo(value: 'bar');
 
-        $this->assertGeneratedValidator('is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) === \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should be same as {{ value }}.\', [\'value\' => \'bar\'], \'8072727f-84e9-580d-9abb-950ca33b4d55\') : null', $constraint);
+        $this->assertGeneratedValidator('(is_scalar(($data->foo ?? null)) && !(($data->foo ?? null) === \'bar\') ? new \Quatrevieux\Form\Validator\FieldError(\'The value should be same as {{ value }}.\', [\'value\' => \'bar\'], \'8072727f-84e9-580d-9abb-950ca33b4d55\') : null)', $constraint);
     }
 }
 
